@@ -21,6 +21,77 @@ interface SearchProps {
 }
 
 export default function Search({ onOpenRegistration }: SearchProps) {
+  const [activeCategory, setActiveCategory] = React.useState<string | null>(null);
+
+  const categories = [
+    { id: 'doctor', icon: Stethoscope, label: 'Doctores' },
+    { id: 'clinic', icon: Hospital, label: 'Clínicas' },
+    { id: 'pharmacy', icon: Store, label: 'Farmacias' },
+    { id: 'lab', icon: FlaskConical, label: 'Laboratorios' }
+  ];
+
+  const allItems = [
+    {
+      id: '1',
+      category: 'doctor',
+      name: 'Dr. Alejandro Martínez',
+      description: 'Cardiología Intervencionista',
+      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200',
+      rating: 4.9,
+      distance: '2.4 km',
+      status: 'Disponible Ahora',
+      statusType: 'available'
+    },
+    {
+      id: '2',
+      category: 'doctor',
+      name: 'Dra. Valentina Silva',
+      description: 'Neurología Clínica',
+      image: 'https://images.unsplash.com/photo-1559839734-2b71f1536783?auto=format&fit=crop&q=80&w=200',
+      rating: 4.8,
+      distance: '3.1 km',
+      status: 'Mañana, 09:00',
+      statusType: 'scheduled'
+    },
+    {
+      id: '3',
+      category: 'clinic',
+      name: 'Clínica Santa Clara',
+      description: 'Políclinico Multidisciplinario',
+      image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=200',
+      rating: 4.7,
+      distance: '1.2 km',
+      status: 'Abierto 24h',
+      statusType: 'available'
+    },
+    {
+      id: '4',
+      category: 'pharmacy',
+      name: 'Farmacia San Jorge',
+      description: 'Medicamentos y Convenios',
+      image: 'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&q=80&w=200',
+      rating: 4.5,
+      distance: '0.5 km',
+      status: 'Cierra a las 22:00',
+      statusType: 'limited'
+    },
+    {
+      id: '5',
+      category: 'lab',
+      name: 'Laboratorio LabQuest',
+      description: 'Análisis Clínicos y Biotecnología',
+      image: 'https://images.unsplash.com/photo-1579152276558-9f196a575a7c?auto=format&fit=crop&q=80&w=200',
+      rating: 4.6,
+      distance: '4.2 km',
+      status: 'Resultados en 24h',
+      statusType: 'available'
+    }
+  ];
+
+  const filteredItems = activeCategory 
+    ? allItems.filter(item => item.category === activeCategory)
+    : allItems;
+
   return (
     <div className="flex flex-col gap-8 pb-20 md:pb-0">
       {/* Search & Filters Hero */}
@@ -59,22 +130,18 @@ export default function Search({ onOpenRegistration }: SearchProps) {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {[
-              { icon: Stethoscope, label: 'Doctores', variant: 'primary' },
-              { icon: Hospital, label: 'Clínicas' },
-              { icon: Store, label: 'Farmacias' },
-              { icon: FlaskConical, label: 'Laboratorios' }
-            ].map((filter, index) => (
+            {categories.map((cat) => (
               <button 
-                key={index}
-                className={`px-5 py-2.5 rounded-full flex items-center gap-2 font-display font-medium text-xs transition-colors border ${
-                  filter.variant === 'primary' 
-                    ? 'bg-primary text-on-primary-fixed-variant border-primary shadow-lg shadow-primary/10' 
+                key={cat.id}
+                onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
+                className={`px-5 py-2.5 rounded-full flex items-center gap-2 font-display font-medium text-xs transition-all border ${
+                  activeCategory === cat.id 
+                    ? 'bg-primary text-on-primary border-primary shadow-lg shadow-primary/20 scale-105' 
                     : 'bg-surface-container-high text-on-surface-variant border-outline-variant/40 hover:border-primary/50'
                 }`}
               >
-                <filter.icon className="w-4 h-4" />
-                {filter.label}
+                <cat.icon className="w-4 h-4" />
+                {cat.label}
               </button>
             ))}
           </div>
@@ -88,86 +155,74 @@ export default function Search({ onOpenRegistration }: SearchProps) {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-display font-bold text-on-surface flex items-center gap-3">
                 <Star className="w-6 h-6 text-secondary fill-secondary" />
-                Resultados Destacados
+                {activeCategory 
+                  ? `Resultados para ${categories.find(c => c.id === activeCategory)?.label}`
+                  : 'Resultados Destacados'
+                }
               </h2>
-              <span className="text-[10px] font-mono font-black text-outline px-3 py-1 border border-outline-variant rounded-full bg-surface-container-low tracking-widest uppercase">
-                Premium
-              </span>
+              {activeCategory && (
+                <button 
+                  onClick={() => setActiveCategory(null)}
+                  className="text-xs font-bold text-primary hover:underline"
+                >
+                  Ver todos
+                </button>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Profile Card 1 */}
-              <motion.div 
-                whileHover={{ y: -4 }}
-                className="bg-surface-container border-l-4 border-l-secondary border-y border-r border-y-outline-variant/30 border-r-outline-variant/30 rounded-r-2xl rounded-l-md p-6 flex flex-col gap-6 relative overflow-hidden shadow-xl"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-surface-bright overflow-hidden shrink-0 border-2 border-surface-container-high shadow-lg">
-                    <img 
-                      src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200" 
-                      alt="Dr. Alejandro Martínez"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-grow pt-1">
-                    <h3 className="text-lg font-display font-bold text-on-surface">Dr. Alejandro Martínez</h3>
-                    <p className="text-primary text-sm font-medium mb-1">Cardiología Intervencionista</p>
-                    <div className="flex items-center gap-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                      <span className="flex items-center text-secondary gap-1">
-                        <Star className="w-3.5 h-3.5 fill-secondary" /> 4.9
-                      </span>
-                      <span className="flex items-center gap-1 opacity-70">
-                        <MapPin className="w-3.5 h-3.5" /> 2.4 km
-                      </span>
+              {filteredItems.map((item) => (
+                <motion.div 
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ y: -4 }}
+                  className="bg-surface-container border border-outline-variant/30 rounded-2xl p-6 flex flex-col gap-6 shadow-xl relative overflow-hidden"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-surface-bright overflow-hidden shrink-0 border-2 border-surface-container-high shadow-lg">
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-grow pt-1">
+                      <h3 className="text-lg font-display font-bold text-on-surface">{item.name}</h3>
+                      <p className="text-primary text-sm font-medium mb-1">{item.description}</p>
+                      <div className="flex items-center gap-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+                        <span className="flex items-center text-secondary gap-1">
+                          <Star className="w-3.5 h-3.5 fill-secondary" /> {item.rating}
+                        </span>
+                        <span className="flex items-center gap-1 opacity-70">
+                          <MapPin className="w-3.5 h-3.5" /> {item.distance}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/10">
-                  <span className="bg-secondary/15 text-secondary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span> Disponible Ahora
-                  </span>
-                  <button className="bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary-container px-5 py-2 rounded-xl text-xs font-bold transition-all border border-primary/30">
-                    Agendar
-                  </button>
-                </div>
-              </motion.div>
-
-              {/* Profile Card 2 */}
-              <motion.div 
-                whileHover={{ y: -4 }}
-                className="bg-surface-container border border-outline-variant/30 rounded-2xl p-6 flex flex-col gap-6 shadow-xl"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-surface-bright overflow-hidden shrink-0 border-2 border-surface-container-high shadow-lg">
-                    <img 
-                      src="https://images.unsplash.com/photo-1559839734-2b71f1536783?auto=format&fit=crop&q=80&w=200" 
-                      alt="Dra. Valentina Silva"
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/10">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${
+                      item.statusType === 'available' 
+                        ? 'bg-secondary/15 text-secondary' 
+                        : 'bg-surface-container-highest text-on-surface-variant'
+                    }`}>
+                      {item.statusType === 'available' && <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>}
+                      {item.status}
+                    </span>
+                    <button className="bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary-container px-5 py-2 rounded-xl text-xs font-bold transition-all border border-primary/30">
+                      {item.category === 'doctor' ? 'Agendar' : 'Ver Detalles'}
+                    </button>
                   </div>
-                  <div className="flex-grow pt-1">
-                    <h3 className="text-lg font-display font-bold text-on-surface">Dra. Valentina Silva</h3>
-                    <p className="text-primary text-sm font-medium mb-1">Neurología Clínica</p>
-                    <div className="flex items-center gap-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                      <span className="flex items-center text-secondary gap-1">
-                        <Star className="w-3.5 h-3.5 fill-secondary" /> 4.8
-                      </span>
-                      <span className="flex items-center gap-1 opacity-70">
-                        <MapPin className="w-3.5 h-3.5" /> 3.1 km
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/10">
-                  <span className="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5" /> Mañana, 09:00
-                  </span>
-                  <button className="bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary-container px-5 py-2 rounded-xl text-xs font-bold transition-all border border-primary/30">
-                    Ver Perfil
-                  </button>
-                </div>
-              </motion.div>
+                </motion.div>
+              ))}
             </div>
+
+            {filteredItems.length === 0 && (
+              <div className="p-12 text-center bg-surface-container border border-outline-variant/30 rounded-3xl">
+                <p className="text-on-surface-variant font-medium">No se encontraron resultados para esta categoría.</p>
+              </div>
+            )}
           </section>
 
           {/* Registration Banner */}

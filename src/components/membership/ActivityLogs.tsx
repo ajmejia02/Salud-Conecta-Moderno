@@ -20,11 +20,14 @@ import {
   History,
   TrendingDown,
   Activity,
-  Heart
+  Heart,
+  Trophy
 } from 'lucide-react';
 
 export default function ActivityLogs() {
-  const stats = [
+  const [timeframe, setTimeframe] = React.useState<'week' | 'month'>('week');
+
+  const stats = timeframe === 'week' ? [
     {
       title: 'Pasos Totales',
       value: '42,850',
@@ -52,9 +55,37 @@ export default function ActivityLogs() {
       color: 'text-secondary',
       bg: 'bg-secondary/10'
     }
+  ] : [
+    {
+      title: 'Pasos Totales',
+      value: '184,200',
+      change: '+8% vs mes ant.',
+      trend: 'up',
+      icon: Footprints,
+      color: 'text-primary',
+      bg: 'bg-primary/10'
+    },
+    {
+      title: 'Calorías Activas',
+      value: '14,560',
+      change: 'Promedio estable',
+      trend: 'neutral',
+      icon: Flame,
+      color: 'text-tertiary',
+      bg: 'bg-tertiary/10'
+    },
+    {
+      title: 'Min. de Actividad',
+      value: '1,280',
+      change: '+15% actividad',
+      trend: 'success',
+      icon: Activity,
+      color: 'text-secondary',
+      bg: 'bg-secondary/10'
+    }
   ];
 
-  const chartData = [
+  const chartData = timeframe === 'week' ? [
     { day: 'L', value: 40, label: '4k' },
     { day: 'M', value: 65, label: '6.5k' },
     { day: 'M', value: 85, label: '8.5k', active: true },
@@ -62,9 +93,14 @@ export default function ActivityLogs() {
     { day: 'V', value: 30, label: '3k' },
     { day: 'S', value: 50, label: '5k' },
     { day: 'D', value: 45, label: '4.5k' },
+  ] : [
+    { day: 'S1', value: 75, label: '45k' },
+    { day: 'S2', value: 90, label: '52k', active: true },
+    { day: 'S3', value: 60, label: '38k' },
+    { day: 'S4', value: 85, label: '50k', active: true, success: true },
   ];
 
-  const challenges = [
+  const challenges = timeframe === 'week' ? [
     {
       title: 'Reto de 10k Pasos Diarios',
       subtitle: 'Día 4 de 7 consecutivos',
@@ -88,9 +124,32 @@ export default function ActivityLogs() {
       current: '1.2L',
       target: '2.0L'
     }
+  ] : [
+    {
+      title: 'Maratón de Salud Mensual',
+      subtitle: 'Acumula 300,000 pasos en 30 días',
+      points: '+2,000 pts',
+      icon: Trophy,
+      color: 'text-secondary',
+      bg: 'bg-secondary/10',
+      progress: 45,
+      current: '135,000',
+      target: '300,000'
+    },
+    {
+      title: 'Consistencia de Sueño',
+      subtitle: '7h+ diarias por 4 semanas',
+      points: '+800 pts',
+      icon: Activity,
+      color: 'text-tertiary',
+      bg: 'bg-tertiary/10',
+      progress: 75,
+      current: '21/28 días',
+      target: '28 días'
+    }
   ];
 
-  const recentActivity = [
+  const recentActivity = timeframe === 'week' ? [
     {
       title: 'Caminata matutina',
       time: 'Hoy, 07:30 AM • 45 min',
@@ -114,24 +173,23 @@ export default function ActivityLogs() {
       icon: Activity,
       color: 'text-on-surface',
       bg: 'bg-surface-variant'
+    }
+  ] : [
+    {
+      title: 'Meta mensual alcanzada (Agua)',
+      time: 'Ayer, 11:00 PM',
+      points: '+500 pts',
+      icon: Droplets,
+      color: 'text-primary',
+      bg: 'bg-primary/10'
     },
     {
-      title: 'Meditación guiada',
-      time: 'Ayer, 07:00 AM • 15 min',
-      points: '+30 pts',
-      icon: Heart, // I'll use Activity or something if Heart is not available
-      color: 'text-tertiary',
-      bg: 'bg-tertiary/10',
-      opacity: 'opacity-70'
-    },
-    {
-      title: 'Trote ligero',
-      time: 'Mar, 06:45 PM • 30 min',
-      points: '+60 pts',
-      icon: Activity, // Using Activity as generic run
+      title: 'Chequeo Médico Mensual',
+      time: 'Hace 5 días',
+      points: '+100 pts',
+      icon: Stethoscope,
       color: 'text-secondary',
-      bg: 'bg-secondary/10',
-      opacity: 'opacity-70'
+      bg: 'bg-secondary/10'
     }
   ];
 
@@ -144,8 +202,26 @@ export default function ActivityLogs() {
           <p className="text-lg text-on-surface-variant mt-1 font-medium opacity-70">Tu progreso de salud y retos completados esta semana.</p>
         </div>
         <div className="flex items-center gap-1 bg-surface-container-low border border-outline-variant/30 rounded-2xl p-1 shadow-sm">
-          <button className="px-6 py-2 rounded-xl bg-surface-container-highest text-on-surface font-display font-black text-[10px] uppercase tracking-widest shadow-sm">Semana</button>
-          <button className="px-6 py-2 rounded-xl text-on-surface-variant hover:text-on-surface font-display font-black text-[10px] uppercase tracking-widest transition-all">Mes</button>
+          <button 
+            onClick={() => setTimeframe('week')}
+            className={`px-6 py-2 rounded-xl font-display font-black text-[10px] uppercase tracking-widest transition-all ${
+              timeframe === 'week' 
+                ? 'bg-surface-container-highest text-on-surface shadow-sm' 
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            Semana
+          </button>
+          <button 
+            onClick={() => setTimeframe('month')}
+            className={`px-6 py-2 rounded-xl font-display font-black text-[10px] uppercase tracking-widest transition-all ${
+              timeframe === 'month' 
+                ? 'bg-surface-container-highest text-on-surface shadow-sm' 
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            Mes
+          </button>
         </div>
       </div>
 
@@ -310,7 +386,7 @@ export default function ActivityLogs() {
               {recentActivity.map((activity, idx) => (
                 <div 
                   key={idx} 
-                  className={`flex items-center gap-4 p-4 hover:bg-surface-container-high/60 rounded-2xl transition-all cursor-pointer group ${activity.opacity || ''}`}
+                  className={`flex items-center gap-4 p-4 hover:bg-surface-container-high/60 rounded-2xl transition-all cursor-pointer group`}
                 >
                   <div className={`w-12 h-12 rounded-2xl ${activity.bg} flex items-center justify-center ${activity.color} shrink-0 group-hover:scale-110 transition-transform shadow-sm border border-outline-variant/10`}>
                     <activity.icon className="w-5 h-5" />
@@ -335,25 +411,5 @@ export default function ActivityLogs() {
         </div>
       </div>
     </div>
-  );
-}
-
-// Extra icons for the activity feed
-function Heart(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-    </svg>
   );
 }

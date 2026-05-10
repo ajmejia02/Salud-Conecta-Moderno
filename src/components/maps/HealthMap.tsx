@@ -221,8 +221,8 @@ function UserLocationMarker({ position }: { position: google.maps.LatLngLiteral 
 export default function HealthMap() {
   const [clinics, setClinics] = useState<(Clinic & { isOpen?: boolean })[]>([]);
   const [selectedClinic, setSelectedClinic] = useState<(Clinic & { isOpen?: boolean }) | null>(null);
-  const [center] = useState({ lat: -33.4489, lng: -70.6693 });
-  const [userLocation] = useState({ lat: -33.455, lng: -70.675 }); // Mock user location
+  const [center] = useState({ lat: 12.1364, lng: -86.2514 }); // Managua, Nicaragua
+  const [userLocation] = useState({ lat: 12.12, lng: -86.24 }); // Mock location in Managua
   const [isNavigating, setIsNavigating] = useState(false);
   const [routeInfo, setRouteInfo] = useState<{
     distance: string;
@@ -237,6 +237,47 @@ export default function HealthMap() {
     description: string;
     condition: string;
   } | null>(null);
+
+  const placesLib = useMapsLibrary('places');
+  const map = useMap();
+
+  useEffect(() => {
+    if (!placesLib || !map) return;
+
+    const fetchHealthPlaces = async () => {
+      try {
+        console.log("Searching for health centers in Nicaragua...");
+        const { places } = await placesLib.Place.searchByText({
+          textQuery: 'hospitales y centros de salud en Nicaragua',
+          fields: ['id', 'displayName', 'location', 'formattedAddress', 'types', 'nationalPhoneNumber', 'regularOpeningHours'],
+          locationBias: { lat: 12.1364, lng: -86.2514 },
+          maxResultCount: 15,
+        });
+
+        const mappedClinics: (Clinic & { isOpen?: boolean })[] = places.map((p: any) => ({
+          id: p.id,
+          name: p.displayName || 'Centro de Salud',
+          type: p.types?.includes('hospital') ? 'emergency' : 'clinic',
+          location: {
+            lat: p.location.lat(),
+            lng: p.location.lng()
+          },
+          address: p.formattedAddress || 'Nicaragua',
+          phone: p.nationalPhoneNumber || '',
+          open24h: p.types?.includes('hospital') || p.regularOpeningHours?.periods?.length === 1 && p.regularOpeningHours?.periods[0].open?.day === 0 && !p.regularOpeningHours?.periods[0].close,
+          isOpen: p.regularOpeningHours?.isOpen() ?? true,
+        }));
+
+        if (mappedClinics.length > 0) {
+          setClinics(mappedClinics);
+        }
+      } catch (error) {
+        console.error("Error fetching Nicaragua health places:", error);
+      }
+    };
+
+    fetchHealthPlaces();
+  }, [placesLib, map]);
 
   useEffect(() => {
     const handleMedicationSearch = (e: any) => {
@@ -341,6 +382,41 @@ export default function HealthMap() {
     // For demo purposes, we show all pharmacies if searching for medication
     return matchesFilter;
   });
+
+  if (!hasValidKey) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-background p-6">
+        <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-8 max-w-md w-full shadow-2xl text-center space-y-6">
+          <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto border border-primary/20">
+             <AlertTriangle className="w-10 h-10 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-on-surface mb-2">Llave de Google Maps Requerida</h2>
+            <p className="text-on-surface-variant text-sm leading-relaxed">
+              Para ver los hospitales y centros de salud en Nicaragua, necesitamos una API Key válida.
+            </p>
+          </div>
+          
+          <div className="space-y-4 text-left">
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-black text-xs shrink-0">1</div>
+              <p className="text-xs text-on-surface-variant">Obtén una llave en <a href="https://console.cloud.google.com/google/maps-apis/start" target="_blank" className="text-primary font-bold underline">Google Cloud Console</a>.</p>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-black text-xs shrink-0">2</div>
+              <p className="text-xs text-on-surface-variant">Agrégala en <b>Settings (⚙️)</b> → <b>Secrets</b> con el nombre <code>GOOGLE_MAPS_PLATFORM_KEY</code>.</p>
+            </div>
+          </div>
+          
+          <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
+            <p className="text-[10px] font-bold text-primary uppercase tracking-widest leading-loose">
+              La aplicación se reiniciará automáticamente al guardar el secreto.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-background">
