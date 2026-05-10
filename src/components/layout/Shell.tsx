@@ -21,7 +21,7 @@ import {
   Flame,
   Bell
 } from 'lucide-react';
-import { auth, signInWithGoogle } from '../../lib/firebase';
+import { auth, signInWithGoogle, handleRedirectResult } from '../../lib/firebase';
 import { onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
 import { syncUserProfile } from '../../lib/authUtils';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -37,6 +37,14 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
   const [user, setUser] = React.useState<FirebaseUser | null>(null);
 
   React.useEffect(() => {
+    // Check for redirect result on mount
+    handleRedirectResult().then(u => {
+      if (u) {
+        setUser(u);
+        syncUserProfile(u);
+      }
+    });
+
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
       if (u) {
