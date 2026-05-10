@@ -136,8 +136,12 @@ export default function TriageChecker() {
   };
 
   const handleGoBack = () => {
-    setResult(null);
-    setIsDetailsExpanded(false);
+    if (result) {
+      setResult(null);
+      setIsDetailsExpanded(false);
+    } else {
+      window.dispatchEvent(new CustomEvent('changeTab', { detail: 'home' }));
+    }
   };
 
   const handleReset = () => {

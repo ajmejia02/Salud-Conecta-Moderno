@@ -42,6 +42,17 @@ export default function App() {
   };
 
   useEffect(() => {
+    // Theme initialization
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    } else {
+      // Default to dark or follow preference
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    }
+
     const handleTabChange = (e: any) => {
       setActiveTab(e.detail);
     };

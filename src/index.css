@@ -83,6 +83,36 @@
     -webkit-font-smoothing: antialiased;
   }
   
+  html.light {
+    --color-background: #f8fafc;
+    --color-on-background: #0f172a;
+    --color-surface: #ffffff;
+    --color-surface-dim: #f1f5f9;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f1f5f9;
+    --color-surface-container: #e2e8f0;
+    --color-surface-container-high: #cbd5e1;
+    --color-surface-container-highest: #94a3b8;
+    
+    --color-on-surface: #1e293b;
+    --color-on-surface-variant: #475569;
+    --color-inverse-surface: #0f172a;
+    --color-inverse-on-surface: #f8fafc;
+    --color-outline: #64748b;
+    --color-outline-variant: #cbd5e1;
+    
+    --color-primary: #005fb0;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #d5e3ff;
+    --color-on-primary-container: #001c3b;
+    
+    --color-secondary: #006d3b;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #70fda7;
+    --color-on-secondary-container: #00210e;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-semibold tracking-tight text-on-surface;
   }

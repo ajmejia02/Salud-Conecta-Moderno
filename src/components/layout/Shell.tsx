@@ -54,13 +54,10 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
 
   const navItems = [
     { id: 'triage', label: 'Triaje', icon: Stethoscope },
-    { id: 'pharmacy', label: 'Medicamentos', icon: Pill },
+    { id: 'pharmacy', label: 'Farmacias', icon: Store },
     { id: 'search', label: 'Buscar', icon: SearchIcon },
-    { id: 'history', label: 'Historial', icon: History },
     { id: 'rewards', label: 'Premios', icon: Trophy },
-    { id: 'activity', label: 'Actividad', icon: Activity },
-    { id: 'appointments', label: 'Citas', icon: Calendar },
-    { id: 'membership', label: 'Membresía', icon: Zap },
+    { id: 'activity', label: 'Retos', icon: Flame },
   ];
 
   return (
@@ -79,10 +76,20 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
 
         <div className="flex items-center gap-2">
           <button 
+            onClick={() => setActiveTab('triage')}
+            className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
+              activeTab === 'triage' ? 'bg-primary/20 text-primary' : 'text-on-surface-variant hover:bg-surface-container'
+            }`}
+            title="Triaje IA"
+          >
+            <Stethoscope className="w-5 h-5" />
+          </button>
+          <button 
             onClick={() => setActiveTab('map')}
             className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
               activeTab === 'map' ? 'bg-primary/20 text-primary' : 'text-on-surface-variant hover:bg-surface-container'
             }`}
+            title="Mapa de Salud"
           >
             <Globe className="w-5 h-5" />
           </button>
@@ -91,6 +98,7 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
             className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
               activeTab === 'activity' ? 'bg-primary/20 text-primary' : 'text-on-surface-variant hover:bg-surface-container'
             }`}
+            title="Actividad y Retos"
           >
             <Radio className="w-5 h-5" />
           </button>

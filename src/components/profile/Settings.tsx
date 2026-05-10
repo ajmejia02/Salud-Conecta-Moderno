@@ -21,7 +21,10 @@ import {
   Save,
   Activity,
   History,
-  Timer
+  Timer,
+  Sun,
+  Moon,
+  Palette
 } from 'lucide-react';
 
 interface SettingItemProps {
@@ -77,7 +80,26 @@ export function Settings() {
     summaryTime: '06:00 PM'
   });
 
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('light') ? 'light' : 'dark';
+    }
+    return 'dark';
+  });
+
   const [saving, setSaving] = useState(false);
+
+  const toggleTheme = (newTheme: 'light' | 'dark') => {
+    setTheme(newTheme);
+    if (newTheme === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    }
+    localStorage.setItem('theme', newTheme);
+  };
 
   const handleSave = () => {
     setSaving(true);
@@ -106,52 +128,95 @@ export function Settings() {
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div>
-            <h2 className="text-4xl font-display font-black text-on-surface">Centro de Notificaciones</h2>
-            <p className="text-sm text-on-surface-variant mt-1 font-medium italic opacity-70">Gestiona cómo y cuándo recibes información importante sobre tu salud.</p>
+            <h2 className="text-4xl font-display font-black text-on-surface">Ajustes y Personalización</h2>
+            <p className="text-sm text-on-surface-variant mt-1 font-medium italic opacity-70">Gestiona como interactúas con la plataforma y su apariencia.</p>
           </div>
         </div>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Sections Column */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          <section className="bg-surface-container-low rounded-[32px] border border-outline-variant/30 overflow-hidden shadow-xl">
-            <div className="divide-y divide-on-surface/5">
-              <SettingItem 
-                title="Alertas Médicas (Críticas)"
-                description="Recordatorios ineludibles de medicamentos y confirmaciones urgentes de citas."
-                icon={Stethoscope}
-                iconColor="text-error"
-                checked={notifs.critical}
-                disabled={true}
-                critical={true}
-                onChange={() => {}}
-              />
-              <SettingItem 
-                title="Retos de Salud"
-                description="Motivación diaria, recordatorios de pasos, hidratación y seguimiento de sueño."
-                icon={Activity}
-                iconColor="text-primary"
-                checked={notifs.challenges}
-                onChange={(v) => setNotifs({...notifs, challenges: v})}
-              />
-              <SettingItem 
-                title="Beneficios Premium"
-                description="Alertas de cupones próximos a vencer, nuevos descuentos y recompensas."
-                icon={Ticket}
-                iconColor="text-secondary"
-                checked={notifs.benefits}
-                onChange={(v) => setNotifs({...notifs, benefits: v})}
-              />
-              <SettingItem 
-                title="Seguridad y Cuenta"
-                description="Validación de identidad, nuevos inicios de sesión y cambios en tu perfil."
-                icon={ShieldCheck}
-                iconColor="text-on-surface"
-                checked={notifs.security}
-                disabled={true}
-                onChange={() => {}}
-              />
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          {/* Notifications Section */}
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 px-2">
+              <Bell className="w-5 h-5 text-primary" />
+              <h3 className="text-xs font-black uppercase tracking-widest text-on-surface">Centro de Notificaciones</h3>
+            </div>
+            <div className="bg-surface-container-low rounded-[32px] border border-outline-variant/30 overflow-hidden shadow-xl">
+              <div className="divide-y divide-on-surface/5">
+                <SettingItem 
+                  title="Alertas Médicas (Críticas)"
+                  description="Recordatorios ineludibles de medicamentos y confirmaciones urgentes de citas."
+                  icon={Stethoscope}
+                  iconColor="text-error"
+                  checked={notifs.critical}
+                  disabled={true}
+                  critical={true}
+                  onChange={() => {}}
+                />
+                <SettingItem 
+                  title="Retos de Salud"
+                  description="Motivación diaria, recordatorios de pasos, hidratación y seguimiento de sueño."
+                  icon={Activity}
+                  iconColor="text-primary"
+                  checked={notifs.challenges}
+                  onChange={(v) => setNotifs({...notifs, challenges: v})}
+                />
+                <SettingItem 
+                  title="Beneficios Premium"
+                  description="Alertas de cupones próximos a vencer, nuevos descuentos y recompensas."
+                  icon={Ticket}
+                  iconColor="text-secondary"
+                  checked={notifs.benefits}
+                  onChange={(v) => setNotifs({...notifs, benefits: v})}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Appearance Section */}
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 px-2">
+              <Palette className="w-5 h-5 text-tertiary" />
+              <h3 className="text-xs font-black uppercase tracking-widest text-on-surface">Apariencia</h3>
+            </div>
+            <div className="bg-surface-container-low rounded-[32px] border border-outline-variant/30 p-8 shadow-xl">
+              <div className="flex flex-col md:flex-row gap-6">
+                <button 
+                  onClick={() => toggleTheme('light')}
+                  className={`flex-1 p-6 rounded-[24px] border-2 transition-all flex flex-col items-center gap-4 ${
+                    theme === 'light' 
+                      ? 'bg-primary/10 border-primary shadow-lg shadow-primary/10' 
+                      : 'bg-surface-container border-outline-variant/30 hover:border-primary/50'
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${theme === 'light' ? 'bg-primary text-on-primary' : 'bg-surface-variant text-on-surface-variant'}`}>
+                    <Sun className="w-6 h-6" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-bold text-on-surface">Modo Diurno</p>
+                    <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Fondo claro, alto contraste</p>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => toggleTheme('dark')}
+                  className={`flex-1 p-6 rounded-[24px] border-2 transition-all flex flex-col items-center gap-4 ${
+                    theme === 'dark' 
+                      ? 'bg-primary/10 border-primary shadow-lg shadow-primary/10' 
+                      : 'bg-surface-container border-outline-variant/30 hover:border-primary/50'
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-primary text-on-primary' : 'bg-surface-variant text-on-surface-variant'}`}>
+                    <Moon className="w-6 h-6" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-bold text-on-surface">Modo Nocturno</p>
+                    <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Tonos profundos, ahorro de batería</p>
+                  </div>
+                </button>
+              </div>
             </div>
           </section>
         </div>
