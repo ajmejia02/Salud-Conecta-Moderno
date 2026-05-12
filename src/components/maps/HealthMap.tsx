@@ -35,6 +35,21 @@ import {
 
 import { Clinic } from '../../types';
 import { getClinics } from '../../services/clinicService';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { useUser } from '../../contexts/UserContext';
+
+const calculateDistance = (pos1: google.maps.LatLngLiteral, pos2: google.maps.LatLngLiteral): string => {
+  const R = 6371; // Radius of the earth in km
+  const dLat = (pos2.lat - pos1.lat) * Math.PI / 180;
+  const dLon = (pos2.lng - pos1.lng) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(pos1.lat * Math.PI / 180) * Math.cos(pos2.lat * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const d = R * c;
+  return d < 1 ? `${(d * 1000).toFixed(0)} m` : `${d.toFixed(1)} km`;
+};
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -222,11 +237,13 @@ function UserLocationMarker({ position }: { position: google.maps.LatLngLiteral 
   );
 }
 
-export default function HealthMap() {
+function HealthMapInner() {
+  const { t } = useLanguage();
+  const { isPremium } = useUser();
   const [clinics, setClinics] = useState<(Clinic & { isOpen?: boolean })[]>([]);
   const [selectedClinic, setSelectedClinic] = useState<(Clinic & { isOpen?: boolean }) | null>(null);
-  const [center] = useState({ lat: 12.1364, lng: -86.2514 }); // Managua, Nicaragua
-  const [userLocation] = useState({ lat: 12.12, lng: -86.24 }); // Mock location in Managua
+  const [center, setCenter] = useState({ lat: 12.1364, lng: -86.2514 }); // Default to Managua
+  const [userLocation, setUserLocation] = useState({ lat: 12.1364, lng: -86.2514 });
   const [isNavigating, setIsNavigating] = useState(false);
   const [routeInfo, setRouteInfo] = useState<{
     distance: string;
@@ -248,6 +265,28 @@ export default function HealthMap() {
 
   const placesLib = useMapsLibrary('places');
   const map = useMap();
+
+  // Real Geolocation
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setUserLocation(pos);
+          setCenter(pos);
+          if (map) {
+            map.setCenter(pos);
+          }
+        },
+        () => {
+          console.warn("Geolocation permission denied or failed. Using default center.");
+        }
+      );
+    }
+  }, [map]);
 
   const userLocationContext = {
     lat: userLocation.lat,
@@ -335,28 +374,42 @@ export default function HealthMap() {
       try {
         console.log("Searching for health centers in Nicaragua...");
         const { places } = await placesLib.Place.searchByText({
-          textQuery: 'hospitales y centros de salud en Nicaragua',
+          textQuery: 'hospitales y farmacias abiertas en Nicaragua',
           fields: ['id', 'displayName', 'location', 'formattedAddress', 'types', 'nationalPhoneNumber', 'regularOpeningHours'],
-          locationBias: { lat: 12.1364, lng: -86.2514 },
-          maxResultCount: 15,
+          locationBias: userLocation,
+          maxResultCount: 20,
         });
 
-        const mappedClinics: (Clinic & { isOpen?: boolean })[] = places.map((p: any) => ({
-          id: p.id,
-          name: p.displayName || 'Centro de Salud',
-          type: p.types?.includes('hospital') ? 'emergency' : 'clinic',
-          location: {
-            lat: p.location.lat(),
-            lng: p.location.lng()
-          },
-          address: p.formattedAddress || 'Nicaragua',
-          phone: p.nationalPhoneNumber || '',
-          open24h: p.types?.includes('hospital') || p.regularOpeningHours?.periods?.length === 1 && p.regularOpeningHours?.periods[0].open?.day === 0 && !p.regularOpeningHours?.periods[0].close,
-          isOpen: p.regularOpeningHours?.isOpen() ?? true,
-        }));
+        const mappedClinics: (Clinic & { isOpen?: boolean })[] = places.map((p: any) => {
+          const name = p.displayName || 'Centro de Salud';
+          // Simple heuristic for public institutions in Nicaragua
+          const isPublic = name.toLowerCase().includes('ministerio') || 
+                          name.toLowerCase().includes('centro de salud') || 
+                          name.toLowerCase().includes('puesto de salud') ||
+                          name.toLowerCase().includes('minsa');
+
+          return {
+            id: p.id,
+            name: name,
+            type: (p.types?.includes('hospital') || p.types?.includes('medical_center')) ? 'emergency' : (p.types?.includes('pharmacy') ? 'pharmacy' : 'clinic'),
+            sector: isPublic ? 'public' : 'private',
+            location: {
+              lat: p.location.lat(),
+              lng: p.location.lng()
+            },
+            address: p.formattedAddress || 'Nicaragua',
+            phone: p.nationalPhoneNumber || '',
+            open24h: p.types?.includes('hospital') || p.regularOpeningHours?.periods?.length === 1 && p.regularOpeningHours?.periods[0].open?.day === 0 && !p.regularOpeningHours?.periods[0].close,
+            isOpen: p.regularOpeningHours?.isOpen() ?? true,
+          };
+        });
 
         if (mappedClinics.length > 0) {
-          setClinics(mappedClinics);
+          setClinics(prev => {
+            const existingIds = new Set(prev.map(c => c.id));
+            const uniqueNew = mappedClinics.filter(c => !existingIds.has(c.id));
+            return [...prev, ...uniqueNew];
+          });
         }
       } catch (error) {
         console.error("Error fetching Nicaragua health places:", error);
@@ -364,7 +417,7 @@ export default function HealthMap() {
     };
 
     fetchHealthPlaces();
-  }, [placesLib, map]);
+  }, [placesLib, map, userLocation]);
 
   useEffect(() => {
     const handleMedicationSearch = (e: any) => {
@@ -399,55 +452,71 @@ export default function HealthMap() {
   useEffect(() => {
     const mockClinics: (Clinic & { isOpen?: boolean })[] = [
       {
-        id: '1',
-        name: 'Farmacia Central MSP',
+        id: 'nic-1',
+        name: 'Farmacia FarmaValue Carretera Masaya',
         type: 'pharmacy',
-        location: { lat: -33.45, lng: -70.66 },
-        address: 'Av. Salud Pública 452',
-        phone: '+56 9 1234 5678',
+        sector: 'private',
+        location: { lat: 12.1154, lng: -86.2354 },
+        address: 'Km 4.5 Carretera a Masaya, Managua',
+        phone: '+505 2270 0000',
         inStock: true,
         open24h: true,
         isOpen: true,
       },
       {
-        id: '2',
-        name: 'FarmaVida Norte',
+        id: 'nic-2',
+        name: 'Farmacia Kielsa Altamira',
         type: 'pharmacy',
-        location: { lat: -33.46, lng: -70.67 },
-        address: 'Calle Bienestar 890',
-        phone: '+56 9 8765 4321',
+        sector: 'private',
+        location: { lat: 12.1250, lng: -86.2540 },
+        address: 'Altamira d’ Este, Managua',
+        phone: '+505 2278 1234',
         inStock: true,
         open24h: false,
-        isOpen: false,
+        isOpen: true,
       },
       {
-        id: '3',
-        name: 'Urgencia Sanitaria 24h',
+        id: 'nic-3',
+        name: 'Hospital Central Dr. César Amador Kühl',
         type: 'emergency',
-        location: { lat: -33.44, lng: -70.65 },
-        address: 'Av. Gran Hospital 10',
-        phone: '911',
+        sector: 'public',
+        location: { lat: 12.1360, lng: -86.2650 },
+        address: 'Managua, Nicaragua',
+        phone: '+505 2277 1234',
         open24h: true,
         isOpen: true,
       },
       {
-        id: '4',
-        name: 'Hospital Regional',
+        id: 'nic-vivian',
+        name: 'Hospital Vivian Pellas',
         type: 'emergency',
-        location: { lat: -33.435, lng: -70.645 },
-        address: 'Calle Medicina 77',
-        phone: '911',
+        sector: 'private',
+        location: { lat: 12.0950, lng: -86.2250 },
+        address: 'Km 9.5 Carretera a Masaya, Managua',
+        phone: '+505 2255 6900',
         open24h: true,
         isOpen: true,
       },
       {
-        id: '5',
-        name: 'Clínica Las Condes',
+        id: 'nic-4',
+        name: 'Hospital Militar Dr. Alejandro Dávila Bolaños',
+        type: 'emergency',
+        sector: 'public',
+        location: { lat: 12.1480, lng: -86.2750 },
+        address: 'Costado Oeste de Tiscapa, Managua',
+        phone: '+505 2222 2100',
+        open24h: true,
+        isOpen: true,
+      },
+      {
+        id: 'nic-5',
+        name: 'Centro de Salud Pedro Altamirano',
         type: 'clinic',
-        location: { lat: -33.42, lng: -70.62 },
-        address: 'Calle Providencia 123',
-        phone: '+56 2 2345 6789',
-        open24h: true,
+        sector: 'public',
+        location: { lat: 12.1280, lng: -86.2420 },
+        address: 'Altamira, Managua',
+        phone: '+505 2267 1111',
+        open24h: false,
         isOpen: true,
       }
     ];
@@ -455,10 +524,22 @@ export default function HealthMap() {
     const fetchClinics = async () => {
       try {
         const data = await getClinics();
-        if (data.length > 0) setClinics(data);
-        else setClinics(mockClinics);
+        // If Firestore data is available, prioritize it, otherwise use Nicaragua-specific mocks
+        if (data.length > 5) {
+          setClinics(data);
+        } else {
+          setClinics(prev => {
+             const existingIds = new Set(prev.map(c => c.id));
+             const uniqueMocks = mockClinics.filter(c => !existingIds.has(c.id));
+             return [...prev, ...uniqueMocks];
+          });
+        }
       } catch (e) {
-        setClinics(mockClinics);
+        setClinics(prev => {
+          const existingIds = new Set(prev.map(c => c.id));
+          const uniqueMocks = mockClinics.filter(c => !existingIds.has(c.id));
+          return [...prev, ...uniqueMocks];
+        });
       }
     };
     fetchClinics();
@@ -466,21 +547,28 @@ export default function HealthMap() {
 
   const filteredClinics = clinics.filter(c => {
     const matchesFilter = filter === 'all' || c.type === filter;
+    
+    // Tiered Access Logic
+    // If not premium, only show public sector units
+    const matchesTier = isPremium || c.sector === 'public';
+
+    // AI search result filtering - if we have AI recommendations, prioritize those
     if (aiSearchResults?.clinics) {
       const recommendedIds = aiSearchResults.clinics
-        .filter(sc => sc.recommended)
-        .map(sc => sc.id);
+        .filter((sc: any) => sc.recommended)
+        .map((sc: any) => sc.id);
       if (recommendedIds.length > 0 && !recommendedIds.includes(c.id)) {
         return false;
       }
     }
-    return matchesFilter;
+
+    return matchesFilter && matchesTier;
   });
 
   const sortedClinics = [...filteredClinics].sort((a, b) => {
     if (aiSearchResults?.clinics) {
-      const aIndex = aiSearchResults.clinics.findIndex(sc => sc.id === a.id);
-      const bIndex = aiSearchResults.clinics.findIndex(sc => sc.id === b.id);
+      const aIndex = aiSearchResults.clinics.findIndex((sc: any) => sc.id === a.id);
+      const bIndex = aiSearchResults.clinics.findIndex((sc: any) => sc.id === b.id);
       if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
       if (aIndex !== -1) return -1;
       if (bIndex !== -1) return 1;
@@ -488,41 +576,7 @@ export default function HealthMap() {
     return 0;
   });
 
-  if (!hasValidKey) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-background p-6">
-        <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-8 max-w-md w-full shadow-2xl text-center space-y-6">
-          <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto border border-primary/20">
-             <AlertTriangle className="w-10 h-10 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-black text-on-surface mb-2">Llave de Google Maps Requerida</h2>
-            <p className="text-on-surface-variant text-sm leading-relaxed">
-              Para ver los hospitales y centros de salud en Nicaragua, necesitamos una API Key válida.
-            </p>
-          </div>
-          
-          <div className="space-y-4 text-left">
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-black text-xs shrink-0">1</div>
-              <p className="text-xs text-on-surface-variant">Obtén una llave en <a href="https://console.cloud.google.com/google/maps-apis/start" target="_blank" className="text-primary font-bold underline">Google Cloud Console</a>.</p>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-black text-xs shrink-0">2</div>
-              <p className="text-xs text-on-surface-variant">Agrégala en <b>Settings (⚙️)</b> → <b>Secrets</b> con el nombre <code>GOOGLE_MAPS_PLATFORM_KEY</code>.</p>
-            </div>
-          </div>
-          
-          <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-            <p className="text-[10px] font-bold text-primary uppercase tracking-widest leading-loose">
-              La aplicación se reiniciará automáticamente al guardar el secreto.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // Early return for invalid key only in the wrapper component, not here
   return (
     <div className="flex-1 flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-background">
       
@@ -549,7 +603,7 @@ export default function HealthMap() {
               <div className="flex flex-col items-end">
                 <span className="text-[10px] font-bold opacity-70 uppercase tracking-tighter">ETA Guardia Central</span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-display font-black text-error leading-none tracking-tighter">08:42</span>
+                  <span className="text-3xl font-display font-black text-error leading-none tracking-tighter">--:--</span>
                   <span className="text-xs font-bold text-error uppercase">min</span>
                 </div>
               </div>
@@ -747,21 +801,30 @@ export default function HealthMap() {
                     </div>
                     <h2 className="text-xl font-display font-bold text-on-surface">Red de Salud</h2>
                   </div>
-                  {searchQuery && (
-                    <motion.button
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      onClick={() => {
-                        setSearchQuery('');
-                        setAiSearchResults(null);
-                        setAiTriageResult(null);
-                      }}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary hover:bg-primary/20 transition-all font-mono"
-                    >
-                      <span>{searchQuery.toUpperCase()}</span>
-                      <X className="w-3 h-3" />
-                    </motion.button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {searchQuery && (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        onClick={() => {
+                          setSearchQuery('');
+                          setAiSearchResults(null);
+                          setAiTriageResult(null);
+                        }}
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary hover:bg-primary/20 transition-all font-mono"
+                      >
+                        <span>{searchQuery.toUpperCase()}</span>
+                        <X className="w-3 h-3" />
+                      </motion.button>
+                    )}
+                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${
+                      isPremium 
+                        ? 'bg-primary/20 text-primary border-primary/30' 
+                        : 'bg-hospital-green/10 text-hospital-green border-hospital-green/20'
+                    }`}>
+                      {isPremium ? 'Red Total Premium' : 'Solo Red Pública'}
+                    </span>
+                  </div>
                 </div>
 
                 {/* AI Smart Search Bar */}
@@ -829,7 +892,29 @@ export default function HealthMap() {
               </div>
             )}
             
-            <div className="flex gap-2 mt-2 md:mt-6 overflow-x-auto scrollbar-hide pb-1">
+            {!isPremium && !isEmergencyMode && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-6 p-5 bg-primary/5 rounded-[24px] border border-primary/20 shadow-inner relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12">
+                   <ShieldAlert className="w-16 h-16 text-primary" />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Nuestra Misión</span>
+                  </div>
+                  <h4 className="text-sm font-display font-black text-on-surface mb-2">{t('maps.social_mission.title')}</h4>
+                  <p className="text-[11px] text-on-surface-variant font-medium leading-relaxed opacity-80">
+                    {t('maps.social_mission.desc')}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+            
+            <div className="flex gap-2 mt-6 md:mt-8 overflow-x-auto scrollbar-hide pb-1">
                {[
                  { id: 'all', label: 'Todos', icon: Globe },
                  { id: 'pharmacy', label: 'Farmacias', icon: Pill },
@@ -858,7 +943,7 @@ export default function HealthMap() {
           {/* Scrollable Pharmacy List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
             {sortedClinics.map((clinic) => {
-              const aiRecommendation = aiSearchResults?.clinics.find(sc => sc.id === clinic.id);
+              const aiRecommendation = aiSearchResults?.clinics.find((sc: any) => sc.id === clinic.id);
               return (
               <motion.div
                 layout
@@ -891,19 +976,28 @@ export default function HealthMap() {
                       }`}>
                         {clinic.name}
                       </h3>
-                      <p className="text-xs text-on-surface-variant flex items-center gap-1 mt-1 font-medium italic opacity-70">
-                        <MapPin className="w-3 h-3" /> {clinic.address}
-                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${
+                          clinic.sector === 'public' 
+                            ? 'bg-hospital-green/10 text-hospital-green border-hospital-green/20' 
+                            : 'bg-primary/10 text-primary border-primary/20'
+                        }`}>
+                          {clinic.sector === 'public' ? t('maps.tag.public') : t('maps.tag.private')}
+                        </span>
+                        <p className="text-[10px] text-on-surface-variant flex items-center gap-1 font-medium italic opacity-70">
+                          <MapPin className="w-3 h-3" /> {clinic.address}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
                     <span className={`text-xl font-display font-bold leading-none ${clinic.type === 'emergency' ? 'text-error' : 'text-primary'}`}>
-                      {clinic.id === '3' ? '2.4 km' : '1.2 km'}
+                      {calculateDistance(userLocation, clinic.location)}
                     </span>
                     {clinic.type === 'emergency' ? (
-                      <span className="text-[10px] font-bold text-error uppercase tracking-tighter mt-1 font-mono">Espera: 5 min</span>
+                      <span className="text-[10px] font-bold text-error uppercase tracking-tighter mt-1 font-mono">Prioridad Alta</span>
                     ) : (
-                      <span className="text-[10px] font-bold text-on-surface-variant font-mono uppercase tracking-tighter mt-1">Aprox. 5 min</span>
+                      <span className="text-[10px] font-bold text-on-surface-variant font-mono uppercase tracking-tighter mt-1">Cerca de ti</span>
                     )}
                   </div>
                 </div>
@@ -999,7 +1093,6 @@ export default function HealthMap() {
         {/* Map Section */}
         <section className="flex-1 relative bg-background overflow-hidden">
           {hasValidKey ? (
-            <APIProvider apiKey={API_KEY}>
               <Map
                 defaultCenter={center}
                 defaultZoom={13}
@@ -1121,7 +1214,7 @@ export default function HealthMap() {
                                   <div className="flex items-center gap-1.5">
                                     <Route className="w-4 h-4 text-primary opacity-60" />
                                     <span className="text-xl font-display font-black text-on-surface leading-none">
-                                      {selectedClinic.id === '3' ? '2.4' : '1.2'} km
+                                      {calculateDistance(userLocation, selectedClinic.location)}
                                     </span>
                                   </div>
                                </div>
@@ -1162,7 +1255,6 @@ export default function HealthMap() {
                   </InfoWindow>
                 )}
               </Map>
-            </APIProvider>
           ) : (
             <div className="absolute inset-0 w-full h-full bg-cover bg-center grayscale opacity-60 mix-blend-screen" 
                  style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuAr1biyQAoYA3-Hq4qI8fOnXgkDERfbtqJkhE-oG7uZ4-nBBThi8jcCdIv0NgUFbXo3y-ZgwB_s_1I-5wAnm4FvBemeWNmid3vACTSYEsbzGZBuGoR5bXL2UudJAMv0AWlhvwFnKwgmGd5DOvNAdY8rTU1fkU19OHPwJpJD9sffZaPnlLUf3ZKASDhmvchKGnkH0COXzxRyi9GhwHgSlHa9ab-IfkSp-uJRxlwfm70XGgys-UtZ2YPaMWxQInl8Pz-lQNgr3E_C5g')` }}
@@ -1214,7 +1306,11 @@ export default function HealthMap() {
 
           {/* Map Controls */}
           <div className="absolute bottom-6 right-6 flex flex-col gap-3 z-10">
-             <button className="w-12 h-12 bg-surface-container border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-all active:scale-95">
+             <button 
+               onClick={() => map?.setCenter(userLocation)}
+               className="w-12 h-12 bg-surface-container border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-all active:scale-95"
+               title="Centrar en mi ubicación"
+             >
                <Target className="w-6 h-6" />
              </button>
              <div className="flex flex-col bg-surface-container border border-outline-variant/30 rounded-2xl shadow-xl overflow-hidden">
@@ -1235,5 +1331,50 @@ export default function HealthMap() {
       </div>
 
     </div>
+  );
+}
+
+export default function HealthMap() {
+  const { t } = useLanguage();
+
+  if (!hasValidKey) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-background p-6">
+        <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-8 max-w-md w-full shadow-2xl text-center space-y-6">
+          <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto border border-primary/20">
+             <AlertTriangle className="w-10 h-10 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-on-surface mb-2">{t('maps.key_required.title')}</h2>
+            <p className="text-on-surface-variant text-sm leading-relaxed">
+              {t('maps.key_required.desc')}
+            </p>
+          </div>
+          
+          <div className="space-y-4 text-left">
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-black text-xs shrink-0">1</div>
+              <p className="text-xs text-on-surface-variant">{t('maps.key_required.step1')} <a href="https://console.cloud.google.com/google/maps-apis/start" target="_blank" className="text-primary font-bold underline">Google Cloud Console</a>.</p>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center font-black text-xs shrink-0">2</div>
+              <p className="text-xs text-on-surface-variant">{t('maps.key_required.step2_prefix')} <b>Settings (⚙️)</b> → <b>Secrets</b> {t('maps.key_required.step2_middle')} <code>GOOGLE_MAPS_PLATFORM_KEY</code>.</p>
+            </div>
+          </div>
+          
+          <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
+            <p className="text-[10px] font-bold text-primary uppercase tracking-widest leading-loose">
+              {t('maps.key_required.rebuild')}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <APIProvider apiKey={API_KEY}>
+      <HealthMapInner />
+    </APIProvider>
   );
 }
