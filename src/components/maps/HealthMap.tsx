@@ -400,7 +400,7 @@ function HealthMapInner() {
             address: p.formattedAddress || 'Nicaragua',
             phone: p.nationalPhoneNumber || '',
             open24h: p.types?.includes('hospital') || p.regularOpeningHours?.periods?.length === 1 && p.regularOpeningHours?.periods[0].open?.day === 0 && !p.regularOpeningHours?.periods[0].close,
-            isOpen: p.regularOpeningHours?.isOpen() ?? true,
+            isOpen: p.regularOpeningHours?.isOpen ?? true,
           };
         });
 
