@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary, InfoWindow, useAdvancedMarkerRef } from '@vis.gl/react-google-maps';
 import { AnimatePresence, motion } from 'motion/react';
 import { 
@@ -28,11 +28,15 @@ import {
   Hospital,
   Store,
   Clock4,
-  AlertTriangle
+  AlertTriangle,
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 
 import { Clinic } from '../../types';
 import { getClinics } from '../../services/clinicService';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const API_KEY = process.env.GOOGLE_MAPS_PLATFORM_KEY || '';
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
@@ -237,9 +241,92 @@ export default function HealthMap() {
     description: string;
     condition: string;
   } | null>(null);
+  const [isSearchingAI, setIsSearchingAI] = useState(false);
+  const [aiSearchResults, setAiSearchResults] = useState<{clinics: any[]; summary: string} | null>(null);
+  const [aiTriageResult, setAiTriageResult] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const placesLib = useMapsLibrary('places');
   const map = useMap();
+
+  const userLocationContext = {
+    lat: userLocation.lat,
+    lng: userLocation.lng,
+    city: 'Managua',
+    country: 'Nicaragua'
+  };
+
+  const handleAISmartSearch = useCallback(async (query: string) => {
+    if (!query.trim() || clinics.length === 0) return;
+    
+    setIsSearchingAI(true);
+    setSearchQuery(query);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/gemini/smart-search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms: query, location: userLocationContext, clinics })
+      });
+      const results = await response.json();
+      setAiSearchResults(results);
+      
+      const triageRes = await fetch(`${API_URL}/api/gemini/triage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms: query, location: userLocationContext })
+      });
+      const triage = await triageRes.json();
+      setAiTriageResult(triage);
+      
+      if (triage.urgency === 'emergency') {
+        setIsEmergencyMode(true);
+        setFilter('emergency');
+      } else if (triage.urgency === 'high') {
+        setFilter('emergency');
+      }
+    } catch (error) {
+      console.error('AI Search Error:', error);
+    } finally {
+      setIsSearchingAI(false);
+    }
+  }, [clinics, userLocationContext]);
+
+  const handleAISymptomSubmit = useCallback(async (symptoms: string) => {
+    setIsSearchingAI(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/gemini/triage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms, location: userLocationContext })
+      });
+      const triage = await response.json();
+      setAiTriageResult(triage);
+      setTriageSummary({
+        urgency: triage.urgency,
+        description: triage.recommendation,
+        condition: triage.medication || 'Evaluación IA'
+      });
+      
+      const searchRes = await fetch(`${API_URL}/api/gemini/smart-search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms, location: userLocationContext, clinics })
+      });
+      const results = await searchRes.json();
+      setAiSearchResults(results);
+      
+      if (triage.urgency === 'emergency' || triage.urgency === 'high') {
+        setIsEmergencyMode(true);
+        setFilter('emergency');
+      }
+    } catch (error) {
+      console.error('AI Triage Error:', error);
+    } finally {
+      setIsSearchingAI(false);
+    }
+  }, [clinics, userLocationContext]);
 
   useEffect(() => {
     if (!placesLib || !map) return;
@@ -379,8 +466,26 @@ export default function HealthMap() {
 
   const filteredClinics = clinics.filter(c => {
     const matchesFilter = filter === 'all' || c.type === filter;
-    // For demo purposes, we show all pharmacies if searching for medication
+    if (aiSearchResults?.clinics) {
+      const recommendedIds = aiSearchResults.clinics
+        .filter(sc => sc.recommended)
+        .map(sc => sc.id);
+      if (recommendedIds.length > 0 && !recommendedIds.includes(c.id)) {
+        return false;
+      }
+    }
     return matchesFilter;
+  });
+
+  const sortedClinics = [...filteredClinics].sort((a, b) => {
+    if (aiSearchResults?.clinics) {
+      const aIndex = aiSearchResults.clinics.findIndex(sc => sc.id === a.id);
+      const bIndex = aiSearchResults.clinics.findIndex(sc => sc.id === b.id);
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+    }
+    return 0;
   });
 
   if (!hasValidKey) {
@@ -572,8 +677,14 @@ export default function HealthMap() {
                   <div className="flex flex-col gap-1">
                     <h4 className="text-[10px] font-bold text-error uppercase tracking-widest font-mono">Resumen de Triaje IA</h4>
                     <p className="text-xs font-medium text-on-surface-variant leading-relaxed">
-                      {triageSummary?.description || 'Dolor torácico agudo reportado. Posible compromiso cardiovascular. Prioridad Alta.'}
+                      {aiTriageResult?.recommendation || triageSummary?.description || 'Dolor torácico agudo reportado. Posible compromiso cardiovascular. Prioridad Alta.'}
                     </p>
+                    {aiTriageResult?.nearestClinic && (
+                      <div className="flex items-center gap-2 mt-1 text-[10px] font-medium text-secondary">
+                        <MapPin className="w-3 h-3" />
+                        <span>Centro más cercano: {aiTriageResult.nearestClinic.name} ({aiTriageResult.nearestClinic.distance})</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -628,23 +739,92 @@ export default function HealthMap() {
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
-                    <Search className="w-4 h-4" />
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
+                      <Search className="w-4 h-4" />
+                    </div>
+                    <h2 className="text-xl font-display font-bold text-on-surface">Red de Salud</h2>
                   </div>
-                  <h2 className="text-xl font-display font-bold text-on-surface">Red de Salud</h2>
+                  {searchQuery && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      onClick={() => {
+                        setSearchQuery('');
+                        setAiSearchResults(null);
+                        setAiTriageResult(null);
+                      }}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary hover:bg-primary/20 transition-all font-mono"
+                    >
+                      <span>{searchQuery.toUpperCase()}</span>
+                      <X className="w-3 h-3" />
+                    </motion.button>
+                  )}
                 </div>
-                {searchTerm && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    onClick={() => setSearchTerm('')}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary hover:bg-primary/20 transition-all font-mono"
+
+                {/* AI Smart Search Bar */}
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const input = e.currentTarget.querySelector('input') as HTMLInputElement;
+                    if (input?.value) handleAISmartSearch(input.value);
+                  }}
+                  className="relative"
+                >
+                  <div className="relative flex items-center">
+                    <Sparkles className="absolute left-4 w-4 h-4 text-secondary animate-pulse" />
+                    <input
+                      type="text"
+                      placeholder="Describe tus síntomas o búsqueda..."
+                      className="w-full h-12 pl-10 pr-24 bg-surface-container-high border border-outline-variant/30 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary transition-colors"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSearchingAI}
+                      className="absolute right-2 h-9 px-4 bg-primary text-on-primary rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                      {isSearchingAI ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="w-4 h-4" />
+                      )}
+                      IA
+                    </button>
+                  </div>
+                </form>
+
+                {/* AI Search Results Summary */}
+                {aiSearchResults && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-secondary-container/20 border border-secondary/20 rounded-xl"
                   >
-                    <span>{searchTerm.toUpperCase()}</span>
-                    <X className="w-3 h-3" />
-                  </motion.button>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="w-4 h-4 text-secondary" />
+                      <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Análisis IA</span>
+                    </div>
+                    <p className="text-xs text-on-surface-variant">{aiSearchResults.summary}</p>
+                    {aiTriageResult && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          aiTriageResult.urgency === 'emergency' ? 'bg-error text-on-error' :
+                          aiTriageResult.urgency === 'high' ? 'bg-error-container text-error' :
+                          aiTriageResult.urgency === 'medium' ? 'bg-secondary-container text-on-secondary-container' :
+                          'bg-surface-container text-on-surface-variant'
+                        }`}>
+                          {aiTriageResult.urgency.toUpperCase()}
+                        </span>
+                        {aiTriageResult.medication && (
+                          <span className="text-[10px] text-on-surface-variant">
+                            • {aiTriageResult.medication} {aiTriageResult.dosage}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </motion.div>
                 )}
               </div>
             )}
@@ -677,7 +857,9 @@ export default function HealthMap() {
 
           {/* Scrollable Pharmacy List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-            {filteredClinics.map((clinic) => (
+            {sortedClinics.map((clinic) => {
+              const aiRecommendation = aiSearchResults?.clinics.find(sc => sc.id === clinic.id);
+              return (
               <motion.div
                 layout
                 key={clinic.id}
@@ -687,7 +869,9 @@ export default function HealthMap() {
                     ? 'border-primary ring-1 ring-primary/40 shadow-[0_8px_24px_rgba(46,144,250,0.15)] bg-surface-container-high' 
                     : isEmergencyMode && clinic.type === 'emergency'
                       ? 'border-error/30 bg-error/5 hover:bg-error/10'
-                      : 'border-outline-variant/30 hover:border-primary/40 hover:bg-surface-container-high'
+                      : aiRecommendation?.recommended
+                        ? 'border-secondary/40 bg-secondary/5 ring-1 ring-secondary/20'
+                        : 'border-outline-variant/30 hover:border-primary/40 hover:bg-surface-container-high'
                 }`}
               >
                 {selectedClinic?.id === clinic.id && (
@@ -725,6 +909,12 @@ export default function HealthMap() {
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-4">
+                  {aiRecommendation?.recommended && (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border bg-secondary-container text-secondary border-secondary-container">
+                      <Sparkles className="w-3 h-3" />
+                      Recomendado IA
+                    </div>
+                  )}
                   {clinic.type === 'pharmacy' && (
                     <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border transition-colors ${
                       searchTerm 
@@ -742,6 +932,12 @@ export default function HealthMap() {
                   )}
                 </div>
 
+                {aiRecommendation?.reason && (
+                  <div className="mb-4 p-2 bg-surface-container-low rounded-lg border border-outline-variant/20">
+                    <p className="text-[10px] text-on-surface-variant italic">{aiRecommendation.reason}</p>
+                  </div>
+                )}
+
                 <button 
                   onClick={() => {
                     setSelectedClinic(clinic);
@@ -756,7 +952,8 @@ export default function HealthMap() {
                   Iniciar Navegación
                 </button>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Emergency Contacts Section from Mockup */}

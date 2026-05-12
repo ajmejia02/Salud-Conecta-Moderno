@@ -5,7 +5,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 export const getHealthAssistant = async (prompt: string, history: { role: string, parts: { text: string }[] }[] = []) => {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: [
         ...history.map(h => ({ role: h.role, parts: h.parts })),
         { role: 'user', parts: [{ text: prompt }] }
@@ -30,7 +30,7 @@ Responde siempre en español.`,
 export const getSmartTriage = async (symptoms: string) => {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: [{ role: 'user', parts: [{ text: symptoms }] }],
       config: {
         systemInstruction: `Eres un motor de triaje médico de alta precisión para Salud Conecta IA. 
