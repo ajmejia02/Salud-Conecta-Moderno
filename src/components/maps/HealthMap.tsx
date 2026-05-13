@@ -76,11 +76,24 @@ function ClinicMarker({ clinic, onClick }: { clinic: Clinic & { isOpen?: boolean
         glow: 'shadow-[0_0_15px_rgba(81,223,142,0.4)]',
         color: '#51df8e'
       };
-      case 'emergency': return { 
+      case 'emergency': 
+      case 'hospital': return { 
         bg: 'bg-error', 
         text: 'text-on-error', 
         glow: 'shadow-[0_0_20px_rgba(240,68,56,0.6)] animate-pulse',
         color: '#F04438'
+      };
+      case 'laboratory': return {
+        bg: 'bg-primary-container',
+        text: 'text-on-primary-container',
+        glow: 'shadow-[0_0_15px_rgba(166,200,255,0.4)]',
+        color: '#a6c8ff'
+      };
+      case 'health-center': return {
+        bg: 'bg-hospital-green',
+        text: 'text-white',
+        glow: 'shadow-[0_0_15px_rgba(46,204,113,0.4)]',
+        color: '#2ecc71'
       };
       default: return { 
         bg: 'bg-primary', 
@@ -92,8 +105,8 @@ function ClinicMarker({ clinic, onClick }: { clinic: Clinic & { isOpen?: boolean
   };
 
   const colors = getColors();
-  const Icon = clinic.type === 'pharmacy' ? Store : (clinic.type === 'emergency' ? ShieldAlert : Hospital);
-  const isVerified = clinic.id === '3' || clinic.id === '5'; // Mock global verification for certain IDs
+  const Icon = clinic.type === 'pharmacy' ? Store : (clinic.type === 'laboratory' ? Stethoscope : (clinic.type === 'emergency' || clinic.type === 'hospital' ? ShieldAlert : Hospital));
+  const isVerified = clinic.sector === 'public' || clinic.id.includes('static');
 
   return (
     <AdvancedMarker
@@ -237,12 +250,12 @@ function UserLocationMarker({ position }: { position: google.maps.LatLngLiteral 
 
 function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
   const { t } = useLanguage();
-  const { isPremium } = useUser();
+  const { isPremium, setMembership } = useUser();
   const [clinics, setClinics] = useState<(Clinic & { isOpen?: boolean })[]>([]);
   const [selectedClinic, setSelectedClinic] = useState<(Clinic & { isOpen?: boolean }) | null>(null);
   const [hasPlacesError, setHasPlacesError] = useState(false);
-  const [center, setCenter] = useState({ lat: 12.1364, lng: -86.2514 }); // Default to Managua
-  const [userLocation, setUserLocation] = useState({ lat: 12.1364, lng: -86.2514 });
+  const [center, setCenter] = useState({ lat: 12.1328, lng: -86.2504 }); // Managua, Nicaragua
+  const [userLocation, setUserLocation] = useState({ lat: 12.1328, lng: -86.2504 });
   const [isNavigating, setIsNavigating] = useState(false);
   const [routeInfo, setRouteInfo] = useState<{
     distance: string;
@@ -250,7 +263,7 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
     steps?: google.maps.DirectionsStep[];
   } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState<'all' | 'pharmacy' | 'emergency'>('all');
+  const [filter, setFilter] = useState<'all' | 'pharmacy' | 'emergency' | 'hospital' | 'health-center' | 'laboratory'>('all');
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
   const [triageSummary, setTriageSummary] = useState<{
     urgency: string;
@@ -261,25 +274,39 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
   const placesLib = useMapsLibrary('places');
   const map = useMap();
 
-  // Real Geolocation
+  // Real Geolocation - Priority Initialization
   useEffect(() => {
+    const handleLocation = (position: GeolocationPosition) => {
+      const pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+      console.log("Location detected:", pos);
+      setUserLocation(pos);
+      // Only set center once or if explicitly requested to avoid jumpy UX
+      setCenter(pos);
+      if (map) {
+        map.setCenter(pos);
+      }
+    };
+
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setUserLocation(pos);
-          setCenter(pos);
-          if (map) {
-            map.setCenter(pos);
-          }
+      // First attempt
+      navigator.geolocation.getCurrentPosition(handleLocation, (err) => {
+        console.warn("Geolocation initial failed:", err);
+      }, { enableHighAccuracy: true });
+
+      // Persistent watch for better accuracy if user moves
+      const watchId = navigator.geolocation.watchPosition(
+        (p) => {
+          const newPos = { lat: p.coords.latitude, lng: p.coords.longitude };
+          setUserLocation(newPos);
         },
-        () => {
-          console.warn("Geolocation permission denied or failed. Using default center.");
-        }
+        null,
+        { enableHighAccuracy: true }
       );
+
+      return () => navigator.geolocation.clearWatch(watchId);
     }
   }, [map]);
 
@@ -387,81 +414,9 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
   }, []);
 
   useEffect(() => {
-    const mockClinics: (Clinic & { isOpen?: boolean })[] = [
-      {
-        id: 'nic-1',
-        name: 'Farmacia FarmaValue Carretera Masaya',
-        type: 'pharmacy',
-        sector: 'private',
-        location: { lat: 12.1154, lng: -86.2354 },
-        address: 'Km 4.5 Carretera a Masaya, Managua',
-        phone: '+505 2270 0000',
-        inStock: true,
-        open24h: true,
-        isOpen: true,
-      },
-      {
-        id: 'nic-2',
-        name: 'Farmacia Kielsa Altamira',
-        type: 'pharmacy',
-        sector: 'private',
-        location: { lat: 12.1250, lng: -86.2540 },
-        address: 'Altamira d’ Este, Managua',
-        phone: '+505 2278 1234',
-        inStock: true,
-        open24h: false,
-        isOpen: true,
-      },
-      {
-        id: 'nic-3',
-        name: 'Hospital Central Dr. César Amador Kühl',
-        type: 'emergency',
-        sector: 'public',
-        location: { lat: 12.1360, lng: -86.2650 },
-        address: 'Managua, Nicaragua',
-        phone: '+505 2277 1234',
-        open24h: true,
-        isOpen: true,
-      },
-      {
-        id: 'nic-vivian',
-        name: 'Hospital Vivian Pellas',
-        type: 'emergency',
-        sector: 'private',
-        location: { lat: 12.0950, lng: -86.2250 },
-        address: 'Km 9.5 Carretera a Masaya, Managua',
-        phone: '+505 2255 6900',
-        open24h: true,
-        isOpen: true,
-      },
-      {
-        id: 'nic-4',
-        name: 'Hospital Militar Dr. Alejandro Dávila Bolaños',
-        type: 'emergency',
-        sector: 'public',
-        location: { lat: 12.1480, lng: -86.2750 },
-        address: 'Costado Oeste de Tiscapa, Managua',
-        phone: '+505 2222 2100',
-        open24h: true,
-        isOpen: true,
-      },
-      {
-        id: 'nic-5',
-        name: 'Centro de Salud Pedro Altamirano',
-        type: 'clinic',
-        sector: 'public',
-        location: { lat: 12.1280, lng: -86.2420 },
-        address: 'Altamira, Managua',
-        phone: '+505 2267 1111',
-        open24h: false,
-        isOpen: true,
-      }
-    ];
-
     const fetchClinics = async () => {
       try {
         const data = await getClinics();
-        // Defensive deduplication
         const seen = new Set();
         const deduplicated = data.filter(c => {
           if (seen.has(String(c.id))) return false;
@@ -469,35 +424,33 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
           return true;
         });
 
-        if (deduplicated.length > 5) {
-          setClinics(deduplicated);
-        } else {
-          setClinics(prev => {
-             const existingIds = new Set(prev.map(c => String(c.id)));
-             const uniqueMocks = mockClinics.filter(c => !existingIds.has(String(c.id)));
-             return [...prev, ...uniqueMocks];
-          });
-        }
-      } catch (e) {
         setClinics(prev => {
           const existingIds = new Set(prev.map(c => String(c.id)));
-          const uniqueMocks = mockClinics.filter(c => !existingIds.has(String(c.id)));
-          return [...prev, ...uniqueMocks];
+          const uniqueResults = deduplicated.filter(c => !existingIds.has(String(c.id)));
+          return [...prev, ...uniqueResults];
         });
+      } catch (e) {
+        console.error("Error loading clinics:", e);
       }
     };
     fetchClinics();
   }, []);
 
-  const filteredClinics = clinics.filter(c => {
-    const matchesFilter = filter === 'all' || c.type === filter;
-    
-    // Tiered Access Logic
-    // If not premium, only show public sector units
-    const matchesTier = isPremium || c.sector === 'public';
+  const filteredClinics = clinics
+    .filter(c => {
+      const matchesFilter = filter === 'all' || c.type === filter;
+      
+      // Tiered Access Logic
+      // If not premium, only show public sector units
+      const matchesTier = isPremium || c.sector === 'public';
 
-    return matchesFilter && matchesTier;
-  });
+      return matchesFilter && matchesTier;
+    })
+    .sort((a, b) => {
+      const distA = Math.sqrt(Math.pow(a.location.lat - userLocation.lat, 2) + Math.pow(a.location.lng - userLocation.lng, 2));
+      const distB = Math.sqrt(Math.pow(b.location.lat - userLocation.lat, 2) + Math.pow(b.location.lng - userLocation.lng, 2));
+      return distA - distB;
+    });
 
   return (
     <div className="flex-1 flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-background">
@@ -749,41 +702,49 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
               <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="mt-6 p-5 bg-primary/5 rounded-[24px] border border-primary/20 shadow-inner relative overflow-hidden"
+                className="mt-6 p-5 bg-gradient-to-br from-primary/10 to-primary/5 rounded-[24px] border border-primary/20 shadow-xl relative overflow-hidden group hover:border-primary/40 transition-all cursor-pointer"
+                onClick={() => setMembership('premium')}
               >
-                <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12">
+                <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 group-hover:rotate-45 transition-transform duration-500">
                    <ShieldAlert className="w-16 h-16 text-primary" />
                 </div>
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Nuestra Misión</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Misión Social Conecta</span>
                   </div>
-                  <h4 className="text-sm font-display font-black text-on-surface mb-2">{t('maps.social_mission.title')}</h4>
-                  <p className="text-[11px] text-on-surface-variant font-medium leading-relaxed opacity-80">
+                  <h4 className="text-base font-display font-black text-on-surface mb-2">{t('maps.social_mission.title')}</h4>
+                  <p className="text-[11px] text-on-surface-variant font-medium leading-relaxed opacity-80 mb-4">
                     {t('maps.social_mission.desc')}
                   </p>
+                  <div className="flex items-center gap-2 text-primary text-[10px] font-black uppercase tracking-widest">
+                    <span>Activar Red Premium Total (Hospitales Privados)</span>
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </motion.div>
             )}
             
-            <div className="flex gap-2 mt-6 md:mt-8 overflow-x-auto scrollbar-hide pb-1">
+            <div className="flex gap-2 mt-6 md:mt-8 overflow-x-auto scrollbar-hide pb-2">
                {[
                  { id: 'all', label: 'Todos', icon: Globe },
+                 { id: 'hospital', label: 'Hospitales', icon: Hospital },
+                 { id: 'health-center', label: 'Centros de Salud', icon: Stethoscope },
+                 { id: 'laboratory', label: 'Laboratorios', icon: Activity },
                  { id: 'pharmacy', label: 'Farmacias', icon: Pill },
-                 { id: 'emergency', label: 'Urgencias', icon: Activity }
+                 { id: 'emergency', label: 'Urgencias', icon: ShieldAlert }
                ].map((f) => (
                  <button
                    key={f.id}
                    onClick={() => setFilter(f.id as any)}
-                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border whitespace-nowrap shadow-sm font-mono ${
+                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border whitespace-nowrap shadow-sm font-mono ${
                      filter === f.id 
                        ? 'bg-primary text-on-primary border-primary' 
                        : 'bg-surface-container-high text-on-surface-variant border-outline-variant/30 hover:border-primary/40'
                    }`}
                  >
-                   <f.icon className="w-3.5 h-3.5" />
-                   {f.label.toUpperCase()}
+                   <f.icon className="w-3 h-3" />
+                   {f.label}
                  </button>
                ))}
             </div>
