@@ -35,7 +35,8 @@ import {
   ArrowUp,
   ArrowRight,
   ArrowLeft,
-  RefreshCw
+  RefreshCw,
+  Menu
 } from 'lucide-react';
 
 import { Clinic } from '../../types';
@@ -298,6 +299,7 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
   } | null>(null);
   const [filter, setFilter] = useState<'all' | 'pharmacy' | 'emergency' | 'hospital' | 'health-center' | 'laboratory' | 'clinic'>('all');
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const handleRouteUpdate = React.useCallback((leg: google.maps.DirectionsLeg) => {
     setRouteInfo({
       distance: leg.distance?.text || '',
@@ -729,6 +731,236 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
         )}
       </AnimatePresence>
 
+      {/* Floating Search Bar - Google Maps Style */}
+      <div className="absolute top-6 left-6 right-6 md:right-auto md:w-[420px] z-40 pointer-events-auto">
+        <div className="flex items-center bg-surface-container/95 backdrop-blur-xl border border-outline-variant/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden group transition-all focus-within:ring-2 focus-within:ring-primary/40 h-14">
+          <button 
+            onClick={() => setIsMenuOpen(true)}
+            className="w-14 h-full flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors active:scale-90 border-r border-outline-variant/10"
+            title="Menú de Red de Salud"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          
+          <div className="flex-1 flex items-center px-4 gap-3 cursor-pointer" onClick={() => setIsMenuOpen(true)}>
+            <Search className="w-5 h-5 text-on-surface-variant/50" />
+            <span className="text-sm text-on-surface-variant/60 font-medium">Buscar hospitales, farmacias...</span>
+          </div>
+
+          <div className="flex items-center gap-1 pr-2">
+            <button 
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors"
+              onClick={() => setIsMenuOpen(true)}
+            >
+              <Mic className="w-5 h-5" />
+            </button>
+            <div className="w-px h-6 bg-outline-variant/20 mx-1" />
+            <button 
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors"
+              onClick={() => setIsMenuOpen(true)}
+            >
+              <User className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] cursor-pointer"
+            />
+            
+            {/* Sidebar Drawer */}
+            <motion.div
+              initial={{ x: -400 }}
+              animate={{ x: 0 }}
+              exit={{ x: -400 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 left-0 w-[85%] max-w-[360px] bg-surface-container-low z-[101] shadow-2xl flex flex-col pointer-events-auto"
+            >
+              <div className="flex flex-col h-full p-6">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
+                      <Plus className="w-5 h-5 rotate-45" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-display font-bold text-on-surface leading-tight">Red de Salud</h2>
+                      <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-primary/20 text-primary border border-primary/30">
+                        Red Total Conectada
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setIsMenuOpen(false)}
+                    className="p-2 rounded-xl hover:bg-surface-container-highest transition-colors"
+                  >
+                    <X className="w-6 h-6 text-on-surface-variant" />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto space-y-8 pr-2 scrollbar-none">
+                  {/* Mission Section */}
+                  <div className="p-5 bg-gradient-to-br from-primary/10 to-primary/5 rounded-[24px] border border-primary/20 shadow-xl relative overflow-hidden">
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Misión Social Conecta</span>
+                      </div>
+                      <h4 className="text-base font-display font-black text-on-surface mb-2">Misión Social de Salud Conecta</h4>
+                      <p className="text-[11px] text-on-surface-variant font-medium leading-relaxed opacity-80 mb-4">
+                        Estamos comprometidos con el acceso a la salud para todos. Si eres usuario gratuito, te conectamos con toda la Red Pública de Salud de Nicaragua sin costo alguno.
+                      </p>
+                      {!isPremium && (
+                        <button 
+                          onClick={() => {
+                            setMembership('premium');
+                            setIsMenuOpen(false);
+                          }}
+                          className="flex items-center justify-between w-full"
+                        >
+                          <div className="flex items-center gap-2 text-primary text-[10px] font-black uppercase tracking-widest">
+                            <span>Ver Red Privada Premium</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[8px] font-black">SOLO PREMIUM</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Filters */}
+                  <div>
+                    <h3 className="text-[10px] font-black text-outline-variant uppercase tracking-[0.2em] font-mono mb-4 px-1">Categorías de Salud</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                       {[
+                         { id: 'all', label: 'Todos', icon: Globe },
+                         { id: 'hospital', label: 'hospitales', icon: Hospital },
+                         { id: 'health-center', label: 'Centros de Salud', icon: Stethoscope },
+                         { id: 'laboratory', label: 'Laboratorios', icon: Activity },
+                         { id: 'pharmacy', label: 'Farmacias', icon: Pill },
+                         { id: 'emergency', label: 'Urgencias', icon: ShieldAlert }
+                       ].map((f) => (
+                         <button
+                           key={f.id}
+                           onClick={() => {
+                             setFilter(f.id as any);
+                             setIsMenuOpen(false);
+                           }}
+                           className={`flex items-center gap-3 px-4 py-3 rounded-[20px] text-[10px] font-black uppercase tracking-wider transition-all border shadow-sm font-mono ${
+                             filter === f.id 
+                               ? 'bg-primary text-on-primary border-primary' 
+                               : 'bg-surface-container-high text-on-surface-variant border-outline-variant/30 hover:border-primary/40'
+                           }`}
+                         >
+                           <f.icon className="w-4 h-4" />
+                           {f.label}
+                         </button>
+                       ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center justify-between mb-4 px-1">
+                      <h3 className="text-[10px] font-black text-outline-variant uppercase tracking-[0.2em] font-mono">Resultados en tiempo real</h3>
+                      <div className="flex items-center gap-2">
+                        {isSearching && <RefreshCw className="w-3 h-3 text-primary animate-spin" />}
+                        <span className="text-[8px] font-black text-secondary uppercase tracking-[0.2em]">En Vivo</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {filteredClinics.length > 0 ? (
+                        filteredClinics.map((clinic) => (
+                          <div
+                            key={clinic.id}
+                            onClick={() => {
+                              setSelectedClinic(clinic);
+                              setIsMenuOpen(false);
+                              if (map) map.panTo(clinic.location);
+                            }}
+                            className={`group relative bg-surface-container-high p-4 rounded-2xl border transition-all cursor-pointer hover:border-primary/40 active:scale-[0.98] ${
+                              selectedClinic?.id === clinic.id ? 'border-primary ring-1 ring-primary/40' : 'border-outline-variant/10'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex items-start gap-3">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-current transition-colors ${
+                                  clinic.type === 'emergency' ? 'bg-error/10 text-error' : 'bg-secondary/10 text-secondary'
+                                }`}>
+                                  {clinic.type === 'emergency' ? <Activity className="w-4 h-4" /> : <Pill className="w-4 h-4" />}
+                                </div>
+                                <div>
+                                  <h4 className="font-display font-bold text-sm text-on-surface leading-tight group-hover:text-primary transition-colors">
+                                    {clinic.name}
+                                  </h4>
+                                  <p className="text-[9px] text-on-surface-variant flex items-center gap-1 font-medium mt-0.5 opacity-70">
+                                    <MapPin className="w-2.5 h-2.5" /> {clinic.address}
+                                  </p>
+                                </div>
+                              </div>
+                              <span className={`text-sm font-display font-bold ${clinic.type === 'emergency' ? 'text-error' : 'text-primary'}`}>
+                                {calculateDistance(userLocation, clinic.location)}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex gap-2">
+                                <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${
+                                  clinic.sector === 'public' 
+                                    ? 'bg-hospital-green/10 text-hospital-green border-hospital-green/20' 
+                                    : 'bg-primary/10 text-primary border-primary/20'
+                                }`}>
+                                  {clinic.sector === 'public' ? t('maps.tag.public') : t('maps.tag.private')}
+                                </span>
+                                {clinic.open24h && (
+                                  <span className="text-[8px] font-bold text-on-surface-variant uppercase bg-surface-container-highest px-1.5 py-0.5 rounded-md">24h</span>
+                                )}
+                              </div>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedClinic(clinic);
+                                  setIsNavigating(true);
+                                  setIsMenuOpen(false);
+                                }}
+                                className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline"
+                              >
+                                Ir ahora
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="py-8 text-center bg-surface-container-high rounded-3xl border border-dashed border-outline-variant/30">
+                          <p className="text-xs text-on-surface-variant font-medium">No se encontraron resultados</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 mt-auto border-t border-outline-variant/20 flex flex-col gap-3">
+                   <button 
+                     onClick={() => setIsMenuOpen(false)}
+                     className="w-full h-12 bg-surface-container-highest text-on-surface font-display font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-outline-variant/10 transition-colors"
+                   >
+                     Cerrar Menú
+                   </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <div className="absolute inset-0 pointer-events-none z-10">
         <div className="flex flex-col h-full w-full">
           {/* Top Search bar wrapper for mobile */}
@@ -736,483 +968,137 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
              {/* We can move search here if needed, but for now sidebar handles it */}
           </div>
 
-          <div className="flex-1 flex flex-col md:flex-row p-4 md:p-6 overflow-hidden items-end md:items-start">
-            {/* Floating Sidebar/Panel */}
-            <aside className="pointer-events-auto w-full md:w-[420px] lg:w-[480px] bg-surface-container-low/95 backdrop-blur-xl md:rounded-[32px] rounded-t-[32px] border border-outline-variant/20 flex flex-col shadow-[0_24px_48px_rgba(0,0,0,0.5)] overflow-hidden relative max-h-[60vh] md:max-h-full h-auto md:h-full transition-all duration-500">
-              {/* Drag Handle for Mobile */}
-              <div className="md:hidden flex justify-center py-2 shrink-0">
-                <div className="w-12 h-1 bg-outline-variant/30 rounded-full" />
-              </div>
-              
-              {/* Navigation Active Sidebar */}
-              <AnimatePresence mode="wait">
-            {isNavigating ? (
-              <motion.div 
-                key="navigation"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -20, opacity: 0 }}
-                className="flex flex-col h-full"
-              >
-                {!routeInfo ? (
-                  <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-                    <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center border-2 border-primary/20 mb-6 relative">
-                       <Navigation className="w-10 h-10 text-primary animate-bounce" />
-                       <div className="absolute -inset-4 bg-primary/5 rounded-full animate-ping" />
-                    </div>
-                    <h3 className="text-xl font-display font-black text-on-surface mb-2">Calculando Ruta Óptima</h3>
-                    <p className="text-sm text-on-surface-variant font-medium opacity-70">
-                      Buscando el camino más rápido hacia {selectedClinic?.name || 'el centro médico'}...
-                    </p>
-                    <button 
-                      onClick={() => setIsNavigating(false)}
-                      className="mt-8 px-6 py-2 rounded-xl bg-surface-container-high text-on-surface text-[10px] font-black tracking-widest uppercase border border-outline-variant/30"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="p-6 bg-surface-container border-b border-outline-variant/30 shrink-0">
-                      <div className="flex items-center justify-between mb-6">
-                        <button 
-                          onClick={() => {
-                            setIsNavigating(false);
-                            setRouteInfo(null);
-                          }}
-                          className="flex items-center gap-2 text-[10px] font-bold text-primary uppercase tracking-widest hover:opacity-80 active:scale-95 transition-transform"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                          Regresar
-                        </button>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
-                          <span className="text-[10px] font-mono font-black text-secondary tracking-widest uppercase">Ruta Activa</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 border-current shadow-xl ${
-                          selectedClinic?.type === 'emergency' ? 'bg-error/10 text-error' : 'bg-primary/10 text-primary'
-                        }`}>
-                          {selectedClinic?.type === 'emergency' ? <Activity className="w-8 h-8" /> : <Hospital className="w-8 h-8" />}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-2xl font-display font-black text-on-surface leading-tight tracking-tight">
-                            {selectedClinic?.name || 'Centro Médico'}
-                          </h3>
-                          <div className="flex items-center gap-4 mt-1">
-                            <div className="flex flex-col">
-                              <span className="text-[10px] font-bold text-outline-variant uppercase">Distancia</span>
-                              <span className="text-sm font-display font-bold text-on-surface">{routeInfo.distance}</span>
-                            </div>
-                            <div className="w-px h-6 bg-outline-variant/30" />
-                            <div className="flex flex-col">
-                              <span className="text-[10px] font-bold text-outline-variant uppercase">Tiempo</span>
-                              <span className={`text-sm font-display font-bold ${selectedClinic?.type === 'emergency' ? 'text-error' : 'text-primary'}`}>{routeInfo.duration}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-surface-container-high rounded-2xl border border-outline-variant/20 flex items-center justify-between shadow-inner">
-                        <div className="flex items-center gap-3">
-                           <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary border border-secondary/20">
-                              <CheckCircle2 className="w-4 h-4" />
-                           </div>
-                           <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Protocolo de Red</span>
-                        </div>
-                        <span className="text-[9px] font-black text-outline-variant">EN TIEMPO REAL</span>
-                      </div>
-                    </div>
-
-                    <div id="navigation-steps" className="flex-1 overflow-y-auto scrollbar-hide p-6">
-                      <h4 className="text-[10px] font-bold text-outline-variant uppercase tracking-[0.2em] font-mono mb-6">Pasos de Navegación</h4>
-                      <div className="space-y-6">
-                        {routeInfo.steps?.map((step, idx) => (
-                          <div key={idx} className="flex gap-4 group">
-                            <div className="flex flex-col items-center">
-                              <div className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all duration-300 ${
-                                idx === 0 ? 'bg-primary text-on-primary shadow-lg shadow-primary/20 border-primary' : 'bg-surface-container-highest border-outline-variant/30 text-on-surface-variant group-hover:border-primary/50'
-                              }`}>
-                                {getStepIcon(step.instructions || '')}
-                              </div>
-                              {idx !== (routeInfo.steps?.length || 0) - 1 && (
-                                <div className="w-0.5 flex-1 bg-outline-variant/20 my-1 group-hover:bg-primary/30 transition-colors" />
-                              )}
-                            </div>
-                            <div className="flex-1 pb-4">
-                              <div className="text-sm text-on-surface font-medium mb-1" dangerouslySetInnerHTML={{ __html: step.instructions || '' }} />
-                              <div className="flex items-center gap-3 text-[10px] font-bold text-outline-variant font-mono">
-                                <span className="flex items-center gap-1"><Navigation className="w-3 h-3" /> {step.distance?.text}</span>
-                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {step.duration?.text}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="p-6 bg-surface-container border-t border-outline-variant/20">
-                      <a 
-                        href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${selectedClinic?.location.lat},${selectedClinic?.location.lng}&travelmode=driving`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full h-14 bg-error text-on-error font-display font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-xl hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
-                      >
-                        <ExternalLink className="w-5 h-5" />
-                        Abrir GPS Externo
-                      </a>
-                    </div>
-                  </>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="list"
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 20, opacity: 0 }}
-                className="flex flex-col h-full"
-              >
-                <div className="p-6 bg-surface-container border-b border-outline-variant/30 shrink-0">
-            {isEmergencyMode ? (
-              <>
-                <div className="mb-4 bg-error-container/10 rounded-2xl p-4 border border-error/20 flex gap-4">
-                  <div className="bg-error/10 p-2 rounded-xl h-fit border border-error/20">
-                    <Stethoscope className="w-5 h-5 text-error" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-[10px] font-bold text-error uppercase tracking-widest font-mono">Resumen de Triaje IA</h4>
-                    <p className="text-xs font-medium text-on-surface-variant leading-relaxed">
-                      {triageSummary?.description || 'Dolor torácico agudo reportado. Posible compromiso cardiovascular. Prioridad Alta.'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Direct Communication Section from Mockup */}
-                <div className="bg-error-container/10 border border-error/20 rounded-2xl p-4 flex flex-col gap-4 shadow-inner">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest font-mono">Comunicación Directa</h4>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-error rounded-full animate-pulse" />
-                      <span className="text-[10px] font-bold text-error uppercase tracking-widest font-mono">Grabando...</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <button className="w-12 h-12 bg-error text-on-error rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(240,68,56,0.3)] animate-pulse hover:scale-105 active:scale-95 transition-all outline-none">
-                      <Mic className="w-5 h-5 fill-current" />
-                    </button>
-                    
-                    <div className="flex-1 h-8 flex items-center gap-1 overflow-hidden">
-                      {[0, 0.2, 0.4, 0.1, 0.3, 0.5, 0.2, 0.4, 0.1, 0.0].map((delay, i) => (
-                        <div 
-                          key={i}
-                          style={{ 
-                            animationDelay: `${delay}s`,
-                            height: `${40 + Math.random() * 60}%` 
-                          }}
-                          className="w-0.5 bg-error/40 rounded-full animate-voice-bounce origin-center"
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-surface-container-lowest/50 border border-outline-variant/30 rounded-xl p-3 shadow-inner">
-                    <h5 className="text-[9px] font-bold text-outline-variant uppercase tracking-widest mb-2 flex items-center gap-2">
-                       <span className="w-1 h-1 bg-primary rounded-full" />
-                       Transcripción en tiempo real
-                    </h5>
-                    <p className="text-xs text-on-surface font-medium italic leading-relaxed">
-                      "Siento un dolor punzante en el pecho que se extiende hacia el brazo izquierdo..."
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button className="flex-1 bg-error/20 border border-error/40 hover:bg-error/30 text-error py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                      <Send className="w-3 h-3" />
-                      Confirmar y Enviar
-                    </button>
-                    <button className="px-3 bg-surface-container-high border border-outline-variant/30 text-on-surface-variant rounded-xl flex items-center justify-center hover:bg-surface-container-highest transition-all group">
-                      <RotateCcw className="w-4 h-4 group-hover:rotate-[-45deg] transition-transform" />
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary border border-primary/30">
-                      <Search className="w-4 h-4" />
-                    </div>
-                    <h2 className="text-xl font-display font-bold text-on-surface">Red de Salud</h2>
-                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm bg-primary/20 text-primary border-primary/30`}>
-                      Red Total Conectada
-                    </span>
-                  </div>
-                  {isSearching && (
-                    <div className="flex items-center gap-2 mt-1 px-2 py-0.5 bg-primary/10 border border-primary/20 rounded-md">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-ping" />
-                      <span className="text-[8px] font-black uppercase tracking-wider text-primary">Actualizando Red Médica...</span>
-                    </div>
-                  )}
-                  {hasPlacesError && !isSearching && (
-                    <div className="flex items-center gap-2 mt-1 px-2 py-0.5 bg-error/10 border border-error/20 rounded-md">
-                      <AlertTriangle className="w-3 h-3 text-error" />
-                      <span className="text-[8px] font-black uppercase tracking-wider text-error">Modo Offline API: Habilitar Places API (New)</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-            
-            {!isPremium && !isEmergencyMode && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="mt-6 p-5 bg-gradient-to-br from-primary/10 to-primary/5 rounded-[24px] border border-primary/20 shadow-xl relative overflow-hidden group hover:border-primary/40 transition-all cursor-pointer"
-                onClick={() => setMembership('premium')}
-              >
-                <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 group-hover:rotate-45 transition-transform duration-500">
-                   <ShieldAlert className="w-16 h-16 text-primary" />
-                </div>
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Misión Social Conecta</span>
-                  </div>
-                  <h4 className="text-base font-display font-black text-on-surface mb-2">{t('maps.social_mission.title')}</h4>
-                  <p className="text-[11px] text-on-surface-variant font-medium leading-relaxed opacity-80 mb-4">
-                    {t('maps.social_mission.desc')}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-primary text-[10px] font-black uppercase tracking-widest">
-                      <span>Ver Red Privada Premium</span>
-                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                    <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[8px] font-black">SOLO PREMIUM</span>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-            
-            <div className="flex gap-2 mt-6 md:mt-8 overflow-x-auto scrollbar-hide pb-2">
-               {[
-                 { id: 'all', label: 'Todos', icon: Globe },
-                 { id: 'hospital', label: 'Hospitales', icon: Hospital },
-                 { id: 'health-center', label: 'Centros de Salud', icon: Stethoscope },
-                 { id: 'laboratory', label: 'Laboratorios', icon: Activity },
-                 { id: 'pharmacy', label: 'Farmacias', icon: Pill },
-                 { id: 'emergency', label: 'Urgencias', icon: ShieldAlert }
-               ].map((f) => (
-                 <button
-                   key={f.id}
-                   onClick={() => setFilter(f.id as any)}
-                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border whitespace-nowrap shadow-sm font-mono ${
-                     filter === f.id 
-                       ? 'bg-primary text-on-primary border-primary scale-105' 
-                       : 'bg-surface-container-high text-on-surface-variant border-outline-variant/30 hover:border-primary/40'
-                   }`}
-                 >
-                   <f.icon className="w-3 h-3" />
-                   {f.label}
-                 </button>
-               ))}
-            </div>
-          </div>
-
-          {/* List Section Wrapper */}
-          <div className="p-4 px-6 bg-surface-container-low border-b border-outline-variant/10 flex items-center justify-between">
-            <h3 className="text-[10px] font-black text-outline-variant uppercase tracking-[0.2em] font-mono">
-              Resultados en tiempo real
-            </h3>
-          </div>
-
-          {/* Scrollable Pharmacy List */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
-            {filteredClinics.map((clinic) => (
-              <motion.div
-                layout
-                key={clinic.id}
-                onClick={() => setSelectedClinic(clinic)}
-                className={`group relative bg-surface-container p-5 rounded-2xl border transition-all cursor-pointer ${
-                  selectedClinic?.id === clinic.id 
-                    ? 'border-primary ring-1 ring-primary/40 shadow-[0_8px_24px_rgba(46,144,250,0.15)] bg-surface-container-high' 
-                    : isEmergencyMode && clinic.type === 'emergency'
-                      ? 'border-error/30 bg-error/5 hover:bg-error/10'
-                      : 'border-outline-variant/30 hover:border-primary/40 hover:bg-surface-container-high'
-                }`}
-              >
-                {selectedClinic?.id === clinic.id && (
-                  <div className={`absolute top-0 left-0 w-1.5 h-full rounded-l-full ${clinic.type === 'emergency' ? 'bg-error' : 'bg-primary'}`} />
-                )}
-                
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-current transition-colors ${
-                      clinic.type === 'emergency' ? 'bg-error/10 text-error' : 'bg-secondary/10 text-secondary'
-                    }`}>
-                      {clinic.type === 'emergency' ? <Activity className="w-5 h-5" /> : <Pill className="w-5 h-5" />}
-                    </div>
-                    <div>
-                      <h3 className={`font-display font-bold text-lg leading-tight transition-colors ${
-                        clinic.type === 'emergency' ? 'text-on-surface group-hover:text-error' : 'text-on-surface group-hover:text-secondary'
-                      }`}>
-                        {clinic.name}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${
-                          clinic.sector === 'public' 
-                            ? 'bg-hospital-green/10 text-hospital-green border-hospital-green/20' 
-                            : 'bg-primary/10 text-primary border-primary/20'
-                        }`}>
-                          {clinic.sector === 'public' ? t('maps.tag.public') : t('maps.tag.private')}
-                        </span>
-                        <p className="text-[10px] text-on-surface-variant flex items-center gap-1 font-medium italic opacity-70">
-                          <MapPin className="w-3 h-3" /> {clinic.address}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <span className={`text-xl font-display font-bold leading-none ${clinic.type === 'emergency' ? 'text-error' : 'text-primary'}`}>
-                      {calculateDistance(userLocation, clinic.location)}
-                    </span>
-                    {clinic.type === 'emergency' ? (
-                      <span className="text-[10px] font-bold text-error uppercase tracking-tighter mt-1 font-mono">Prioridad Alta</span>
-                    ) : (
-                      <span className="text-[10px] font-bold text-on-surface-variant font-mono uppercase tracking-tighter mt-1">Cerca de ti</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {clinic.open24h && (
-                    <div className="flex items-center gap-1.5 bg-surface-container-highest text-on-surface-variant px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border border-outline-variant/30">
-                      <Clock className="w-3 h-3" /> 24 Horas
-                    </div>
-                  )}
-                </div>
-
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (clinic.sector === 'private' && !isPremium) {
-                      setMembership('premium');
-                      return;
-                    }
-                    setSelectedClinic(clinic);
-                    setIsNavigating(true);
-                    // Scroll to top of panel to see instructions
-                    const panel = document.querySelector('aside');
-                    if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className={`w-full py-3.5 px-4 rounded-[18px] font-display font-bold text-xs flex items-center justify-center gap-2 transition-all ${
-                    clinic.sector === 'private' && !isPremium
-                      ? 'bg-outline-variant/10 text-outline-variant border border-outline-variant/20 grayscale'
-                      : selectedClinic?.id === clinic.id
-                        ? clinic.type === 'emergency' ? 'bg-error text-on-error shadow-lg shadow-error/20' : 'bg-primary text-on-primary shadow-lg shadow-primary/20'
-                        : 'bg-surface-container-highest text-on-surface border border-outline-variant/30 hover:bg-surface-container transition-all active:scale-[0.98]'
-                  }`}>
-                  {clinic.sector === 'private' && !isPremium ? (
-                    <ShieldAlert className="w-4 h-4" />
-                  ) : (
-                    <Route className="w-4 h-4" />
-                  )}
-                  {clinic.sector === 'private' && !isPremium ? 'Bloqueado (Suscripción)' : 'Navegar (Instrucciones)'}
-                </button>
-
-                {clinic.sector !== 'private' || isPremium ? (
-                  <a 
-                    href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${clinic.location.lat},${clinic.location.lng}&travelmode=driving`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full mt-2 py-2.5 px-4 rounded-[18px] font-display font-bold text-[10px] uppercase tracking-widest bg-surface-container-high border border-outline-variant/30 text-secondary hover:bg-surface-container-highest flex items-center justify-center gap-2 transition-all"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    Abrir en Google Maps GPS
-                  </a>
-                ) : null}
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Emergency Contacts Section from Mockup */}
-          {isEmergencyMode && (
-            <div className="p-6 bg-surface-container border-t border-outline-variant/20 flex flex-col gap-4">
-               <h3 className="text-[10px] font-bold text-outline-variant uppercase tracking-[0.2em] font-mono pl-1">Contactos de Emergencia</h3>
-               <button className="w-full bg-surface-container-high border border-outline-variant/30 rounded-2xl p-4 flex items-center gap-4 hover:border-primary group transition-all shadow-sm">
-                 <div className="w-12 h-12 bg-primary/10 text-primary border border-primary/20 rounded-full flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-all">
-                   <User className="w-6 h-6 fill-current" />
-                 </div>
-                 <div className="flex-1 text-left">
-                   <h4 className="font-bold text-on-surface text-sm">María (Hija)</h4>
-                   <p className="text-[10px] font-medium text-on-surface-variant uppercase tracking-widest mt-0.5">Aviso de Emergencia</p>
-                 </div>
-                 <div className="w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-all shadow-sm">
-                   <Phone className="w-5 h-5" />
-                 </div>
-               </button>
-            </div>
-          )}
-
-          {isEmergencyMode && (
-             <div className="px-6 pb-6 pt-2 space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <button 
-                    onClick={() => {
-                      if (selectedClinic?.sector === 'private' && !isPremium) {
-                        setMembership('premium');
-                        return;
-                      }
-                      if (selectedClinic) {
-                        setIsNavigating(true);
-                        const panel = document.querySelector('aside');
-                        if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' });
-                      }
-                    }}
-                    className={`w-full h-14 font-display font-black text-sm uppercase tracking-[0.15em] rounded-2xl shadow-[0_8px_20px_rgba(46,144,250,0.3)] hover:shadow-[0_12px_28px_rgba(46,144,250,0.4)] hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group ${
-                      selectedClinic?.sector === 'private' && !isPremium
-                        ? 'bg-outline-variant/20 text-outline-variant cursor-not-allowed'
-                        : 'bg-primary text-on-primary'
-                    }`}>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                    {selectedClinic?.sector === 'private' && !isPremium ? (
-                      <ShieldAlert className="w-5 h-5" />
-                    ) : (
-                      <Navigation className="w-5 h-5 fill-current" />
-                    )}
-                    {selectedClinic?.sector === 'private' && !isPremium ? 'Suscripción Requerida' : 'Instrucciones de Ruta'}
-                  </button>
-
-                  {selectedClinic && (selectedClinic.sector !== 'private' || isPremium) && (
-                    <a 
-                      href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${selectedClinic.location.lat},${selectedClinic.location.lng}&travelmode=driving`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full h-12 bg-secondary text-on-secondary font-display font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-lg flex items-center justify-center gap-2 hover:brightness-110 transition-all"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Abrir GPS Google Maps
-                    </a>
-                  )}
-                </div>
-
-                <button 
-                  onClick={() => setIsEmergencyMode(false)}
-                  className="w-full py-3 text-[10px] font-bold text-outline-variant hover:text-error uppercase tracking-widest transition-colors flex items-center justify-center gap-2 border border-dashed border-outline-variant/30 rounded-xl"
+          <div className="flex-1 flex flex-col md:flex-row p-4 md:p-6 overflow-hidden items-end md:items-start relative z-10 pointer-events-none">
+            <AnimatePresence>
+              {isNavigating && (
+                <motion.aside 
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -20, opacity: 0 }}
+                  className="pointer-events-auto w-full md:w-[420px] lg:w-[480px] bg-surface-container-low/95 backdrop-blur-xl md:rounded-[32px] rounded-t-[32px] border border-outline-variant/20 flex flex-col shadow-[0_24px_48px_rgba(0,0,0,0.5)] overflow-hidden relative max-h-[60vh] md:max-h-full h-auto md:h-full transition-all duration-500"
                 >
-                  <X className="w-3.5 h-3.5" /> Finalizar Modo Emergencia
-                </button>
-             </div>
-          )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </aside>
+                  {/* Drag Handle for Mobile */}
+                  <div className="md:hidden flex justify-center py-2 shrink-0">
+                    <div className="w-12 h-1 bg-outline-variant/30 rounded-full" />
+                  </div>
+                  
+                  <div className="flex flex-col h-full">
+                    {!routeInfo ? (
+                      <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                        <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center border-2 border-primary/20 mb-6 relative">
+                           <Navigation className="w-10 h-10 text-primary animate-bounce" />
+                           <div className="absolute -inset-4 bg-primary/5 rounded-full animate-ping" />
+                        </div>
+                        <h3 className="text-xl font-display font-black text-on-surface mb-2">Calculando Ruta Óptima</h3>
+                        <p className="text-sm text-on-surface-variant font-medium opacity-70">
+                          Buscando el camino más rápido hacia {selectedClinic?.name || 'el centro médico'}...
+                        </p>
+                        <button 
+                          onClick={() => setIsNavigating(false)}
+                          className="mt-8 px-6 py-2 rounded-xl bg-surface-container-high text-on-surface text-[10px] font-black tracking-widest uppercase border border-outline-variant/30"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="p-6 bg-surface-container border-b border-outline-variant/30 shrink-0">
+                          <div className="flex items-center justify-between mb-6">
+                            <button 
+                              onClick={() => {
+                                setIsNavigating(false);
+                                setRouteInfo(null);
+                              }}
+                              className="flex items-center gap-2 text-[10px] font-bold text-primary uppercase tracking-widest hover:opacity-80 active:scale-95 transition-transform"
+                            >
+                              <RotateCcw className="w-3.5 h-3.5" />
+                              Regresar
+                            </button>
+                            <div className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+                              <span className="text-[10px] font-mono font-black text-secondary tracking-widest uppercase">Ruta Activa</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4 mb-6">
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 border-current shadow-xl ${
+                              selectedClinic?.type === 'emergency' ? 'bg-error/10 text-error' : 'bg-primary/10 text-primary'
+                            }`}>
+                              {selectedClinic?.type === 'emergency' ? <Activity className="w-8 h-8" /> : <Hospital className="w-8 h-8" />}
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-2xl font-display font-black text-on-surface leading-tight tracking-tight">
+                                {selectedClinic?.name || 'Centro Médico'}
+                              </h3>
+                              <div className="flex items-center gap-4 mt-1">
+                                <div className="flex flex-col">
+                                  <span className="text-[10px] font-bold text-outline-variant uppercase">Distancia</span>
+                                  <span className="text-sm font-display font-bold text-on-surface">{routeInfo.distance}</span>
+                                </div>
+                                <div className="w-px h-6 bg-outline-variant/30" />
+                                <div className="flex flex-col">
+                                  <span className="text-[10px] font-bold text-outline-variant uppercase">Tiempo</span>
+                                  <span className={`text-sm font-display font-bold ${selectedClinic?.type === 'emergency' ? 'text-error' : 'text-primary'}`}>{routeInfo.duration}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="p-4 bg-surface-container-high rounded-2xl border border-outline-variant/20 flex items-center justify-between shadow-inner">
+                            <div className="flex items-center gap-3">
+                               <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary border border-secondary/20">
+                                  <CheckCircle2 className="w-4 h-4" />
+                               </div>
+                               <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Protocolo de Red</span>
+                            </div>
+                            <span className="text-[9px] font-black text-outline-variant">EN TIEMPO REAL</span>
+                          </div>
+                        </div>
+
+                        <div id="navigation-steps" className="flex-1 overflow-y-auto scrollbar-hide p-6">
+                          <h4 className="text-[10px] font-bold text-outline-variant uppercase tracking-[0.2em] font-mono mb-6">Pasos de Navegación</h4>
+                          <div className="space-y-6">
+                            {routeInfo.steps?.map((step, idx) => (
+                              <div key={idx} className="flex gap-4 group">
+                                <div className="flex flex-col items-center">
+                                  <div className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all duration-300 ${
+                                    idx === 0 ? 'bg-primary text-on-primary shadow-lg shadow-primary/20 border-primary' : 'bg-surface-container-highest border-outline-variant/30 text-on-surface-variant group-hover:border-primary/50'
+                                  }`}>
+                                    {getStepIcon(step.instructions || '')}
+                                  </div>
+                                  {idx !== (routeInfo.steps?.length || 0) - 1 && (
+                                    <div className="w-0.5 flex-1 bg-outline-variant/20 my-1 group-hover:bg-primary/30 transition-colors" />
+                                  )}
+                                </div>
+                                <div className="flex-1 pb-4">
+                                  <div className="text-sm text-on-surface font-medium mb-1" dangerouslySetInnerHTML={{ __html: step.instructions || '' }} />
+                                  <div className="flex items-center gap-3 text-[10px] font-bold text-outline-variant font-mono">
+                                    <span className="flex items-center gap-1"><Navigation className="w-3 h-3" /> {step.distance?.text}</span>
+                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {step.duration?.text}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="p-6 bg-surface-container border-t border-outline-variant/20">
+                          <a 
+                            href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${selectedClinic?.location.lat},${selectedClinic?.location.lng}&travelmode=driving`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full h-14 bg-error text-on-error font-display font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-xl hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                            Abrir GPS Externo
+                          </a>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </motion.aside>
+              )}
+            </AnimatePresence>
 
         {/* Floating Desktop Controls */}
         <div className="flex-1 relative hidden md:block">
