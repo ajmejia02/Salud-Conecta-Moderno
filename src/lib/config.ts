@@ -5,7 +5,7 @@
  */
 
 // Fallback keys are empty in production. In AI Studio, keys are provided via environment secrets.
-const FALLBACK_GEMINI_KEY = "";
+const FALLBACK_GEMINI_KEY = "AIzaSyCWXgxSq1g92KhifiIh0ObOvSfDdV1kjgw";
 const FALLBACK_MAPS_KEY = "";
 
 // Known leaked keys that should be blocked to avoid 403 errors

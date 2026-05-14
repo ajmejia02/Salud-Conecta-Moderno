@@ -29,7 +29,13 @@ import {
   Store,
   Clock4,
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  CornerUpLeft,
+  CornerUpRight,
+  ArrowUp,
+  ArrowRight,
+  ArrowLeft,
+  RefreshCw
 } from 'lucide-react';
 
 import { Clinic } from '../../types';
@@ -292,6 +298,26 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
   } | null>(null);
   const [filter, setFilter] = useState<'all' | 'pharmacy' | 'emergency' | 'hospital' | 'health-center' | 'laboratory' | 'clinic'>('all');
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
+  const handleRouteUpdate = React.useCallback((leg: google.maps.DirectionsLeg) => {
+    setRouteInfo({
+      distance: leg.distance?.text || '',
+      duration: leg.duration?.text || '',
+      steps: leg.steps
+    });
+  }, []);
+
+  const getStepIcon = (instructions: string) => {
+    const lower = instructions.toLowerCase();
+    if (lower.includes('izquierda') || lower.includes('left')) return <CornerUpLeft className="w-3.5 h-3.5" />;
+    if (lower.includes('derecha') || lower.includes('right')) return <CornerUpRight className="w-3.5 h-3.5" />;
+    if (lower.includes('continúa') || lower.includes('continue') || lower.includes('recto') || lower.includes('straight')) return <ArrowUp className="w-3.5 h-3.5" />;
+    if (lower.includes('gira') || lower.includes('turn')) {
+        if (lower.includes('izquierda') || lower.includes('left')) return <CornerUpLeft className="w-3.5 h-3.5" />;
+        return <CornerUpRight className="w-3.5 h-3.5" />;
+    }
+    return <Navigation className="w-3.5 h-3.5" />;
+  };
+
   const [triageSummary, setTriageSummary] = useState<{
     urgency: string;
     description: string;
@@ -536,13 +562,7 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
                 <Directions
                   origin={userLocation}
                   destination={selectedClinic.location}
-                  onRouteUpdate={(leg) => {
-                    setRouteInfo({
-                      distance: leg.distance?.text || '',
-                      duration: leg.duration?.text || '',
-                      steps: leg.steps
-                    });
-                  }}
+                  onRouteUpdate={handleRouteUpdate}
                 />
               )}
 
@@ -812,8 +832,10 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
                         {routeInfo.steps?.map((step, idx) => (
                           <div key={idx} className="flex gap-4 group">
                             <div className="flex flex-col items-center">
-                              <div className="w-6 h-6 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                                <span className="text-[10px] font-bold">{idx + 1}</span>
+                              <div className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all duration-300 ${
+                                idx === 0 ? 'bg-primary text-on-primary shadow-lg shadow-primary/20 border-primary' : 'bg-surface-container-highest border-outline-variant/30 text-on-surface-variant group-hover:border-primary/50'
+                              }`}>
+                                {getStepIcon(step.instructions || '')}
                               </div>
                               {idx !== (routeInfo.steps?.length || 0) - 1 && (
                                 <div className="w-0.5 flex-1 bg-outline-variant/20 my-1 group-hover:bg-primary/30 transition-colors" />
