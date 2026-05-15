@@ -515,8 +515,8 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
               <UserLocationMarker position={userLocation} />
 
               {/* Floating Bottom Card custom logic */}
-              {selectedClinic && (
-                <div className="absolute top-[88px] left-4 right-4 sm:top-[88px] sm:left-auto sm:right-4 sm:w-[380px] z-50 animate-in slide-in-from-top-8 duration-300">
+              {selectedClinic && !isNavigating && (
+                <div className="absolute top-[88px] left-4 right-4 md:left-6 md:right-auto md:w-[420px] z-50 animate-in slide-in-from-top-8 duration-300">
                   {(() => {
                     const isOpen = selectedClinic.isOpen !== undefined ? selectedClinic.isOpen : selectedClinic.open24h;
                     return (
@@ -1051,34 +1051,45 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
           {/* Map Section was moved to background, this area is for map-top overlays */}
           
           {/* Route Overlay: Desktop only floating panel */}
-          <div className="absolute top-6 right-6 p-6 glass-panel-elevated rounded-2xl w-[320px] flex flex-col gap-4 z-10 shadow-2xl border border-outline-variant/20 pointer-events-auto">
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${isEmergencyMode ? 'bg-error/20 text-error border-error/30' : 'bg-primary/20 text-primary border-primary/30'}`}>
-                {isEmergencyMode ? <AlertCircle className="w-4 h-4 animation-pulse" /> : <Route className="w-4 h-4" />}
+          {isNavigating && (
+            <div className="absolute top-6 right-6 p-6 glass-panel-elevated rounded-2xl w-[320px] flex flex-col gap-4 z-10 shadow-2xl border border-outline-variant/20 pointer-events-auto animate-in slide-in-from-right-8 duration-300">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${isEmergencyMode ? 'bg-error/20 text-error border-error/30' : 'bg-primary/20 text-primary border-primary/30'}`}>
+                    {isEmergencyMode ? <AlertCircle className="w-4 h-4 animate-pulse" /> : <Route className="w-4 h-4" />}
+                  </div>
+                  <h3 className="font-display font-bold text-lg text-on-surface leading-tight">
+                    {isEmergencyMode ? 'Ruta de Urgencia' : 'Ruta Activa'}
+                  </h3>
+                </div>
+                <button 
+                  onClick={() => setIsNavigating(false)}
+                  className="p-1 rounded-full hover:bg-surface-container-highest transition-colors"
+                >
+                  <X className="w-5 h-5 text-on-surface-variant" />
+                </button>
               </div>
-              <h3 className="font-display font-bold text-lg text-on-surface leading-tight">
-                {isEmergencyMode ? 'Ruta de Urgencia' : 'Ruta Activa'}
-              </h3>
-            </div>
-            
-            <div className="flex justify-between items-end border-b border-outline-variant/20 pb-3">
-              <span className="text-xs text-on-surface-variant font-medium">Llegada estimada</span>
-              <span className={`text-2xl font-display font-bold ${isEmergencyMode ? 'text-error' : 'text-primary'}`}>14:35</span>
-            </div>
-
-            <div className={`flex items-center gap-3 ${isEmergencyMode ? 'text-error' : 'text-secondary-container'}`}>
-              <CheckCircle2 className={`w-5 h-5 shrink-0 ${isEmergencyMode ? 'animate-pulse' : ''}`} />
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] font-mono leading-tight">
-                {isEmergencyMode ? 'Prioridad Médica Notificada' : 'Stock Reservado Temporalmente'}
-              </p>
-            </div>
-
-            {!hasValidKey && (
-              <div className="p-3 bg-error/10 border border-error/20 rounded-xl flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-error shrink-0 mt-0.5" />
-                <p className="text-[10px] font-bold text-error leading-tight">Configuración de API Key requerida para navegación real.</p>
+              
+              <div className="flex justify-between items-end border-b border-outline-variant/20 pb-3">
+                <span className="text-xs text-on-surface-variant font-medium">Tiempo de Viaje</span>
+                <span className={`text-xl font-display font-bold ${isEmergencyMode ? 'text-error' : 'text-primary'}`}>
+                  {routeInfo.duration?.text || 'Calculando...'}
+                </span>
               </div>
-            )}
+
+              <div className={`flex items-center gap-3 ${isEmergencyMode ? 'text-error' : 'text-secondary-container'}`}>
+                <CheckCircle2 className={`w-5 h-5 shrink-0 ${isEmergencyMode ? 'animate-pulse' : ''}`} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] font-mono leading-tight">
+                  {isEmergencyMode ? 'Prioridad Médica Notificada' : 'Navegación Iniciada'}
+                </p>
+              </div>
+
+              {!hasValidKey && (
+                <div className="p-3 bg-error/10 border border-error/20 rounded-xl flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-error shrink-0 mt-0.5" />
+                  <p className="text-[10px] font-bold text-error leading-tight">Configuración de API Key requerida para navegación real.</p>
+                </div>
+              )}
             
             {isEmergencyMode && (
               <div className="bg-surface-container-high rounded-xl p-3 border border-error/10">
@@ -1092,6 +1103,7 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
     </div>
