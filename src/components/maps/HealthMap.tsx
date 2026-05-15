@@ -514,20 +514,13 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
               {/* User Current Location */}
               <UserLocationMarker position={userLocation} />
 
-              {/* InfoWindow custom logic */}
+              {/* Floating Bottom Card custom logic */}
               {selectedClinic && (
-                <InfoWindow
-                  position={selectedClinic.location}
-                  onCloseClick={() => {
-                    setSelectedClinic(null);
-                    if (isNavigating) setIsNavigating(false);
-                  }}
-                  headerDisabled
-                >
+                <div className="absolute bottom-20 left-4 right-4 sm:bottom-4 sm:left-auto sm:right-4 sm:w-[380px] z-50 animate-in slide-in-from-bottom-8 duration-300">
                   {(() => {
                     const isOpen = selectedClinic.isOpen !== undefined ? selectedClinic.isOpen : selectedClinic.open24h;
                     return (
-                      <div className="p-0 -m-1 w-[85vw] sm:w-[320px] max-w-[320px] overflow-hidden bg-surface rounded-2xl shadow-2xl animate-in fade-in zoom-in duration-300">
+                      <div className="w-full overflow-hidden bg-surface rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-outline-variant/20">
                         {/* Card Header with Type-specific background gradient */}
                         <div className={`p-4 relative ${
                           selectedClinic.type === 'emergency' 
@@ -642,7 +635,7 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
                       </div>
                     );
                   })()}
-                </InfoWindow>
+                </div>
               )}
             </Map>
         ) : (
