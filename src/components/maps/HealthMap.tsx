@@ -70,91 +70,19 @@ const createClinicIcon = (type: string, isOpen: boolean, isSelected: boolean) =>
   };
   const color = type === 'pharmacy' ? colors.pharmacy : type === 'emergency' ? colors.emergency : colors.default;
   
-  return L.divIcon({
-    className: 'custom-clinic-marker',
-    html: `
-      <div style="
-        width: 44px; height: 44px; 
-        background: ${isOpen ? color.bg : '#404753'}; 
-        border: 3px solid ${isSelected ? '#fff' : color.border};
-        border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        cursor: pointer;
-        transition: all 0.3s;
-        ${!isOpen ? 'opacity: 0.6;' : ''}
-      ">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-          ${type === 'pharmacy' 
-            ? '<path d="M6 19V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M9 9h6M12 6v6"/>'
-            : type === 'emergency'
-              ? '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>'
-              : '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'
-          }
-        </svg>
-        ${!isOpen ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.4);border-radius:11px;display:flex;align-items:center;justify-content:center"><div style="width:70%;height:2px;background:white;transform:rotate(45deg)"/></div></div>' : ''}
-      </div>
-      <div style="
-        width: 0; height: 0; 
-        border-left: 6px solid transparent; 
-        border-right: 6px solid transparent; 
-        border-top: 10px solid ${isOpen ? color.bg : '#404753'};
-        margin: -2px auto 0;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-      "></div>
-      ${isOpen ? `<div style="
-        width: 10px; height: 10px; 
-        background: ${color.bg}; 
-        border-radius: 50%;
-        position: absolute; bottom: 18px; right: -2px;
-        border: 2px solid white;
-        box-shadow: 0 0 10px ${color.bg};
-      "></div>` : ''}
-    `,
-    iconSize: [44, 56],
-    iconAnchor: [22, 56],
-    popupAnchor: [0, -56],
-  });
+  return null as any;
 };
 
-const userIcon = L.divIcon({
-  className: 'user-location-marker',
-  html: `
-    <div style="position:relative;width:24px;height:24px">
-      <div style="position:absolute;inset:-8px;border-radius:50%;background:rgba(46,144,250,0.2);animation:pulse 2s infinite"></div>
-      <div style="
-        width:24px;height:24px;background:white;border-radius:50%;
-        border:3px solid #2E90FA;display:flex;align-items:center;justify-content:center;
-        box-shadow:0 0 20px rgba(46,144,250,0.6);
-      ">
-        <div style="width:10px;height:10px;background:#2E90FA;border-radius:50%"></div>
-      </div>
-    </div>
-  `,
-  iconSize: [24, 24],
-  iconAnchor: [12, 12],
-});
+const userIcon = null as any;
 
-function ChangeView({ center }: { center: { lat: number; lng: number } }) {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, map.getZoom());
-  }, [center, map]);
-  return null;
-}
-
-function ClinicsMap({
-  clinics,
-  selectedClinic,
-  setSelectedClinic,
-  userLocation,
-  setCenter,
+function Directions({
+  origin,
+  destination,
+  onRouteUpdate
 }: {
-  clinics: (Clinic & { isOpen?: boolean })[];
-  selectedClinic: (Clinic & { isOpen?: boolean }) | null;
-  setSelectedClinic: (c: (Clinic & { isOpen?: boolean }) | null) => void;
-  userLocation: { lat: number; lng: number };
-  setCenter: (c: { lat: number; lng: number }) => void;
+  origin: google.maps.LatLngLiteral;
+  destination: google.maps.LatLngLiteral;
+  onRouteUpdate: (leg: google.maps.DirectionsLeg) => void;
 }) {
   const map = useMap();
   const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService | null>(null);
@@ -212,6 +140,57 @@ function ClinicsMap({
   }, [directionsService, map, origin, destination, onRouteUpdate]);
 
   return null;
+}
+
+const ClinicMarker: React.FC<{ clinic: Clinic & { isOpen?: boolean }, onClick: (c: Clinic & { isOpen?: boolean }) => void }> = ({ clinic, onClick }) => {
+  const isOpen = clinic.isOpen !== undefined ? clinic.isOpen : clinic.open24h;
+  const isSelected = false;
+  
+  const colors: Record<string, { bg: string; border: string }> = {
+    pharmacy: { bg: '#51df8e', border: '#2ecc71' },
+    emergency: { bg: '#F04438', border: '#c0392b' },
+    default: { bg: '#a6c8ff', border: '#2E90FA' },
+  };
+  const color = clinic.type === 'pharmacy' ? colors.pharmacy : clinic.type === 'emergency' ? colors.emergency : colors.default;
+
+  return (
+    <AdvancedMarker position={clinic.location} onClick={() => onClick(clinic)}>
+      <div className="relative flex flex-col items-center cursor-pointer group hover:scale-110 transition-transform">
+        <div style={{
+          width: '44px', height: '44px', 
+          background: isOpen ? color.bg : '#404753', 
+          border: `3px solid ${isSelected ? '#fff' : color.border}`,
+          borderRadius: '14px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
+          transition: 'all 0.3s',
+          opacity: !isOpen ? 0.6 : 1
+        }}>
+          {clinic.type === 'pharmacy' ? <Pill className="w-5 h-5 text-white" /> : 
+           clinic.type === 'emergency' ? <ShieldAlert className="w-5 h-5 text-white" /> : 
+           <Hospital className="w-5 h-5 text-white" />}
+        </div>
+        <div style={{
+          width: 0, height: 0, 
+          borderLeft: '6px solid transparent', 
+          borderRight: '6px solid transparent', 
+          borderTop: `10px solid ${isOpen ? color.bg : '#404753'}`,
+          marginTop: '-2px',
+          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+        }} />
+        {isOpen && (
+          <div style={{
+            width: '10px', height: '10px', 
+            background: color.bg, 
+            borderRadius: '50%',
+            position: 'absolute', bottom: '18px', right: '-2px',
+            border: '2px solid white',
+            boxShadow: `0 0 10px ${color.bg}`
+          }} />
+        )}
+      </div>
+    </AdvancedMarker>
+  );
 }
 
 function UserLocationMarker({ position }: { position: google.maps.LatLngLiteral }) {
