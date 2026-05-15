@@ -85,18 +85,18 @@
   
   html.light {
     --color-background: #f8fafc;
-    --color-on-background: #0f172a;
+    --color-on-background: #020617;
     --color-surface: #ffffff;
     --color-surface-dim: #f1f5f9;
     --color-surface-bright: #ffffff;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f1f5f9;
-    --color-surface-container: #e2e8f0;
-    --color-surface-container-high: #cbd5e1;
-    --color-surface-container-highest: #94a3b8;
+    --color-surface-container-low: #f8fafc;
+    --color-surface-container: #f1f5f9;
+    --color-surface-container-high: #e2e8f0;
+    --color-surface-container-highest: #cbd5e1;
     
-    --color-on-surface: #1e293b;
-    --color-on-surface-variant: #475569;
+    --color-on-surface: #0f172a;
+    --color-on-surface-variant: #334155;
     --color-inverse-surface: #0f172a;
     --color-inverse-on-surface: #f8fafc;
     --color-outline: #64748b;
@@ -111,6 +111,16 @@
     --color-on-secondary: #ffffff;
     --color-secondary-container: #70fda7;
     --color-on-secondary-container: #00210e;
+
+    /* Adaptive effects for light mode */
+    --glass-border: rgba(15, 23, 42, 0.08);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Default (Dark) Adaptive effects */
+  :root {
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(11, 19, 38, 0.6);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -120,15 +130,20 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-surface/40 backdrop-blur-xl border border-white/5;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
   }
   
   .glass-panel-elevated {
-    @apply bg-surface/60 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(46,144,250,0.1)];
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   }
 
   .bento-card {
-    @apply bg-surface-container p-6 rounded-lg border border-outline-variant/30 hover:border-primary/40 transition-all duration-300;
+    @apply bg-surface-container p-6 rounded-2xl border border-outline-variant/20 hover:border-primary/40 transition-all duration-300 shadow-sm;
   }
 }
 

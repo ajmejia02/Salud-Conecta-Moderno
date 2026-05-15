@@ -423,7 +423,7 @@ export function Settings() {
         <button 
           onClick={handleSave}
           disabled={saving}
-          className="w-full md:w-auto bg-primary text-on-primary-fixed-variant px-10 py-5 rounded-2xl font-display font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
+          className="w-full md:w-auto bg-primary text-on-primary px-10 py-5 rounded-2xl font-display font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
         >
           {saving ? t('settings.processing') : (
             <>

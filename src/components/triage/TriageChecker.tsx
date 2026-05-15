@@ -239,7 +239,7 @@ export default function TriageChecker() {
   };
 
   return (
-    <div className="flex-1 w-full bg-background min-h-screen">
+    <div className="flex-1 w-full bg-background min-h-screen font-sans">
       <div className="max-w-[1400px] mx-auto h-full px-4 md:px-6 py-6">
         <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-140px)] relative">
           
@@ -406,7 +406,6 @@ export default function TriageChecker() {
             </div>
           </div>
 
-          {/* Right Column: Live Analysis Board (Desktop Only) */}
           <div className="hidden lg:flex w-[420px] flex-col gap-6 shrink-0 h-full overflow-y-auto custom-scrollbar pb-6">
             {result ? (
               renderAnalysisBoard()
@@ -436,7 +435,6 @@ export default function TriageChecker() {
               </div>
             )}
 
-            {/* Quick Tips / Info Section */}
             <div className="p-6 bg-primary-container/10 rounded-[28px] border border-primary/20">
                <h4 className="text-xs font-bold text-primary uppercase tracking-widest mb-4 flex items-center gap-2">
                  <Zap className="w-4 h-4" />
@@ -461,7 +459,6 @@ export default function TriageChecker() {
         </div>
       </div>
 
-      {/* Toast Notification */}
       <AnimatePresence>
         {showToast && (
           <motion.div
@@ -494,7 +491,6 @@ export default function TriageChecker() {
     </div>
   );
 
-  // Helper to render the Analysis Board (used in both columns depending on screen size)
   function renderAnalysisBoard() {
     if (!result) return null;
     return (
@@ -503,7 +499,6 @@ export default function TriageChecker() {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col gap-6"
       >
-        {/* Urgency Card */}
         <div className={`overflow-hidden rounded-[28px] border-2 ${getUrgencyColor(result.urgency)} shadow-2xl relative`}>
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <Activity className="w-24 h-24 rotate-12" />
@@ -525,7 +520,6 @@ export default function TriageChecker() {
           </div>
         </div>
 
-        {/* Diagnostic Details */}
         <div className="bg-surface-container-high/40 backdrop-blur-sm rounded-[32px] border border-outline-variant/30 overflow-hidden shadow-xl">
           <div className="p-6 border-b border-outline-variant/20 flex items-center justify-between">
             <div className="flex flex-col">
@@ -609,7 +603,6 @@ export default function TriageChecker() {
           </div>
         </div>
 
-        {/* Safety Footer */}
         <div className="bg-error-container/10 rounded-2xl p-4 border border-error/20 flex gap-3">
           <AlertTriangle className="w-4 h-4 text-error shrink-0" />
           <p className="text-[10px] font-medium text-on-surface-variant leading-snug">

@@ -32,15 +32,15 @@ export default function Hero({ onStartAssistant, onViewMap, onOpenRegistration }
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-2xl text-white drop-shadow-lg"
+            className="max-w-2xl text-on-background drop-shadow-sm"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-background/60 backdrop-blur-md rounded-full border border-white/10 mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-surface-container/60 backdrop-blur-md rounded-full border border-outline-variant/30 mb-8">
                <span className="w-2 h-2 rounded-full bg-hospital-green animate-pulse" />
-               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white">{t('hero.badge')}</span>
+               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">{t('hero.badge')}</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-[1.1]">
-              <span className="text-secondary-fixed">
+              <span className="text-primary">
                 {language === 'es' ? 'Eficiencia' : 'Empathetic'}
               </span>
               {' '}
@@ -49,20 +49,20 @@ export default function Hero({ onStartAssistant, onViewMap, onOpenRegistration }
               {language === 'es' ? 'al servicio de tu salud.' : "at your health's service."}
             </h1>
 
-            <p className="text-xl md:text-2xl text-primary-fixed mb-10 leading-relaxed font-semibold">
+            <p className="text-xl md:text-2xl text-on-surface-variant mb-10 leading-relaxed font-semibold">
               {t('hero.subtitle')}
             </p>
             <div className="flex flex-wrap gap-5">
               <button 
                 onClick={onStartAssistant}
-                className="bg-white text-[#001c3b] px-10 py-5 rounded-xl font-black text-xl hover:scale-105 hover:bg-neutral-100 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.3)] transition-all flex items-center gap-3"
+                className="bg-primary text-on-primary px-10 py-5 rounded-xl font-black text-xl hover:scale-105 hover:brightness-110 shadow-lg shadow-primary/20 transition-all flex items-center gap-3"
               >
                 {t('hero.cta.primary')}
                 <Stethoscope className="w-6 h-6" />
               </button>
               <button 
                 onClick={onViewMap}
-                className="bg-primary-container/20 text-white border-2 border-white/40 px-10 py-5 rounded-xl font-black text-xl hover:scale-105 hover:bg-white/20 transition-all flex items-center gap-3"
+                className="bg-surface-container-high text-on-surface-variant border-2 border-outline-variant/30 px-10 py-5 rounded-xl font-black text-xl hover:scale-105 hover:bg-surface-container-highest transition-all flex items-center gap-3"
               >
                 {t('hero.cta.secondary')}
                 <MapPin className="w-6 h-6" />
