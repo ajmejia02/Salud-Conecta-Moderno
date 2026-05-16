@@ -1,56 +1,55 @@
-import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
-import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { AnimatePresence, motion } from 'motion/react';
 import { 
   MapPin, Phone, Pill, Activity, Navigation, Search, Clock, CheckCircle2, 
-  Route, Target, Plus, Minus, AlertCircle, Globe, X, ShieldAlert, Stethoscope,
-  ChevronRight, Hospital
+  Route, Target, Plus, Minus, X, ShieldAlert, Stethoscope, ChevronRight, 
+  Hospital, RefreshCw, Loader2
 } from 'lucide-react';
 import { Clinic } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useUser } from '../../contexts/UserContext';
 import { GOOGLE_MAPS_KEY } from "../../lib/config";
+import { getClinics } from '../../services/clinicService';
 
 const API_KEY = GOOGLE_MAPS_KEY;
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
 
-const MapContext = createContext<google.maps.Map | null>(null);
-
-const SAMPLE_CLINICS: (Clinic & { isOpen?: boolean })[] = [
-  { id: '1', name: 'Hospital Central', type: 'hospital', sector: 'public', location: { lat: 12.1362, lng: -86.2514 }, address: 'Managua', phone: '2222-2222', open24h: true, rating: 4.5, reviews: 150 },
-  { id: '2', name: 'Farmacia La Popular', type: 'pharmacy', sector: 'private', location: { lat: 12.1340, lng: -86.2490 }, address: 'Centro', phone: '2222-1111', open24h: true, rating: 4.2, reviews: 80 },
-  { id: '3', name: 'Centro de Salud San Juan', type: 'health-center', sector: 'public', location: { lat: 12.1300, lng: -86.2550 }, address: 'San Juan', phone: '2222-3333', open24h: false, isOpen: true, rating: 4.0, reviews: 45 },
-  { id: '4', name: 'Clínica Privada Santa María', type: 'clinic', sector: 'private', location: { lat: 12.1380, lng: -86.2480 }, address: 'Carrera a Masaya', phone: '2222-4444', open24h: false, isOpen: false, rating: 4.8, reviews: 200 },
-  { id: '5', name: 'Emergency Medical', type: 'emergency', sector: 'private', location: { lat: 12.1350, lng: -86.2520 }, address: 'Pista Roosevelt', phone: '2222-9111', open24h: true, rating: 4.7, reviews: 300 },
-];
+const NICARAGUA_CENTER = { lat: 12.1328, lng: -86.2504 };
 
 const ClinicMarker: React.FC<{ clinic: Clinic & { isOpen?: boolean }, onClick: (c: Clinic & { isOpen?: boolean }) => void }> = ({ clinic, onClick }) => {
   const isOpen = clinic.isOpen !== undefined ? clinic.isOpen : clinic.open24h;
   const colors: Record<string, { bg: string; border: string }> = {
     pharmacy: { bg: '#51df8e', border: '#2ecc71' },
     emergency: { bg: '#F04438', border: '#c0392b' },
-    default: { bg: '#a6c8ff', border: '#2E90FA' },
+    hospital: { bg: '#2E90FA', border: '#1a73e8' },
+    'health-center': { bg: '#9334E6', border: '#7c3aed' },
+    clinic: { bg: '#a6c8ff', border: '#2E90FA' },
+    laboratory: { bg: '#F59E0B', border: '#d97706' },
   };
-  const color = clinic.type === 'pharmacy' ? colors.pharmacy : clinic.type === 'emergency' ? colors.emergency : colors.default;
+  const color = colors[clinic.type] || colors.default;
 
   return (
     <AdvancedMarker position={clinic.location} onClick={() => onClick(clinic)}>
       <div className="relative flex flex-col items-center cursor-pointer group hover:scale-110 transition-transform">
         <div style={{
-          width: '44px', height: '44px',
+          width: '40px', height: '40px',
           background: isOpen ? color.bg : '#404753',
           border: `3px solid ${color.border}`,
-          borderRadius: '14px',
+          borderRadius: '12px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
           opacity: !isOpen ? 0.6 : 1
         }}>
-          {clinic.type === 'pharmacy' ? <Pill className="w-5 h-5 text-white" /> : 
-           clinic.type === 'emergency' ? <ShieldAlert className="w-5 h-5 text-white" /> : 
-           <Hospital className="w-5 h-5 text-white" />}
+          {clinic.type === 'pharmacy' ? <Pill className="w-4 h-4 text-white" /> : 
+           clinic.type === 'emergency' ? <ShieldAlert className="w-4 h-4 text-white" /> : 
+           clinic.type === 'hospital' ? <Hospital className="w-4 h-4 text-white" /> :
+           clinic.type === 'health-center' ? <Stethoscope className="w-4 h-4 text-white" /> :
+           clinic.type === 'laboratory' ? <Activity className="w-4 h-4 text-white" /> :
+           <MapPin className="w-4 h-4 text-white" />}
         </div>
-        <div style={{ width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: `10px solid ${isOpen ? color.bg : '#404753'}`, marginTop: '-2px' }} />
-        {isOpen && <div style={{ width: '10px', height: '10px', background: color.bg, borderRadius: '50%', position: 'absolute', bottom: '18px', right: '-2px', border: '2px solid white', boxShadow: `0 0 10px ${color.bg}` }} />}
+        <div style={{ width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: `8px solid ${isOpen ? color.bg : '#404753'}`, marginTop: '-1px' }} />
+        {isOpen && <div style={{ width: '8px', height: '8px', background: color.bg, borderRadius: '50%', position: 'absolute', bottom: '14px', right: '-2px', border: '1.5px solid white' }} />}
       </div>
     </AdvancedMarker>
   );
@@ -59,30 +58,14 @@ const ClinicMarker: React.FC<{ clinic: Clinic & { isOpen?: boolean }, onClick: (
 function UserLocationMarker({ position }: { position: google.maps.LatLngLiteral }) {
   return (
     <AdvancedMarker position={position} zIndex={100}>
-      <div className="relative flex items-center justify-center group">
-        <div className="absolute w-16 h-16 bg-primary/10 rounded-full animate-ping opacity-30" />
-        <div className="absolute w-10 h-10 bg-primary/25 rounded-full animate-ping opacity-50" />
-        <div className="relative w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(46,144,250,0.8)] border-[3px] border-primary">
-          <div className="w-2.5 h-2.5 bg-primary rounded-full" />
+      <div className="relative flex items-center justify-center">
+        <div className="absolute w-14 h-14 bg-primary/10 rounded-full animate-ping opacity-40" />
+        <div className="absolute w-8 h-8 bg-primary/20 rounded-full animate-ping opacity-60" />
+        <div className="relative w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg border-[2.5px] border-primary">
+          <div className="w-2 h-2 bg-primary rounded-full" />
         </div>
       </div>
     </AdvancedMarker>
-  );
-}
-
-function MapControls({ onCenter, onZoomIn, onZoomOut }: { onCenter: () => void; onZoomIn: () => void; onZoomOut: () => void }) {
-  return (
-    <div className="absolute bottom-6 right-6 flex flex-col gap-3 z-30">
-      <button onClick={onCenter} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Centrar en mi ubicación">
-        <Target className="w-6 h-6" />
-      </button>
-      <button onClick={onZoomIn} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Acercar">
-        <Plus className="w-6 h-6" />
-      </button>
-      <button onClick={onZoomOut} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Alejar">
-        <Minus className="w-6 h-6" />
-      </button>
-    </div>
   );
 }
 
@@ -90,20 +73,18 @@ function MapContent({
   clinics, 
   userLocation, 
   onClinicSelect,
-  onCenterChange 
+  onMapReady
 }: { 
   clinics: (Clinic & { isOpen?: boolean })[]; 
   userLocation: { lat: number; lng: number };
   onClinicSelect: (c: Clinic & { isOpen?: boolean }) => void;
-  onCenterChange: (map: google.maps.Map) => void;
+  onMapReady: (map: google.maps.Map) => void;
 }) {
   const map = useMap();
   
   useEffect(() => {
-    if (map) {
-      onCenterChange(map);
-    }
-  }, [map, onCenterChange]);
+    if (map) onMapReady(map);
+  }, [map, onMapReady]);
 
   return (
     <>
@@ -115,35 +96,160 @@ function MapContent({
   );
 }
 
+function MapControls({ onCenter, onZoomIn, onZoomOut }: { onCenter: () => void; onZoomIn: () => void; onZoomOut: () => void }) {
+  return (
+    <div className="absolute bottom-6 right-6 flex flex-col gap-3 z-30">
+      <button onClick={onCenter} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Mi ubicación">
+        <Target className="w-5 h-5" />
+      </button>
+      <button onClick={onZoomIn} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Acercar">
+        <Plus className="w-5 h-5" />
+      </button>
+      <button onClick={onZoomOut} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Alejar">
+        <Minus className="w-5 h-5" />
+      </button>
+    </div>
+  );
+}
+
 export default function HealthMap() {
   const { t } = useLanguage();
   const { isPremium } = useUser();
-  const [clinics, setClinics] = useState<(Clinic & { isOpen?: boolean })[]>(SAMPLE_CLINICS);
+  const [clinics, setClinics] = useState<(Clinic & { isOpen?: boolean })[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingPlaces, setLoadingPlaces] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState<(Clinic & { isOpen?: boolean }) | null>(null);
-  const [center, setCenter] = useState({ lat: 12.1328, lng: -86.2504 });
-  const [userLocation, setUserLocation] = useState({ lat: 12.1328, lng: -86.2504 });
+  const [center, setCenter] = useState(NICARAGUA_CENTER);
+  const [userLocation, setUserLocation] = useState(NICARAGUA_CENTER);
   const [isNavigating, setIsNavigating] = useState(false);
   const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
-  const [filter, setFilter] = useState<'all' | 'pharmacy' | 'emergency' | 'hospital' | 'health-center'>('all');
+  const [filter, setFilter] = useState<'all' | 'pharmacy' | 'emergency' | 'hospital' | 'health-center' | 'laboratory' | 'clinic'>('all');
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const [placesLib, setPlacesLib] = useState<google.maps.places.PlacesLibrary | null>(null);
+
+  const placesLibrary = useMapsLibrary('places');
+
+  useEffect(() => {
+    setPlacesLib(placesLibrary || null);
+  }, [placesLibrary]);
 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => console.warn('Geolocation denied')
+        () => console.warn('Geolocation denied, using default')
       );
     }
   }, []);
+
+  useEffect(() => {
+    const loadClinics = async () => {
+      setLoading(true);
+      try {
+        const dbClinics = await getClinics();
+        setClinics(dbClinics);
+      } catch (error) {
+        console.error('Error loading clinics:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadClinics();
+  }, []);
+
+  const searchPlacesInArea = useCallback(async (map: google.maps.Map) => {
+    if (!placesLib || !hasValidKey) return;
+    
+    setLoadingPlaces(true);
+    try {
+      const bounds = map.getBounds();
+      if (!bounds) return;
+
+      const searchTerms = [
+        { term: 'hospital', type: 'hospital' },
+        { term: 'clínica médica', type: 'clinic' },
+        { term: 'centro de salud', type: 'health-center' },
+        { term: 'farmacia', type: 'pharmacy' },
+        { term: 'laboratorio clínico', type: 'laboratory' },
+        { term: 'emergencia médica', type: 'emergency' },
+      ];
+
+      const newClinics: (Clinic & { isOpen?: boolean })[] = [];
+      const existingIds = new Set(clinics.map(c => c.id));
+
+      for (const { term, type } of searchTerms) {
+        try {
+          const request: google.maps.places.TextSearchRequest = {
+            query: `${term} Nicaragua`,
+            bounds: bounds,
+            fields: ['id', 'name', 'geometry', 'formatted_address', 'types', 'formatted_phone_number', 'rating', 'user_ratings_total'],
+          };
+          
+          const service = new placesLib.PlacesService(map);
+          const results = await new Promise<google.maps.places.PlaceResult[]>((resolve, reject) => {
+            service.textSearch(request, (results, status) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                resolve(results);
+              } else {
+                resolve([]);
+              }
+            });
+          });
+
+          for (const place of results) {
+            if (place.geometry?.location && !existingIds.has(place.place_id || '')) {
+              const clinic: Clinic & { isOpen?: boolean } = {
+                id: `google-${place.place_id}`,
+                name: place.name || 'Sin nombre',
+                type: type as Clinic['type'],
+                sector: 'private',
+                location: {
+                  lat: place.geometry.location.lat(),
+                  lng: place.geometry.location.lng(),
+                },
+                address: place.formatted_address || '',
+                phone: place.formatted_phone_number || '',
+                open24h: type === 'hospital' || type === 'emergency',
+                isOpen: true,
+                rating: place.rating,
+                reviews: place.user_ratings_total,
+              };
+              newClinics.push(clinic);
+              existingIds.add(place.place_id || '');
+            }
+          }
+        } catch (err) {
+          console.warn(`Search failed for ${term}:`, err);
+        }
+      }
+
+      if (newClinics.length > 0) {
+        setClinics(prev => [...prev, ...newClinics]);
+      }
+    } catch (error) {
+      console.error('Error searching places:', error);
+    } finally {
+      setLoadingPlaces(false);
+    }
+  }, [placesLib, clinics, hasValidKey]);
+
+  const handleMapIdle = useCallback(() => {
+    if (mapInstance && placesLib && hasValidKey && clinics.length < 50) {
+      searchPlacesInArea(mapInstance);
+    }
+  }, [mapInstance, placesLib, hasValidKey, clinics.length, searchPlacesInArea]);
 
   const filteredClinics = clinics.filter(c => filter === 'all' || c.type === filter);
 
   const handleClinicSelect = (clinic: Clinic & { isOpen?: boolean }) => {
     setSelectedClinic(clinic);
     setIsNavigating(false);
+    if (mapInstance) {
+      mapInstance.panTo(clinic.location);
+      mapInstance.setZoom(16);
+    }
   };
 
   const handleCenterToUser = () => {
@@ -154,14 +260,16 @@ export default function HealthMap() {
   };
 
   const handleZoomIn = () => {
-    if (mapInstance) {
-      mapInstance.setZoom((mapInstance.getZoom() || 14) + 1);
-    }
+    if (mapInstance) mapInstance.setZoom((mapInstance.getZoom() || 14) + 1);
   };
 
   const handleZoomOut = () => {
+    if (mapInstance) mapInstance.setZoom((mapInstance.getZoom() || 14) - 1);
+  };
+
+  const handleRefreshSearch = () => {
     if (mapInstance) {
-      mapInstance.setZoom((mapInstance.getZoom() || 14) - 1);
+      searchPlacesInArea(mapInstance);
     }
   };
 
@@ -173,6 +281,18 @@ export default function HealthMap() {
     return labels[type] || type;
   };
 
+  const getTypeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      hospital: 'bg-blue-100 text-blue-700',
+      pharmacy: 'bg-green-100 text-green-700',
+      emergency: 'bg-red-100 text-red-700',
+      'health-center': 'bg-purple-100 text-purple-700',
+      clinic: 'bg-indigo-100 text-indigo-700',
+      laboratory: 'bg-amber-100 text-amber-700',
+    };
+    return colors[type] || 'bg-gray-100 text-gray-700';
+  };
+
   if (!hasValidKey) {
     return (
       <div className="flex-1 flex items-center justify-center bg-background p-6">
@@ -182,9 +302,9 @@ export default function HealthMap() {
           </div>
           <h2 className="text-xl font-black text-on-surface">{t('maps.key_required.title') || 'API Key requerida'}</h2>
           <p className="text-sm text-on-surface-variant">{t('maps.key_required.description') || 'Configure su API key de Google Maps para usar el mapa.'}</p>
-          <button onClick={() => setFilter('all')} className="w-full py-4 bg-surface-container-highest rounded-2xl text-xs font-black uppercase tracking-widest">
-            Ver Lista de Centros
-          </button>
+          <div className="text-xs text-on-surface-variant bg-surface-container p-3 rounded-lg">
+            <p>📍 {clinics.length} centros de salud cargados de la base de datos</p>
+          </div>
         </div>
       </div>
     );
@@ -196,14 +316,12 @@ export default function HealthMap() {
         <section className="absolute inset-0 z-0">
           <Map 
             defaultCenter={center} 
-            defaultZoom={14} 
+            defaultZoom={12} 
             mapId="DARK_MODE_MAP" 
             className="w-full h-full" 
             gestureHandling="greedy" 
             disableDefaultUI
-            onCenterChanged={() => {
-              // Optional: track center changes
-            }}
+            onIdle={handleMapIdle}
           >
             <MapContent 
               clinics={filteredClinics} 
@@ -213,6 +331,13 @@ export default function HealthMap() {
             />
           </Map>
         </section>
+
+        {loadingPlaces && (
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-surface/95 backdrop-blur-md px-4 py-2 rounded-full shadow-lg z-50 flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-xs font-bold">Buscando más centros...</span>
+          </div>
+        )}
 
         <AnimatePresence>
           {isEmergencyMode && (
@@ -224,22 +349,23 @@ export default function HealthMap() {
                 </div>
                 <div>
                   <h3 className="text-xs font-black uppercase tracking-widest text-error">Modo Emergencia</h3>
-                  <p className="text-[10px] font-bold opacity-80">Buscando atención de urgencias</p>
+                  <p className="text-[10px] font-bold opacity-80">Mostrando solo centros de emergencias</p>
                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="absolute top-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-surface/95 backdrop-blur-md rounded-2xl shadow-xl border border-outline-variant/20 z-40 overflow-hidden">
+        <div className="absolute top-4 left-4 right-4 md:left-auto md:right-4 md:w-80 max-h-[60vh] bg-surface/95 backdrop-blur-md rounded-2xl shadow-xl border border-outline-variant/20 z-40 overflow-hidden flex flex-col">
           <div className="p-3 border-b border-outline-variant/20">
             <div className="flex items-center gap-2 mb-2">
-              <Search className="w-4 h-4 text-on-surface-variant" />
+              <Search className="w-4 h-4 text-on-surface-variant shrink-0" />
               <input type="text" placeholder="Buscar centro de salud..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none" />
+                className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none min-w-0" />
+              {loadingPlaces && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
             </div>
-            <div className="flex gap-1 overflow-x-auto pb-1">
-              {(['all', 'hospital', 'pharmacy', 'emergency', 'health-center'] as const).map(f => (
+            <div className="flex gap-1 overflow-x-auto pb-1 flex-wrap">
+              {(['all', 'hospital', 'emergency', 'health-center', 'pharmacy', 'clinic', 'laboratory'] as const).map(f => (
                 <button key={f} onClick={() => setFilter(f)}
                   className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase whitespace-nowrap transition-colors ${filter === f ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>
                   {f === 'all' ? 'Todos' : getTypeLabel(f)}
@@ -247,24 +373,55 @@ export default function HealthMap() {
               ))}
             </div>
           </div>
-          <div className="max-h-64 overflow-y-auto">
-            {filteredClinics.filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase())).map(clinic => (
-              <button key={clinic.id} onClick={() => handleClinicSelect(clinic)}
-                className={`w-full p-3 flex items-start gap-3 border-b border-outline-variant/10 hover:bg-surface-container-high transition-colors ${selectedClinic?.id === clinic.id ? 'bg-primary/10' : ''}`}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${clinic.type === 'emergency' ? 'bg-error/20 text-error' : clinic.type === 'pharmacy' ? 'bg-green-100 text-green-600' : 'bg-primary/20 text-primary'}`}>
-                  {clinic.type === 'pharmacy' ? <Pill className="w-4 h-4" /> : clinic.type === 'emergency' ? <ShieldAlert className="w-4 h-4" /> : <Hospital className="w-4 h-4" />}
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="text-xs font-bold text-on-surface">{clinic.name}</p>
-                  <p className="text-[10px] text-on-surface-variant">{clinic.address}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    {clinic.open24h || clinic.isOpen ? <span className="text-[9px] font-bold text-green-600">Abierto</span> : <span className="text-[9px] text-error">Cerrado</span>}
-                    {clinic.rating && <span className="text-[9px] text-primary">★ {clinic.rating.toFixed(1)}</span>}
+
+          <div className="flex items-center justify-between px-3 py-2 bg-surface-container/50 border-b border-outline-variant/10">
+            <span className="text-[10px] text-on-surface-variant">
+              {filteredClinics.filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase())).length} resultados
+            </span>
+            <button onClick={handleRefreshSearch} disabled={loadingPlaces} className="flex items-center gap-1 text-[10px] text-primary font-bold hover:underline disabled:opacity-50">
+              <RefreshCw className={`w-3 h-3 ${loadingPlaces ? 'animate-spin' : ''}`} />
+              Actualizar
+            </button>
+          </div>
+
+          <div className="overflow-y-auto flex-1">
+            {loading ? (
+              <div className="p-8 text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary mb-2" />
+                <p className="text-xs text-on-surface-variant">Cargando centros de salud...</p>
+              </div>
+            ) : filteredClinics.filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-xs text-on-surface-variant">No se encontraron centros</p>
+              </div>
+            ) : (
+              filteredClinics.filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase())).map(clinic => (
+                <button key={clinic.id} onClick={() => handleClinicSelect(clinic)}
+                  className={`w-full p-3 flex items-start gap-3 border-b border-outline-variant/10 hover:bg-surface-container-high transition-colors ${selectedClinic?.id === clinic.id ? 'bg-primary/10' : ''}`}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${getTypeColor(clinic.type)}`}>
+                    {clinic.type === 'pharmacy' ? <Pill className="w-4 h-4" /> : 
+                     clinic.type === 'emergency' ? <ShieldAlert className="w-4 h-4" /> : 
+                     clinic.type === 'hospital' ? <Hospital className="w-4 h-4" /> :
+                     clinic.type === 'health-center' ? <Stethoscope className="w-4 h-4" /> :
+                     clinic.type === 'laboratory' ? <Activity className="w-4 h-4" /> :
+                     <MapPin className="w-4 h-4" />}
                   </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-on-surface-variant shrink-0" />
-              </button>
-            ))}
+                  <div className="flex-1 text-left min-w-0">
+                    <p className="text-xs font-bold text-on-surface truncate">{clinic.name}</p>
+                    <p className="text-[10px] text-on-surface-variant truncate">{clinic.address}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${clinic.open24h || clinic.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {clinic.open24h ? '24h' : clinic.isOpen ? 'Abierto' : 'Cerrado'}
+                      </span>
+                      {clinic.sector === 'public' && <span className="text-[9px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">PÚBLICO</span>}
+                      {clinic.rating && <span className="text-[9px] text-primary">★ {clinic.rating.toFixed(1)}</span>}
+                      {clinic.reviews && <span className="text-[9px] text-on-surface-variant">({clinic.reviews})</span>}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-on-surface-variant shrink-0" />
+                </button>
+              ))
+            )}
           </div>
         </div>
 
