@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
+import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { AnimatePresence, motion } from 'motion/react';
 import { 
   MapPin, Phone, Pill, Activity, Navigation, Search, Clock, CheckCircle2, 
   Route, Target, Plus, Minus, AlertCircle, Globe, X, ShieldAlert, Stethoscope,
-  ChevronRight, TrendingDown, User, Mic, RotateCcw, Send, Hospital, Store,
-  Clock4, AlertTriangle, ExternalLink, CornerUpLeft, CornerUpRight, ArrowUp,
-  ArrowRight, ArrowLeft, RefreshCw, Menu
+  ChevronRight, Hospital
 } from 'lucide-react';
 import { Clinic } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -16,60 +14,15 @@ import { GOOGLE_MAPS_KEY } from "../../lib/config";
 const API_KEY = GOOGLE_MAPS_KEY;
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
 
-const calculateDistance = (pos1: google.maps.LatLngLiteral, pos2: google.maps.LatLngLiteral): string => {
-  const R = 6371;
-  const dLat = (pos2.lat - pos1.lat) * Math.PI / 180;
-  const dLon = (pos2.lng - pos1.lng) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(pos1.lat * Math.PI / 180) * Math.cos(pos2.lat * Math.PI / 180) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  const d = R * c;
-  return d < 1 ? `${(d * 1000).toFixed(0)} m` : `${d.toFixed(1)} km`;
-};
+const MapContext = createContext<google.maps.Map | null>(null);
 
-function Directions({ origin, destination, onRouteUpdate }: {
-  origin: google.maps.LatLngLiteral;
-  destination: google.maps.LatLngLiteral;
-  onRouteUpdate: (leg: google.maps.DirectionsLeg) => void;
-}) {
-  const map = useMap();
-  const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService | null>(null);
-  const polylineRef = useRef<google.maps.Polyline | null>(null);
-
-  useEffect(() => {
-    if (!map) return;
-    setDirectionsService(new google.maps.DirectionsService());
-    return () => {
-      if (polylineRef.current) polylineRef.current.setMap(null);
-    };
-  }, [map]);
-
-  useEffect(() => {
-    if (!directionsService || !map || !origin || !destination) return;
-    directionsService.route({
-      origin, destination, travelMode: google.maps.TravelMode.DRIVING
-    }, (result, status) => {
-      if (status === google.maps.DirectionsStatus.OK && result) {
-        const route = result.routes[0];
-        const leg = route.legs[0];
-        if (polylineRef.current) polylineRef.current.setMap(null);
-        const polyline = new google.maps.Polyline({
-          path: route.overview_path,
-          strokeColor: '#2E90FA',
-          strokeWeight: 6,
-          strokeOpacity: 0.8,
-          map: map
-        });
-        polylineRef.current = polyline;
-        if (route.bounds) map.fitBounds(route.bounds);
-        onRouteUpdate(leg);
-      }
-    });
-  }, [directionsService, map, origin, destination, onRouteUpdate]);
-
-  return null;
-}
+const SAMPLE_CLINICS: (Clinic & { isOpen?: boolean })[] = [
+  { id: '1', name: 'Hospital Central', type: 'hospital', sector: 'public', location: { lat: 12.1362, lng: -86.2514 }, address: 'Managua', phone: '2222-2222', open24h: true, rating: 4.5, reviews: 150 },
+  { id: '2', name: 'Farmacia La Popular', type: 'pharmacy', sector: 'private', location: { lat: 12.1340, lng: -86.2490 }, address: 'Centro', phone: '2222-1111', open24h: true, rating: 4.2, reviews: 80 },
+  { id: '3', name: 'Centro de Salud San Juan', type: 'health-center', sector: 'public', location: { lat: 12.1300, lng: -86.2550 }, address: 'San Juan', phone: '2222-3333', open24h: false, isOpen: true, rating: 4.0, reviews: 45 },
+  { id: '4', name: 'Clínica Privada Santa María', type: 'clinic', sector: 'private', location: { lat: 12.1380, lng: -86.2480 }, address: 'Carrera a Masaya', phone: '2222-4444', open24h: false, isOpen: false, rating: 4.8, reviews: 200 },
+  { id: '5', name: 'Emergency Medical', type: 'emergency', sector: 'private', location: { lat: 12.1350, lng: -86.2520 }, address: 'Pista Roosevelt', phone: '2222-9111', open24h: true, rating: 4.7, reviews: 300 },
+];
 
 const ClinicMarker: React.FC<{ clinic: Clinic & { isOpen?: boolean }, onClick: (c: Clinic & { isOpen?: boolean }) => void }> = ({ clinic, onClick }) => {
   const isOpen = clinic.isOpen !== undefined ? clinic.isOpen : clinic.open24h;
@@ -117,13 +70,50 @@ function UserLocationMarker({ position }: { position: google.maps.LatLngLiteral 
   );
 }
 
-const SAMPLE_CLINICS: (Clinic & { isOpen?: boolean })[] = [
-  { id: '1', name: 'Hospital Central', type: 'hospital', sector: 'public', location: { lat: 12.1362, lng: -86.2514 }, address: 'Managua', phone: '2222-2222', open24h: true, rating: 4.5, reviews: 150 },
-  { id: '2', name: 'Farmacia La Popular', type: 'pharmacy', sector: 'private', location: { lat: 12.1340, lng: -86.2490 }, address: 'Centro', phone: '2222-1111', open24h: true, rating: 4.2, reviews: 80 },
-  { id: '3', name: 'Centro de Salud San Juan', type: 'health-center', sector: 'public', location: { lat: 12.1300, lng: -86.2550 }, address: 'San Juan', phone: '2222-3333', open24h: false, isOpen: true, rating: 4.0, reviews: 45 },
-  { id: '4', name: 'Clínica Privada Santa María', type: 'clinic', sector: 'private', location: { lat: 12.1380, lng: -86.2480 }, address: 'Carrera a Masaya', phone: '2222-4444', open24h: false, isOpen: false, rating: 4.8, reviews: 200 },
-  { id: '5', name: 'Emergency Medical', type: 'emergency', sector: 'private', location: { lat: 12.1350, lng: -86.2520 }, address: 'Pista Roosevelt', phone: '2222-9111', open24h: true, rating: 4.7, reviews: 300 },
-];
+function MapControls({ onCenter, onZoomIn, onZoomOut }: { onCenter: () => void; onZoomIn: () => void; onZoomOut: () => void }) {
+  return (
+    <div className="absolute bottom-6 right-6 flex flex-col gap-3 z-30">
+      <button onClick={onCenter} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Centrar en mi ubicación">
+        <Target className="w-6 h-6" />
+      </button>
+      <button onClick={onZoomIn} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Acercar">
+        <Plus className="w-6 h-6" />
+      </button>
+      <button onClick={onZoomOut} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Alejar">
+        <Minus className="w-6 h-6" />
+      </button>
+    </div>
+  );
+}
+
+function MapContent({ 
+  clinics, 
+  userLocation, 
+  onClinicSelect,
+  onCenterChange 
+}: { 
+  clinics: (Clinic & { isOpen?: boolean })[]; 
+  userLocation: { lat: number; lng: number };
+  onClinicSelect: (c: Clinic & { isOpen?: boolean }) => void;
+  onCenterChange: (map: google.maps.Map) => void;
+}) {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (map) {
+      onCenterChange(map);
+    }
+  }, [map, onCenterChange]);
+
+  return (
+    <>
+      {clinics.map(clinic => (
+        <ClinicMarker key={clinic.id} clinic={clinic} onClick={onClinicSelect} />
+      ))}
+      <UserLocationMarker position={userLocation} />
+    </>
+  );
+}
 
 export default function HealthMap() {
   const { t } = useLanguage();
@@ -138,13 +128,7 @@ export default function HealthMap() {
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const placesLib = useMapsLibrary('places');
-  const map = useMap();
-
-  const handleRouteUpdate = (leg: google.maps.DirectionsLeg) => {
-    setRouteInfo({ distance: leg.distance?.text || '', duration: leg.duration?.text || '' });
-  };
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -162,19 +146,23 @@ export default function HealthMap() {
     setIsNavigating(false);
   };
 
-  const handleStartNavigation = () => {
-    if (selectedClinic) {
-      setIsNavigating(true);
-      setRouteInfo(null);
+  const handleCenterToUser = () => {
+    if (mapInstance) {
+      mapInstance.setCenter(userLocation);
+      mapInstance.setZoom(15);
     }
   };
 
-  const getStepIcon = (instructions: string) => {
-    const lower = instructions.toLowerCase();
-    if (lower.includes('izquierda') || lower.includes('left')) return <CornerUpLeft className="w-3.5 h-3.5" />;
-    if (lower.includes('derecha') || lower.includes('right')) return <CornerUpRight className="w-3.5 h-3.5" />;
-    if (lower.includes('continúa') || lower.includes('continue') || lower.includes('recto')) return <ArrowUp className="w-3.5 h-3.5" />;
-    return <Navigation className="w-3.5 h-3.5" />;
+  const handleZoomIn = () => {
+    if (mapInstance) {
+      mapInstance.setZoom((mapInstance.getZoom() || 14) + 1);
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (mapInstance) {
+      mapInstance.setZoom((mapInstance.getZoom() || 14) - 1);
+    }
   };
 
   const getTypeLabel = (type: string) => {
@@ -206,17 +194,24 @@ export default function HealthMap() {
     <APIProvider apiKey={API_KEY}>
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-background relative">
         <section className="absolute inset-0 z-0">
-          {hasValidKey ? (
-            <Map defaultCenter={center} defaultZoom={14} mapId="DARK_MODE_MAP" className="w-full h-full" gestureHandling="greedy" disableDefaultUI>
-              {filteredClinics.map(clinic => <ClinicMarker key={clinic.id} clinic={clinic} onClick={handleClinicSelect} />)}
-              {isNavigating && selectedClinic && <Directions origin={userLocation} destination={selectedClinic.location} onRouteUpdate={handleRouteUpdate} />}
-              <UserLocationMarker position={userLocation} />
-            </Map>
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-              <p className="text-white/50">Mapa no disponible</p>
-            </div>
-          )}
+          <Map 
+            defaultCenter={center} 
+            defaultZoom={14} 
+            mapId="DARK_MODE_MAP" 
+            className="w-full h-full" 
+            gestureHandling="greedy" 
+            disableDefaultUI
+            onCenterChanged={() => {
+              // Optional: track center changes
+            }}
+          >
+            <MapContent 
+              clinics={filteredClinics} 
+              userLocation={userLocation}
+              onClinicSelect={handleClinicSelect}
+              onCenterChange={setMapInstance}
+            />
+          </Map>
         </section>
 
         <AnimatePresence>
@@ -301,7 +296,7 @@ export default function HealthMap() {
               </div>
             </div>
             <div className="p-4 pt-0 flex gap-2">
-              <button onClick={handleStartNavigation}
+              <button onClick={() => setIsNavigating(true)}
                 className="flex-1 py-3 bg-primary text-on-primary font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
                 <Navigation className="w-4 h-4" /> Cómo Llegar
               </button>
@@ -313,40 +308,7 @@ export default function HealthMap() {
           </motion.div>
         )}
 
-        {isNavigating && selectedClinic && routeInfo && (
-          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            className="absolute bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 bg-surface rounded-2xl p-4 shadow-2xl border border-outline-variant/20 z-50">
-            <div className="flex justify-between items-center mb-3">
-              <div className="flex items-center gap-2">
-                <Route className="w-5 h-5 text-primary" />
-                <span className="text-sm font-bold text-on-surface">Navegación Activa</span>
-              </div>
-              <button onClick={() => setIsNavigating(false)} className="p-1 rounded-full hover:bg-surface-container-high">
-                <X className="w-4 h-4 text-on-surface-variant" />
-              </button>
-            </div>
-            <div className="flex justify-between items-end border-b border-outline-variant/20 pb-3 mb-3">
-              <span className="text-xs text-on-surface-variant">Tiempo</span>
-              <span className="text-xl font-bold text-primary">{routeInfo.duration}</span>
-            </div>
-            <div className="flex justify-between items-end">
-              <span className="text-xs text-on-surface-variant">Distancia</span>
-              <span className="text-lg font-bold text-on-surface">{routeInfo.distance}</span>
-            </div>
-          </motion.div>
-        )}
-
-        <div className="absolute bottom-6 right-6 flex flex-col gap-3 z-30">
-          <button onClick={() => map?.setCenter(userLocation)} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center">
-            <Target className="w-6 h-6" />
-          </button>
-          <button onClick={() => map?.setZoom((map.getZoom() || 14) + 1)} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center">
-            <Plus className="w-6 h-6" />
-          </button>
-          <button onClick={() => map?.setZoom((map.getZoom() || 14) - 1)} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center">
-            <Minus className="w-6 h-6" />
-          </button>
-        </div>
+        <MapControls onCenter={handleCenterToUser} onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
       </div>
     </APIProvider>
   );
