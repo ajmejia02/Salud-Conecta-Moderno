@@ -11,6 +11,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useUser } from '../../contexts/UserContext';
 import { GOOGLE_MAPS_KEY } from "../../lib/config";
 import { getClinics } from '../../services/clinicService';
+import { PUBLIC_HEALTH_NETWORK } from '../../data/nicaraguaPublicHealthNetwork';
 
 const API_KEY = GOOGLE_MAPS_KEY;
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
@@ -150,7 +151,13 @@ export default function HealthMap() {
       setLoading(true);
       try {
         const dbClinics = await getClinics();
-        setClinics(dbClinics);
+        // Inyectamos la red pública de Nicaragua con IDs únicos
+        const minsaNetwork = PUBLIC_HEALTH_NETWORK.map((c, i) => ({
+          ...c,
+          id: `minsa-${i}`
+        })) as Clinic[];
+        
+        setClinics([...dbClinics, ...minsaNetwork]);
       } catch (error) {
         console.error('Error loading clinics:', error);
       } finally {
