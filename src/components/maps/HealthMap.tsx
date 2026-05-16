@@ -327,7 +327,7 @@ export default function HealthMap() {
               clinics={filteredClinics} 
               userLocation={userLocation}
               onClinicSelect={handleClinicSelect}
-              onCenterChange={setMapInstance}
+              onMapReady={setMapInstance}
             />
           </Map>
         </section>

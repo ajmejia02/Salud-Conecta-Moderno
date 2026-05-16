@@ -24,14 +24,9 @@ export const getHealthAssistant = async (prompt: string, membership: 'free' | 'p
       return "El asistente de IA no está configurado. Por favor, asegúrate de añadir tu GEMINI_API_KEY en los secretos de la aplicación (Menú Settings).";
     }
 
-    const response = await ai.models.generateContent({
+    const model = ai.getGenerativeModel({ 
       model: "gemini-1.5-flash",
-      contents: [
-        ...history.map(h => ({ role: h.role, parts: h.parts })),
-        { role: 'user', parts: [{ text: prompt }] }
-      ],
-      config: {
-        systemInstruction: `Eres un asistente de salud inteligente para "Salud Conecta IA", un ecosistema de salud con una fuerte misión social en Nicaragua.
+      systemInstruction: `Eres un asistente de salud inteligente para "Salud Conecta IA", un ecosistema de salud con una fuerte misión social en Nicaragua.
 Tu tono es empático, eficiente y confiable. 
 ${membership === 'free' 
   ? 'El usuario actual tiene acceso a la RED PÚBICA (MINSA). Prioriza siempre recomendar centros de salud públicos y hospitales estatales, enfatizando que son accesibles sin costo.' 
@@ -41,9 +36,16 @@ Si el usuario menciona una emergencia crítica, indícale inmediatamente que lla
 No proporciones diagnósticos médicos definitivos, siempre sugiere consultar con un profesional.
 Ayuda a encontrar clínicas, explicar procesos de farmacia y agendar citas.
 Responde siempre en español.`,
-      },
     });
-    return response.text;
+
+    const result = await model.generateContent({
+      contents: [
+        ...history.map(h => ({ role: h.role, parts: h.parts })),
+        { role: 'user', parts: [{ text: prompt }] }
+      ],
+    });
+    const response = await result.response;
+    return response.text();
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     
@@ -81,11 +83,9 @@ export const getSmartTriage = async (symptoms: string, membership: 'free' | 'pre
       };
     }
 
-    const response = await ai.models.generateContent({
+    const model = ai.getGenerativeModel({ 
       model: "gemini-1.5-flash",
-      contents: [{ role: 'user', parts: [{ text: symptoms }] }],
-      config: {
-        systemInstruction: `Eres un motor de triaje médico de alta precisión para Salud Conecta IA. 
+      systemInstruction: `Eres un motor de triaje médico de alta precisión para Salud Conecta IA. 
 Analiza los síntomas proporcionados y clasifica la urgencia.
 REGLA CRÍTICA: Solo puedes proporcionar UNA recomendación única de acción o un único tipo de medicamento de venta libre si aplica.
 
@@ -109,10 +109,16 @@ Debes responder ÚNICAMENTE con un objeto JSON válido con la siguiente estructu
 Si es "emergency", la recomendación debe ser dirigirse a urgencias inmediatamente.
 Si es "low", puede ser reposo o farmacia.
 Responde siempre en español.`,
-        responseMimeType: "application/json"
-      },
+      generationConfig: {
+        responseMimeType: "application/json",
+      }
     });
-    const text = response.text;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: symptoms }] }],
+    });
+    const response = await result.response;
+    const text = response.text();
     const parsed = JSON.parse(text);
     
     // Basic schema validation
@@ -158,16 +164,18 @@ export const getDailyHealthTip = async (language: string = 'es', membership: 'fr
         : "Note: Configure your GEMINI_API_KEY in Settings for personalized tips. Tip: Walk 30m daily.";
     }
 
-    const response = await ai.models.generateContent({
+    const model = ai.getGenerativeModel({ 
       model: "gemini-1.5-flash",
-      contents: [{ role: 'user', parts: [{ text: "Genera un consejo de salud breve, motivador y práctico para hoy." }] }],
-      config: {
-        systemInstruction: `Eres un asistente de bienestar de Salud Conecta IA con enfoque social. 
+      systemInstruction: `Eres un asistente de bienestar de Salud Conecta IA con enfoque social. 
         Tu objetivo es dar un consejo de salud diario de 150 caracteres máximo.
         ${membership === 'free' ? 'Enfócate en la prevención y el uso eficiente de recursos naturales o de salud pública.' : 'Enfócate en bienestar general y optimización de salud.'}
         El tono es positivo, científico y directo.
         Responde en el idioma: ${language === 'es' ? 'Español' : 'Inglés'}.`,
-      },
+    });
+
+    const result = await model.generateContent("Genera un consejo de salud breve, motivador y práctico para hoy.");
+    const response = await result.response;
+    return response.text();
     });
     return response.text;
   } catch (error: any) {
