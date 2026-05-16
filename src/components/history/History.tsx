@@ -82,7 +82,7 @@ export default function History() {
           </p>
           <button 
             onClick={signInWithGoogle}
-            className="w-full bg-primary text-on-primary py-4 rounded-2xl font-display font-bold text-lg hover:bg-primary-container transition-all flex items-center justify-center gap-3 shadow-lg"
+            className="w-full bg-primary text-on-primary py-4 rounded-2xl font-display font-bold text-lg hover:brightness-110 transition-all flex items-center justify-center gap-3 shadow-lg"
           >
             Ver Mi Pasaporte
             <ArrowRight className="w-5 h-5" />
@@ -133,7 +133,7 @@ export default function History() {
               <div className="flex flex-wrap gap-3">
                 <button 
                   onClick={() => setIsScannerOpen(true)}
-                  className="flex-1 sm:flex-none bg-primary text-on-primary font-display font-bold py-3.5 px-8 rounded-2xl flex items-center justify-center gap-2 hover:bg-primary-container transition-all active:scale-95 shadow-xl"
+                  className="flex-1 sm:flex-none bg-primary text-on-primary font-display font-bold py-3.5 px-8 rounded-2xl flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-95 shadow-xl"
                 >
                   <Scan className="w-4 h-4" />
                   Digitalizar Orden
@@ -236,7 +236,7 @@ export default function History() {
                               </p>
                               <button 
                                 onClick={() => setIsScannerOpen(true)}
-                                className="mt-2 w-fit bg-primary text-on-primary font-mono text-[10px] font-black uppercase tracking-widest px-8 py-3.5 rounded-full flex items-center gap-3 hover:bg-primary-container transition-all active:scale-95 shadow-xl shadow-primary/20"
+                                className="mt-2 w-fit bg-primary text-on-primary font-mono text-[10px] font-black uppercase tracking-widest px-8 py-3.5 rounded-full flex items-center gap-3 hover:brightness-110 transition-all active:scale-95 shadow-xl shadow-primary/20"
                               >
                                 <Camera className="w-4 h-4" />
                                 <span>Escanear Orden Médica</span>

@@ -210,7 +210,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                       {item.statusType === 'available' && <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>}
                       {item.status}
                     </span>
-                    <button className="bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary-container px-5 py-2 rounded-xl text-xs font-bold transition-all border border-primary/30">
+                    <button className="bg-primary text-on-primary hover:brightness-110 px-5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
                       {item.category === 'doctor' ? 'Agendar' : 'Ver Detalles'}
                     </button>
                   </div>
@@ -246,7 +246,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
               </button>
               <button 
                 onClick={() => onOpenRegistration('clinic')}
-                className="px-8 py-4 bg-primary-container text-on-primary-container font-display font-bold text-sm rounded-2xl hover:bg-primary transition-all shadow-xl shadow-primary/20"
+                className="px-8 py-4 bg-primary text-on-primary font-display font-bold text-sm rounded-2xl hover:brightness-110 transition-all shadow-xl shadow-primary/20"
               >
                 ¿Tienes una clínica? Únete
               </button>
@@ -300,7 +300,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                     </div>
                   </div>
                 </div>
-                <button className="w-full py-3 bg-surface-container-high rounded-xl text-xs font-bold uppercase tracking-widest text-primary flex items-center justify-center gap-2 hover:bg-primary hover:text-on-primary transition-all">
+                <button className="w-full py-3 bg-primary text-on-primary rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-lg">
                   Ver Detalles
                   <ChevronRight className="w-4 h-4" />
                 </button>
