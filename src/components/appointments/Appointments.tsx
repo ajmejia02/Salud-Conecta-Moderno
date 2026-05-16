@@ -42,6 +42,7 @@ export default function Appointments({ initialTab = 'appointments' }: Appointmen
   const [triages, setTriages] = useState<TriageRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'doctors' | 'labs' | 'clinics'>('all');
+  const [activeTab, setActiveTab] = useState<'appointments' | 'history'>(initialTab);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -265,7 +266,7 @@ export default function Appointments({ initialTab = 'appointments' }: Appointmen
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-display font-bold text-on-surface">Historial Reciente</h2>
               <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('changeTab', { detail: 'history' }))}
+                onClick={() => setActiveTab('history')}
                 className="text-xs font-bold text-primary hover:underline"
               >
                 Ver todo el historial
@@ -305,7 +306,7 @@ export default function Appointments({ initialTab = 'appointments' }: Appointmen
                 </div>
               )}
               <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('changeTab', { detail: 'history' }))}
+                onClick={() => setActiveTab('history')}
                 className="w-full py-4 bg-surface-container-high/30 text-center text-primary font-display font-bold text-xs uppercase tracking-widest hover:bg-surface-container-high transition-all border-t border-outline-variant/10"
               >
                 Ver Pasaporte de Salud Completo
