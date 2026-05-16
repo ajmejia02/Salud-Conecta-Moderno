@@ -1276,6 +1276,7 @@ function HealthMapInner({ hideMap = false }: { hideMap?: boolean }) {
         Vista Satelital IA
       </div>
     </div>
+    </div>
   );
 }
 

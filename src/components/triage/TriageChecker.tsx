@@ -238,4 +238,12 @@ export default function TriageChecker() {
       <div className="max-w-[1400px] mx-auto w-full flex-1 flex flex-col px-0 sm:px-4 md:px-6 sm:py-6">
         <div className="flex-1 flex flex-col lg:flex-row gap-0 lg:gap-8 relative overflow-hidden">
           
-          <div className="flex-1 flex
+          <div className="flex-1 flex flex-col">
+             {/* The rest of your chat/triage UI logic should go here */}
+             <p className="p-4 text-slate-500">Contenido del triaje...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
