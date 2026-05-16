@@ -297,7 +297,7 @@ export default function HealthMap() {
                   isOpen: true,
                   rating: place.rating,
                   reviews: place.user_ratings_total,
-                });
+                };
                 newOrUpdatedClinics.push(newClinic);
 
                 // Si es un centro MINSA, lo guardamos en Firestore
