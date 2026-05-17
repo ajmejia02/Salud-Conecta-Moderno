@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { AnimatePresence, motion } from 'motion/react';
 import { 
@@ -294,7 +294,7 @@ function MapContent({
 function MapControls({ onCenter, onZoomIn, onZoomOut }: { onCenter: () => void; onZoomIn: () => void; onZoomOut: () => void }) {
   return (
     <div className="absolute bottom-6 right-6 flex flex-col gap-3 z-30">
-      <button onClick={onCenter} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Mi ubicación">
+      <button onClick={onCenter} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Mi ubicaciÃ³n">
         <Target className="w-5 h-5" />
       </button>
       <button onClick={onZoomIn} className="w-12 h-12 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-2xl shadow-xl flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Acercar">
@@ -327,7 +327,7 @@ export default function HealthMap() {
   const [isAutoCentered, setIsAutoCentered] = useState(false);
   const [placesLib, setPlacesLib] = useState<any>(null);
 
-  // ── Autocomplete state (Google Maps-style live search) ──────────────────
+  // â”€â”€ Autocomplete state (Google Maps-style live search) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [searchQuery, setSearchQuery] = useState('');
   // Use 'any' to avoid crashes when google.maps.places types are not available (API key restriction)
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -346,7 +346,7 @@ export default function HealthMap() {
     setPlacesLib(placesLibrary || null);
   }, [placesLibrary]);
 
-  // ── Seed static data so local search always works (even without API key) ────
+  // â”€â”€ Seed static data so local search always works (even without API key) â”€â”€â”€â”€
   useEffect(() => {
     const seedClinics: (Clinic & { isOpen?: boolean })[] = NICARAGUA_HOSPITALS.map((h, i) => ({
       ...h,
@@ -356,7 +356,7 @@ export default function HealthMap() {
     setClinics(seedClinics);
   }, []);
 
-  // ── Local fallback search: always works regardless of API key ────────────
+  // â”€â”€ Local fallback search: always works regardless of API key â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.length < 2) {
       setLocalSuggestions([]);
@@ -369,7 +369,7 @@ export default function HealthMap() {
     setLocalSuggestions(matches);
   }, [searchQuery, clinics]);
 
-  // ── Google Places Autocomplete: real-time predictions ─────────────────────
+  // â”€â”€ Google Places Autocomplete: real-time predictions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Only runs when Google Maps API is fully authorized (production / Vercel)
   useEffect(() => {
     if (!placesLib || !searchQuery.trim() || searchQuery.length < 2) {
@@ -400,7 +400,7 @@ export default function HealthMap() {
         }
       );
     } catch (err) {
-      // Google Maps not loaded or API key blocked — silently fall back to local search
+      // Google Maps not loaded or API key blocked â€” silently fall back to local search
       setAutocompleteLoading(false);
       setSuggestions([]);
     }
@@ -408,7 +408,7 @@ export default function HealthMap() {
     return () => { cancelled = true; };
   }, [searchQuery, placesLib, mapInstance]);
 
-  // ── Handle suggestion selection: fetch full details + open panel ────────
+  // â”€â”€ Handle suggestion selection: fetch full details + open panel â”€â”€â”€â”€â”€â”€â”€â”€
   const handleSuggestionSelect = useCallback((prediction: google.maps.places.AutocompletePrediction) => {
     if (!placesLib || !mapInstance) return;
 
@@ -502,7 +502,7 @@ export default function HealthMap() {
     );
   }, [placesLib, mapInstance]);
 
-  // ── Geolocation ──────────────────────────────────────────────────────────
+  // â”€â”€ Geolocation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -515,7 +515,7 @@ export default function HealthMap() {
     }
   }, []);
 
-  // ── Auto-center once user location is detected ────────────────────────────
+  // â”€â”€ Auto-center once user location is detected â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (mapInstance && userLocation !== NICARAGUA_CENTER && !isAutoCentered) {
       mapInstance.panTo(userLocation);
@@ -524,13 +524,13 @@ export default function HealthMap() {
     }
   }, [mapInstance, userLocation, isAutoCentered]);
 
-  // ── Load community report badges from Firestore (lightweight) ────────────
-  // This is the ONLY Firestore read at startup — clinics come from Google Places.
+  // â”€â”€ Load community report badges from Firestore (lightweight) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // This is the ONLY Firestore read at startup â€” clinics come from Google Places.
   useEffect(() => {
     const loadReports = async () => {
       setLoading(true);
       try {
-        // We start with zero static clinics — Google Places fills them on map idle.
+        // We start with zero static clinics â€” Google Places fills them on map idle.
         // We pre-load an empty reports map so the confidence badge system is ready.
         const summaries = await getReportSummaries([]);
         setReportSummaries(summaries);
@@ -543,7 +543,7 @@ export default function HealthMap() {
     loadReports();
   }, []);
 
-  // ── Google Places → Clinics (Zero-DB real-time discovery) ────────────────
+  // â”€â”€ Google Places â†’ Clinics (Zero-DB real-time discovery) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // No static data. No MINSA files. Google Places is the sole truth source.
   // Each search term maps to a specific Salud Conecta facility type.
   const lastSearchBoundsRef = useRef<string | null>(null);
@@ -602,7 +602,7 @@ export default function HealthMap() {
               try { photos.push(ref.getUrl({ maxWidth: 800, maxHeight: 600 })); } catch (_) {}
             });
 
-            // Classify sector: if Google name or address mentions known public keywords → public
+            // Classify sector: if Google name or address mentions known public keywords â†’ public
             const nameLower = (place.name || '').toLowerCase();
             const isPublic = /minsa|hospital|centro de salud|puesto de salud|gobierno|public/i.test(nameLower);
 
@@ -664,8 +664,8 @@ export default function HealthMap() {
   }, [placesLib, hasValidKey]);
 
   const handleMapIdle = useCallback(() => {
-    // Solo buscar si el mapa está listo, Places API está cargada y no estamos ya cargando
-    // La condición clinics.length < 50 es un heurístico para evitar sobrecargar la API en el inicio
+    // Solo buscar si el mapa estÃ¡ listo, Places API estÃ¡ cargada y no estamos ya cargando
+    // La condiciÃ³n clinics.length < 50 es un heurÃ­stico para evitar sobrecargar la API en el inicio
     if (mapInstance && placesLib && hasValidKey && !loadingPlaces) {
       searchPlacesInArea(mapInstance);
     }
@@ -718,7 +718,7 @@ export default function HealthMap() {
           <h2 className="text-xl font-black text-on-surface">{t('maps.key_required.title') || 'API Key requerida'}</h2>
           <p className="text-sm text-on-surface-variant">{t('maps.key_required.description') || 'Configure su API key de Google Maps para usar el mapa.'}</p>
           <div className="text-xs text-on-surface-variant bg-surface-container p-3 rounded-lg">
-            <p>📍 {clinics.length} centros de salud cargados de la base de datos</p>
+            <p>ðŸ“ {clinics.length} centros de salud cargados de la base de datos</p>
           </div>
         </div>
       </div>
@@ -751,7 +751,7 @@ export default function HealthMap() {
         {loadingPlaces && (
           <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-surface/95 backdrop-blur-md px-4 py-2 rounded-full shadow-lg z-50 flex items-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-xs font-bold">Buscando más centros...</span>
+            <span className="text-xs font-bold">Buscando mÃ¡s centros...</span>
           </div>
         )}
 
@@ -772,10 +772,10 @@ export default function HealthMap() {
           )}
         </AnimatePresence>
 
-        {/* ── Google Maps-Style Search: Left compact panel ─────────────────── */}
+        {/* â”€â”€ Google Maps-Style Search: Left compact panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="absolute top-3 left-3 z-40 flex flex-col gap-2" style={{ width: 'min(360px, calc(100vw - 1.5rem))' }}>
 
-          {/* Main search bar — white, Google-style */}
+          {/* Main search bar â€” white, Google-style */}
           <div className="relative">
             <div className={`flex items-center bg-white rounded-3xl shadow-xl border transition-all duration-200 ${
               searchFocused ? 'border-blue-400' : 'border-gray-200'
@@ -812,10 +812,10 @@ export default function HealthMap() {
               {/* Divider */}
               <div className="w-px h-5 bg-gray-200 shrink-0" />
 
-              {/* Directions button — Google Maps blue hexagon style */}
+              {/* Directions button â€” Google Maps blue hexagon style */}
               <button
                 onClick={() => { if (selectedClinic) setIsNavigating(true); }}
-                title="Cómo llegar"
+                title="CÃ³mo llegar"
                 className="w-10 h-10 mr-1 rounded-full flex items-center justify-center shrink-0 transition-all"
                 style={{ background: selectedClinic ? '#1a73e8' : '#e8f0fe' }}
               >
@@ -823,7 +823,7 @@ export default function HealthMap() {
               </button>
             </div>
 
-            {/* ── Suggestions Dropdown: Local + Google Places ─────────────── */}
+            {/* â”€â”€ Suggestions Dropdown: Local + Google Places â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <AnimatePresence>
               {searchFocused && (suggestions.length > 0 || localSuggestions.length > 0) && (
                 <motion.div
@@ -892,7 +892,7 @@ export default function HealthMap() {
                             </div>
                             <div className="shrink-0 flex flex-col items-end gap-0.5">
                               {clinic.rating && (
-                                <span className="text-[9px] text-amber-500 font-bold">★ {clinic.rating.toFixed(1)}</span>
+                                <span className="text-[9px] text-amber-500 font-bold">â˜… {clinic.rating.toFixed(1)}</span>
                               )}
                               {(clinic.isOpen || clinic.open24h) ? (
                                 <span className="text-[8px] font-bold text-emerald-500">Abierto</span>
@@ -971,7 +971,7 @@ export default function HealthMap() {
           </div>
 
 
-          {/* ── Category chips — Google Maps style white pills ─── */}
+          {/* â”€â”€ Category chips â€” Google Maps style white pills â”€â”€â”€ */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
             {FILTER_OPTIONS.map(({ value, label, labelShort }) => {
               const details = value !== 'all' ? getClinicTypeDetails(value) : null;
@@ -1002,200 +1002,296 @@ export default function HealthMap() {
 
         {selectedClinic && !isNavigating && (
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="absolute bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 bg-surface rounded-3xl shadow-2xl border border-outline-variant/20 z-50 overflow-hidden max-h-[80vh] flex flex-col"
+            key={selectedClinic.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-0 left-0 bottom-0 z-45 flex"
+            style={{ zIndex: 45 }}
           >
-            {/* ── Photo Header ── */}
-            {selectedClinic.photos && selectedClinic.photos.length > 0 ? (
-              <div className="relative h-36 shrink-0 overflow-hidden">
-                <img
-                  src={selectedClinic.photos[0]}
-                  alt={selectedClinic.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                {/* Close button over photo */}
-                <button
-                  onClick={() => setSelectedClinic(null)}
-                  className="absolute top-3 right-3 w-8 h-8 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-all"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                {/* Type badge over photo */}
-                <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                  <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full backdrop-blur-sm ${
-                    selectedClinic.type === 'emergency' ? 'bg-error/80 text-white' : 'bg-primary/80 text-white'
-                  }`}>
-                    {getClinicTypeDetails(selectedClinic.type).label}
-                  </span>
-                  {selectedClinic.sector === 'public' && (
-                    <span className="text-[9px] font-black uppercase px-2 py-1 rounded-full bg-blue-600/80 text-white backdrop-blur-sm">PÚBLICO</span>
-                  )}
-                  {selectedClinic.wheelchairAccessible && (
-                    <span className="text-[9px] font-black uppercase px-2 py-1 rounded-full bg-black/50 text-white backdrop-blur-sm">♿</span>
-                  )}
-                </div>
-              </div>
-            ) : (
-              // Fallback header without photo
-              <div className={`p-4 shrink-0 flex items-center justify-between ${
-                selectedClinic.type === 'emergency' ? 'bg-error/10' : 'bg-primary/10'
-              }`}>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] font-bold text-on-surface-variant uppercase">{getClinicTypeDetails(selectedClinic.type).label}</span>
-                  {selectedClinic.sector === 'public' && <span className="text-[9px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">PÚBLICO</span>}
-                  {selectedClinic.wheelchairAccessible && <span className="text-[9px] font-bold bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full">♿ Accesible</span>}
-                </div>
-                <button onClick={() => setSelectedClinic(null)}
-                  className="w-8 h-8 bg-surface-container rounded-full flex items-center justify-center hover:bg-surface-container-high">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            )}
+            {/* â”€â”€ Narrow left strip (like Google Maps sidebar) â”€â”€ */}
+            <div className="w-10 shrink-0" />
 
-            {/* ── Scrollable body ── */}
-            <div className="overflow-y-auto flex-1">
-              {/* Name + rating + confidence */}
-              <div className="px-4 pt-3 pb-2">
-                <h3 className="text-base font-black text-on-surface leading-tight">{selectedClinic.name}</h3>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  {selectedClinic.rating && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-black text-amber-500">{selectedClinic.rating.toFixed(1)}</span>
-                      <div className="flex">
-                        {[1,2,3,4,5].map(s => (
-                          <span key={s} className={`text-[10px] ${
-                            s <= Math.round(selectedClinic.rating!) ? 'text-amber-400' : 'text-surface-container-high'
-                          }`}>★</span>
-                        ))}
-                      </div>
-                      {selectedClinic.reviews && (
-                        <span className="text-[10px] text-on-surface-variant">({selectedClinic.reviews.toLocaleString()})</span>
-                      )}
+            {/* â”€â”€ Main detail panel (Google Maps left panel) â”€â”€ */}
+            <div
+              className="flex flex-col bg-white shadow-2xl overflow-hidden"
+              style={{ width: 'min(360px, calc(100vw - 2.5rem))', maxHeight: '100dvh', overflowY: 'auto' }}
+            >
+              {/* â”€â”€ Photo â”€â”€ */}
+              {selectedClinic.photos && selectedClinic.photos.length > 0 ? (
+                <div className="relative shrink-0" style={{ height: '200px' }}>
+                  <img
+                    src={selectedClinic.photos[0]}
+                    alt={selectedClinic.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={() => setSelectedClinic(null)}
+                    className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition-all"
+                  >
+                    <X className="w-4 h-4 text-gray-700" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="relative shrink-0 flex items-center justify-center"
+                  style={{ height: '160px', background: '#f1f3f4' }}
+                >
+                  {React.createElement(getClinicTypeDetails(selectedClinic.type).icon, {
+                    className: 'w-16 h-16 text-gray-300'
+                  })}
+                  <button
+                    onClick={() => setSelectedClinic(null)}
+                    className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition-all"
+                  >
+                    <X className="w-4 h-4 text-gray-700" />
+                  </button>
+                </div>
+              )}
+
+              {/* â”€â”€ Name + Rating block â”€â”€ */}
+              <div className="px-5 pt-4 pb-2">
+                <h2 className="text-xl font-semibold text-gray-900 leading-tight">
+                  {selectedClinic.name}
+                </h2>
+
+                {/* Stars + review count â€” exactly like Google Maps */}
+                {selectedClinic.rating ? (
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <span className="text-sm font-semibold text-gray-700">
+                      {selectedClinic.rating.toFixed(1)}
+                    </span>
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map(s => (
+                        <svg key={s} className="w-3.5 h-3.5" viewBox="0 0 24 24" fill={s <= Math.round(selectedClinic.rating!) ? '#F9AB01' : '#E0E0E0'}>
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                      ))}
                     </div>
-                  )}
-                  {selectedClinic.priceLevel === 0 && <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded">Gratuito</span>}
-                  {(() => {
-                    const badge = getConfidenceBadge(reportSummaries.get(selectedClinic.id));
-                    const badgeConfig = {
-                      verified:    { label: '✅ Verificado', cls: 'bg-emerald-500/10 text-emerald-600' },
-                      warned:      { label: '⚠️ En revisión', cls: 'bg-amber-500/10 text-amber-600' },
-                      flagged:     { label: '🚩 Reportado', cls: 'bg-red-500/10 text-red-600' },
-                      unconfirmed: null,
-                    }[badge];
-                    return badgeConfig ? (
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${badgeConfig.cls}`}>{badgeConfig.label}</span>
-                    ) : null;
-                  })()}
-                </div>
-                <p className="text-[11px] text-on-surface-variant mt-1">{selectedClinic.address}</p>
-              </div>
-
-              {/* ── Quick action chips (Google Maps style) ── */}
-              <div className="px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar border-y border-outline-variant/10">
-                <button
-                  onClick={() => setIsNavigating(true)}
-                  className="flex flex-col items-center gap-1 px-4 py-2 bg-primary/10 text-primary rounded-2xl shrink-0 hover:bg-primary/20 transition-all"
-                >
-                  <Navigation className="w-4 h-4" />
-                  <span className="text-[9px] font-bold">Cómo llegar</span>
-                </button>
-                {selectedClinic.phone && (
-                  <a
-                    href={`tel:${selectedClinic.phone}`}
-                    className="flex flex-col items-center gap-1 px-4 py-2 bg-surface-container text-on-surface-variant rounded-2xl shrink-0 hover:bg-surface-container-high transition-all"
-                  >
-                    <Phone className="w-4 h-4" />
-                    <span className="text-[9px] font-bold">Llamar</span>
-                  </a>
-                )}
-                {selectedClinic.website && (
-                  <a
-                    href={selectedClinic.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-1 px-4 py-2 bg-surface-container text-on-surface-variant rounded-2xl shrink-0 hover:bg-surface-container-high transition-all"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                    <span className="text-[9px] font-bold">Sitio web</span>
-                  </a>
-                )}
-                <button
-                  onClick={() => setSelectedForReport(selectedClinic)}
-                  className="flex flex-col items-center gap-1 px-4 py-2 bg-surface-container text-amber-600 rounded-2xl shrink-0 hover:bg-amber-50 transition-all"
-                >
-                  <Flag className="w-4 h-4" />
-                  <span className="text-[9px] font-bold">Reportar</span>
-                </button>
-              </div>
-
-              {/* ── Opening Hours ── */}
-              {selectedClinic.openingHours?.weekdayText && selectedClinic.openingHours.weekdayText.length > 0 ? (
-                <div className="px-4 py-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="w-3.5 h-3.5 text-on-surface-variant" />
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase">Horario de atención</span>
-                    {selectedClinic.openingHours.isOpen !== undefined && (
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ml-auto ${
-                        selectedClinic.openingHours.isOpen
-                          ? 'bg-emerald-500/10 text-emerald-600'
-                          : 'bg-red-500/10 text-red-600'
-                      }`}>
-                        {selectedClinic.openingHours.isOpen ? '● Abierto ahora' : '● Cerrado ahora'}
+                    {selectedClinic.reviews && (
+                      <span className="text-sm text-blue-700 underline cursor-pointer">
+                        ({selectedClinic.reviews.toLocaleString()})
                       </span>
                     )}
                   </div>
-                  <div className="space-y-1">
-                    {selectedClinic.openingHours.weekdayText.map((line, i) => {
-                      const today = new Date().getDay(); // 0=Sun, 1=Mon...
-                      const adjustedToday = today === 0 ? 6 : today - 1; // Mon=0..Sun=6
-                      const isToday = i === adjustedToday;
-                      return (
-                        <div key={i} className={`flex text-[10px] px-2 py-0.5 rounded ${
-                          isToday ? 'bg-primary/5 font-bold text-on-surface' : 'text-on-surface-variant'
-                        }`}>
-                          <span className={`w-24 shrink-0 ${isToday ? 'text-primary font-bold' : ''}`}>
-                            {line.split(':')[0]}
-                          </span>
-                          <span>{line.split(':').slice(1).join(':').trim()}</span>
-                        </div>
-                      );
-                    })}
+                ) : null}
+
+                {/* Type badge + wheelchair â€” like "Hospital â€¢ â™¿" */}
+                <div className="flex items-center gap-1.5 mt-1.5 text-[13px] text-gray-600">
+                  <span>{getClinicTypeDetails(selectedClinic.type).label}</span>
+                  {selectedClinic.wheelchairAccessible && (
+                    <>
+                      <span className="text-gray-400">Â·</span>
+                      <span>â™¿</span>
+                    </>
+                  )}
+                  {selectedClinic.sector === 'public' && (
+                    <>
+                      <span className="text-gray-400">Â·</span>
+                      <span className="text-blue-600 font-medium">PÃºblico</span>
+                    </>
+                  )}
+                  {/* Confidence badge */}
+                  {(() => {
+                    const badge = getConfidenceBadge(reportSummaries.get(selectedClinic.id));
+                    const map: Record<string, string> = {
+                      verified: 'âœ… Verificado',
+                      warned: 'âš ï¸ En revisiÃ³n',
+                      flagged: 'ðŸš© Reportado',
+                    };
+                    return map[badge] ? (
+                      <>
+                        <span className="text-gray-400">Â·</span>
+                        <span className="text-[12px] text-gray-500">{map[badge]}</span>
+                      </>
+                    ) : null;
+                  })()}
+                </div>
+              </div>
+
+              {/* â”€â”€ Tabs: DescripciÃ³n | Opiniones | Acerca de â”€â”€ */}
+              <div className="flex border-b border-gray-200 px-2 mt-1">
+                {['DescripciÃ³n general', 'Opiniones', 'Acerca de'].map((tab, i) => (
+                  <button
+                    key={tab}
+                    className={`flex-1 py-2.5 text-[13px] font-medium border-b-2 transition-colors ${
+                      i === 0
+                        ? 'border-blue-600 text-blue-700'
+                        : 'border-transparent text-gray-500 hover:text-gray-800'
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              {/* â”€â”€ Circular Action Buttons â€” exactly like Google Maps â”€â”€ */}
+              <div className="flex justify-around px-3 py-4 border-b border-gray-100">
+                {/* Indicaciones */}
+                <button
+                  onClick={() => setIsNavigating(true)}
+                  className="flex flex-col items-center gap-1.5 group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                    <Navigation className="w-5 h-5 text-blue-700" />
+                  </div>
+                  <span className="text-[11px] text-blue-700 font-medium text-center leading-tight" style={{ maxWidth: '56px' }}>
+                    Indicaciones
+                  </span>
+                </button>
+
+                {/* Guardar */}
+                <button className="flex flex-col items-center gap-1.5 group">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                    <Flag className="w-5 h-5 text-blue-700" />
+                  </div>
+                  <span className="text-[11px] text-blue-700 font-medium">Guardar</span>
+                </button>
+
+                {/* Cerca */}
+                <button className="flex flex-col items-center gap-1.5 group">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                    <Search className="w-5 h-5 text-blue-700" />
+                  </div>
+                  <span className="text-[11px] text-blue-700 font-medium">Cerca</span>
+                </button>
+
+                {/* Llamar */}
+                {selectedClinic.phone ? (
+                  <a
+                    href={`tel:${selectedClinic.phone}`}
+                    className="flex flex-col items-center gap-1.5 group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                      <Phone className="w-5 h-5 text-blue-700" />
+                    </div>
+                    <span className="text-[11px] text-blue-700 font-medium">Llamar</span>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setSelectedForReport(selectedClinic)}
+                    className="flex flex-col items-center gap-1.5 group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                      <Flag className="w-5 h-5 text-blue-700" />
+                    </div>
+                    <span className="text-[11px] text-blue-700 font-medium">Reportar</span>
+                  </button>
+                )}
+              </div>
+
+              {/* â”€â”€ Address row â”€â”€ */}
+              {selectedClinic.address && (
+                <div className="flex items-start gap-4 px-5 py-3.5 border-b border-gray-100">
+                  <MapPin className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] text-gray-700 leading-snug">{selectedClinic.address}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* â”€â”€ Hours row â”€â”€ */}
+              {selectedClinic.open24h ? (
+                <div className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-100">
+                  <Clock className="w-4 h-4 text-gray-500 shrink-0" />
+                  <div>
+                    <p className="text-[13px] text-gray-700">
+                      <span className="text-green-700 font-medium">Abierto</span>
+                      {' Â· '}
+                      <span>Abre las 24 horas</span>
+                    </p>
+                  </div>
+                </div>
+              ) : selectedClinic.openingHours ? (
+                <div className="flex items-start gap-4 px-5 py-3.5 border-b border-gray-100">
+                  <Clock className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[13px] font-medium ${
+                        selectedClinic.openingHours.isOpen ? 'text-green-700' : 'text-red-600'
+                      }`}>
+                        {selectedClinic.openingHours.isOpen ? 'Abierto ahora' : 'Cerrado ahora'}
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                    </div>
+                    {selectedClinic.openingHours.weekdayText && (
+                      <div className="mt-1.5 space-y-0.5">
+                        {selectedClinic.openingHours.weekdayText.map((line, i) => {
+                          const today = new Date().getDay();
+                          const adjustedToday = today === 0 ? 6 : today - 1;
+                          const isToday = i === adjustedToday;
+                          return (
+                            <div key={i} className={`flex gap-3 text-[12px] ${
+                              isToday ? 'font-semibold text-gray-900' : 'text-gray-500'
+                            }`}>
+                              <span className="w-20 shrink-0">{line.split(':')[0]}</span>
+                              <span>{line.split(':').slice(1).join(':').trim()}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
-                <div className="px-4 py-3 flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-on-surface-variant" />
-                  <span className="text-xs text-on-surface-variant">
-                    {selectedClinic.open24h ? 'Abierto 24 horas' : selectedClinic.isOpen ? 'Abierto' : 'Cerrado'}
+                <div className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-100">
+                  <Clock className="w-4 h-4 text-gray-500 shrink-0" />
+                  <span className={`text-[13px] font-medium ${selectedClinic.isOpen ? 'text-green-700' : 'text-red-600'}`}>
+                    {selectedClinic.isOpen ? 'Abierto' : 'Cerrado'}
                   </span>
                 </div>
               )}
 
-              {/* ── Photo gallery strip (if multiple photos) ── */}
+              {/* â”€â”€ Phone row â”€â”€ */}
+              {selectedClinic.phone && (
+                <div className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-100">
+                  <Phone className="w-4 h-4 text-gray-500 shrink-0" />
+                  <a href={`tel:${selectedClinic.phone}`} className="text-[13px] text-blue-700 hover:underline">
+                    {selectedClinic.phone}
+                  </a>
+                </div>
+              )}
+
+              {/* â”€â”€ Website row â”€â”€ */}
+              {selectedClinic.website && (
+                <div className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-100">
+                  <Globe2 className="w-4 h-4 text-gray-500 shrink-0" />
+                  <a
+                    href={selectedClinic.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[13px] text-blue-700 hover:underline truncate"
+                  >
+                    {selectedClinic.website.replace(/^https?:\/\//, '')}
+                  </a>
+                </div>
+              )}
+
+              {/* â”€â”€ Report button (community tool, unique to Salud Conecta) â”€â”€ */}
+              <div className="px-5 py-4">
+                <button
+                  onClick={() => setSelectedForReport(selectedClinic)}
+                  className="flex items-center gap-2 text-[13px] text-gray-500 hover:text-red-600 transition-colors"
+                >
+                  <Flag className="w-4 h-4" />
+                  <span>Reportar un problema</span>
+                </button>
+              </div>
+
+              {/* â”€â”€ Photo gallery strip â”€â”€ */}
               {selectedClinic.photos && selectedClinic.photos.length > 1 && (
-                <div className="px-4 pb-3">
+                <div className="px-5 pb-4">
                   <div className="flex gap-2 overflow-x-auto no-scrollbar">
                     {selectedClinic.photos.slice(1).map((url, i) => (
                       <img
                         key={i}
                         src={url}
                         alt={`${selectedClinic.name} foto ${i + 2}`}
-                        className="w-24 h-16 object-cover rounded-xl shrink-0 border border-outline-variant/20"
+                        className="w-28 h-20 object-cover rounded-lg shrink-0"
                       />
                     ))}
                   </div>
-                </div>
-              )}
-
-              {/* ── Phone row (if no chip showed) ── */}
-              {selectedClinic.phone && !selectedClinic.website && (
-                <div className="px-4 pb-3 flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-on-surface-variant shrink-0" />
-                  <a href={`tel:${selectedClinic.phone}`} className="text-xs text-primary font-bold hover:underline">
-                    {selectedClinic.phone}
-                  </a>
                 </div>
               )}
             </div>
