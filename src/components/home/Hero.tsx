@@ -82,14 +82,14 @@ export default function Hero({ onStartAssistant, onViewMap, onViewAppointments, 
                 </button>
                 <button 
                   onClick={onViewMap}
-                  className="bg-surface-container-high text-primary border-2 border-primary/20 px-6 py-4 sm:px-10 sm:py-5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest hover:scale-105 hover:bg-primary/10 hover:border-primary/40 transition-all flex items-center justify-center gap-3"
+                  className="bg-primary text-on-primary px-6 py-4 sm:px-10 sm:py-5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest hover:scale-105 hover:brightness-110 shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-3"
                 >
                   {t('hero.cta.secondary')}
                   <MapPin className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={onViewAppointments}
-                  className="bg-surface-container-high text-primary border-2 border-primary/20 px-6 py-4 sm:px-10 sm:py-5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest hover:scale-105 hover:bg-primary/10 hover:border-primary/40 transition-all flex items-center justify-center gap-3"
+                  className="bg-primary text-on-primary px-6 py-4 sm:px-10 sm:py-5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest hover:scale-105 hover:brightness-110 shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-3"
                 >
                   Mis Citas
                   <Calendar className="w-5 h-5" />
@@ -183,24 +183,24 @@ export default function Hero({ onStartAssistant, onViewMap, onViewAppointments, 
             <div className="flex flex-col sm:flex-row gap-4">
               <button 
                 onClick={() => onOpenRegistration('doctor')}
-                className="group bg-surface border-2 border-primary/20 text-on-surface px-8 py-5 rounded-2xl font-display font-black text-sm uppercase tracking-widest hover:border-primary hover:bg-primary/5 transition-all flex items-center gap-4"
+                className="group bg-primary text-on-primary px-8 py-5 rounded-2xl font-display font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 hover:brightness-110 transition-all flex items-center gap-4"
               >
                 {t('cta.professional.doctor')}
-                <Stethoscope className="w-5 h-5 text-primary" />
+                <Stethoscope className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </button>
               <button 
                 onClick={() => onOpenRegistration('clinic')}
-                className="group bg-primary text-on-primary px-8 py-5 rounded-2xl font-display font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 transition-all flex items-center gap-4 text-center"
+                className="group bg-primary text-on-primary px-8 py-5 rounded-2xl font-display font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 hover:brightness-110 transition-all flex items-center gap-4 text-center"
               >
                 {t('cta.professional.clinic')}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <button 
                 onClick={() => onOpenRegistration('lab_pharmacy')}
-                className="group bg-surface border-2 border-primary/20 text-on-surface px-8 py-5 rounded-2xl font-display font-black text-sm uppercase tracking-widest hover:border-primary hover:bg-primary/5 transition-all flex items-center gap-4"
+                className="group bg-primary text-on-primary px-8 py-5 rounded-2xl font-display font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 hover:brightness-110 transition-all flex items-center gap-4"
               >
                 {t('cta.professional.business')}
-                <ArrowRight className="w-5 h-5 text-primary" />
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </motion.div>
