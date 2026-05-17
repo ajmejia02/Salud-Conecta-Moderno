@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { AnimatePresence, motion } from 'motion/react';
 import { 
   MapPin, Phone, Navigation, Search, Clock,
@@ -22,6 +22,9 @@ const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
 
 const NICARAGUA_CENTER = { lat: 12.1328, lng: -86.2504 };
 
+const normalizeString = (str: string) => 
+  str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
 const CONFIDENCE_BADGE_STYLE: Record<string, { border: string; dot?: string }> = {
   verified:    { border: '#10B981', dot: '#10B981' },
   unconfirmed: { border: 'transparent' },
@@ -29,11 +32,163 @@ const CONFIDENCE_BADGE_STYLE: Record<string, { border: string; dot?: string }> =
   flagged:     { border: '#EF4444', dot: '#EF4444' },
 };
 
+class SafeMarkerBoundary extends React.Component<
+  { children: React.ReactNode; fallback: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: any, errorInfo: any) {
+    console.warn("SafeMarkerBoundary caught an error (AdvancedMarker vector/cloud failure):", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
+// Proactive Google Maps capability checks
+const getGoogleMapsSupport = () => {
+  if (typeof window === 'undefined' || !window.google || !window.google.maps) {
+    return { standard: false, advanced: false };
+  }
+  const hasMarker = typeof window.google.maps.Marker === 'function';
+  // Check if AdvancedMarkerElement is supported in the loaded Maps SDK version
+  const hasAdvancedMarker = typeof (window.google.maps as any).marker?.AdvancedMarkerElement !== 'undefined' ||
+                            typeof (window.google.maps as any).AdvancedMarkerElement !== 'undefined';
+  return { standard: hasMarker, advanced: hasAdvancedMarker };
+};
+
+// Custom lightweight React component wrapping standard google.maps.Marker
+const Marker: React.FC<{
+  position: { lat: number; lng: number };
+  onClick?: () => void;
+  icon?: string;
+  zIndex?: number;
+}> = ({ position, onClick, icon, zIndex }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || typeof window === 'undefined' || !(window as any).google?.maps?.Marker) return;
+    
+    const googleMaps = (window as any).google.maps;
+    const marker = new googleMaps.Marker({
+      position,
+      map,
+      icon,
+      zIndex
+    });
+
+    let clickListener: any;
+    if (onClick) {
+      clickListener = marker.addListener('click', onClick);
+    }
+
+    return () => {
+      if (clickListener) {
+        googleMaps.event.removeListener(clickListener);
+      }
+      marker.setMap(null);
+    };
+  }, [map, position, icon, zIndex, onClick]);
+
+  return null;
+};
+
+const FallbackClinicMarker: React.FC<{
+  clinic: Clinic & { isOpen?: boolean };
+  confidence: ReturnType<typeof getConfidenceBadge>;
+  onClick: (c: Clinic & { isOpen?: boolean }) => void;
+}> = ({ clinic, confidence, onClick }) => {
+  const support = getGoogleMapsSupport();
+  if (!support.standard) {
+    return null; // Gracefully return null if Google Maps API failed to load to prevent app crashes
+  }
+
+  const details = getClinicTypeDetails(clinic.type);
+  const color = details.markerColors;
+  const badgeColor = {
+    verified: '#10B981',
+    unconfirmed: '#6B7280',
+    warned: '#F59E0B',
+    flagged: '#EF4444',
+  }[confidence];
+
+  // Dynamically constructed high-fidelity SVG path for fallback marker icon
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">
+      <path d="M18,0 C8.1,0 0,8.1 0,18 C0,28.8 18,46 18,46 C18,46 36,28.8 36,18 C36,8.1 27.9,0 18,0 Z" fill="${color.border}" />
+      <path d="M18,2.5 C9.4,2.5 2.5,9.4 2.5,18 C2.5,26.6 18,42.5 18,42.5 C18,42.5 33.5,26.6 33.5,18 C33.5,9.4 26.6,2.5 18,2.5 Z" fill="${color.bg}" />
+      <circle cx="18" cy="18" r="9" fill="white" opacity="0.9" />
+      <path d="M14,18 h8 M18,14 v8" stroke="${color.bg}" stroke-width="2.5" stroke-linecap="round" />
+      <circle cx="28" cy="10" r="5" fill="${badgeColor}" stroke="white" stroke-width="1.2" />
+    </svg>
+  `;
+  const iconUrl = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg.trim())}`;
+
+  return (
+    <Marker
+      position={clinic.location}
+      onClick={() => onClick(clinic)}
+      icon={iconUrl}
+    />
+  );
+};
+
+const FallbackUserLocationMarker: React.FC<{ position: google.maps.LatLngLiteral }> = ({ position }) => {
+  const support = getGoogleMapsSupport();
+  if (!support.standard) {
+    return null; // Gracefully return null if Google Maps API failed to load to prevent app crashes
+  }
+
+  // Dynamically constructed SVG for user location standard marker
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+      <circle cx="15" cy="15" r="13" fill="#005fb0" fill-opacity="0.15" />
+      <circle cx="15" cy="15" r="9" fill="#005fb0" fill-opacity="0.3" />
+      <circle cx="15" cy="15" r="6" fill="white" />
+      <circle cx="15" cy="15" r="4.5" fill="#005fb0" />
+    </svg>
+  `;
+  const iconUrl = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg.trim())}`;
+
+  return (
+    <Marker
+      position={position}
+      icon={iconUrl}
+      zIndex={100}
+    />
+  );
+};
+
 const ClinicMarker: React.FC<{
   clinic: Clinic & { isOpen?: boolean };
   confidence: ReturnType<typeof getConfidenceBadge>;
   onClick: (c: Clinic & { isOpen?: boolean }) => void;
 }> = ({ clinic, confidence, onClick }) => {
+  const support = getGoogleMapsSupport();
+  
+  // Proactively fallback to standard Marker if AdvancedMarker is not supported (cloud/MapID failure)
+  if (!support.advanced) {
+    return (
+      <FallbackClinicMarker
+        clinic={clinic}
+        confidence={confidence}
+        onClick={onClick}
+      />
+    );
+  }
+
   const isOpen = clinic.isOpen !== undefined ? clinic.isOpen : clinic.open24h;
   const details = getClinicTypeDetails(clinic.type);
   const color = details.markerColors;
@@ -70,6 +225,13 @@ const ClinicMarker: React.FC<{
 };
 
 function UserLocationMarker({ position }: { position: google.maps.LatLngLiteral }) {
+  const support = getGoogleMapsSupport();
+  
+  // Proactively fallback to standard Marker if AdvancedMarker is not supported (cloud/MapID failure)
+  if (!support.advanced) {
+    return <FallbackUserLocationMarker position={position} />;
+  }
+
   return (
     <AdvancedMarker position={position} zIndex={100}>
       <div className="relative flex items-center justify-center">
@@ -103,7 +265,21 @@ function MapContent({
   }, [map, onMapReady]);
 
   return (
-    <>
+    <SafeMarkerBoundary
+      fallback={
+        <>
+          {clinics.map(clinic => (
+            <FallbackClinicMarker
+              key={clinic.id}
+              clinic={clinic}
+              confidence={getConfidenceBadge(reportSummaries.get(clinic.id))}
+              onClick={onClinicSelect}
+            />
+          ))}
+          <FallbackUserLocationMarker position={userLocation} />
+        </>
+      }
+    >
       {clinics.map(clinic => (
         <ClinicMarker
           key={clinic.id}
@@ -113,7 +289,7 @@ function MapContent({
         />
       ))}
       <UserLocationMarker position={userLocation} />
-    </>
+    </SafeMarkerBoundary>
   );
 }
 
@@ -320,7 +496,7 @@ export default function HealthMap() {
     } finally {
       setLoadingPlaces(false);
     }
-  }, [placesLib, hasValidKey, clinics, normalizeString, PUBLIC_HEALTH_NETWORK, NICARAGUA_HOSPITALS]);
+  }, [placesLib, hasValidKey, clinics]);
 
   const handleMapIdle = useCallback(() => {
     // Solo buscar si el mapa está listo, Places API está cargada y no estamos ya cargando
@@ -388,7 +564,7 @@ export default function HealthMap() {
     <APIProvider apiKey={API_KEY}>
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-background relative">
         <section className="absolute inset-0 z-0">
-          <Map 
+          <GoogleMap 
             defaultCenter={center} 
             defaultZoom={12} 
             mapId="DARK_MODE_MAP" 
@@ -404,7 +580,7 @@ export default function HealthMap() {
               onMapReady={setMapInstance}
               reportSummaries={reportSummaries}
             />
-          </Map>
+          </GoogleMap>
         </section>
 
         {loadingPlaces && (
