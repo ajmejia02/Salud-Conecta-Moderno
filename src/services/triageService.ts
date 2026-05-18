@@ -5,6 +5,7 @@ import { getClinics } from './clinicService'; // Importar getClinics para obtene
 import { getCurrentLocation, getNearestFacility, getEmergencyFacilities, estimateTravelTime, calculateDistance } from '../lib/geolocationService';
 import { NICARAGUA_HOSPITALS } from '../data/nicaraguaHospitals';
 import { PUBLIC_HEALTH_NETWORK } from '../data/nicaraguaPublicHealthNetwork';
+import { getSmartTriage } from '../lib/gemini';
 
 const handleFirestoreError = (error: unknown, operationType: OperationType, path: string | null) => {
   const errInfo: FirestoreErrorInfo = {
@@ -94,78 +95,88 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
     let userLat = 12.1328;
     let userLng = -86.2504;
 
-    // Obtener la red completa de clínicas verificadas desde Firestore
-    const fullNetwork = await getClinics();
-
     const userLocation = await getCurrentLocation();
     if (userLocation) {
       userLat = userLocation.latitude;
       userLng = userLocation.longitude;
     }
 
-    // Filtrar la red de clínicas de acuerdo a la membresía del usuario
+    // 1. Obtener la red completa combinada (Firestore dinámicas + Red pública y de hospitales estáticos de Nicaragua)
+    const dbClinics = await getClinics();
+    const staticClinics: Clinic[] = [
+      ...NICARAGUA_HOSPITALS.map((h, i) => ({ id: `static-h-${i}`, ...h } as Clinic)),
+      ...PUBLIC_HEALTH_NETWORK.map((h, i) => ({ id: `static-p-${i}`, ...h } as Clinic))
+    ];
+    const fullNetwork = [...dbClinics, ...staticClinics];
+
+    // 2. Filtrar la red de clínicas de acuerdo a la membresía del usuario
     // Free: Solo red pública (MINSA)
     // Premium: Red pública + clínicas privadas premium registradas
     const allowedFacilities = membership === 'free'
       ? fullNetwork.filter(c => c.sector === 'public')
       : fullNetwork;
 
-    let nearestFacility = null;
-    let distanceKm = Infinity;
+    // 3. Evaluar los síntomas y determinar la urgencia con la IA (Gemini)
+    const aiTriage = await getSmartTriage(symptoms, membership);
 
-    if (allowedFacilities.length > 0) {
-      const result = getNearestFacility(allowedFacilities, userLat, userLng, membership === 'free');
-      nearestFacility = result.facility;
-      distanceKm = result.distanceKm;
-    }
+    // 4. Calcular el centro de salud más cercano matemáticamente usando la fórmula Haversine basada en el GPS real del usuario
+    let closestClinic = null;
+    let minDistance = Infinity;
 
-    let isEmergency = false;
-    let nearestEmergency = null;
-
-    // Detectar si el caso requiere urgencia crítica y obtener el hospital de emergencia más cercano
-    const emergencyHospitals = getEmergencyFacilities(allowedFacilities);
-    if (emergencyHospitals?.length > 0) {
-      for (const hospital of emergencyHospitals) {
-        if (hospital.location) {
-          const dist = calculateDistance(userLat, userLng, hospital.location.lat, hospital.location.lng);
-          if (dist < 15 && dist < distanceKm) {
-            distanceKm = dist;
-            nearestEmergency = hospital;
-            isEmergency = true;
-          }
+    for (const clinic of allowedFacilities) {
+      if (clinic.location) {
+        const dist = calculateDistance(userLat, userLng, clinic.location.lat, clinic.location.lng);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestClinic = clinic;
         }
       }
     }
 
-    const recommendedClinic = isEmergency && nearestEmergency ? nearestEmergency : nearestFacility;
-    const finalDistance = distanceKm === Infinity ? 0 : distanceKm;
-
-    if (recommendedClinic) {
-      const isPriv = recommendedClinic.sector === 'private';
-      const sectorTag = isPriv ? 'Centro Privado Premium' : 'Red Pública (MINSA)';
-      
-      return {
-        severity: isEmergency ? 'critical' : 'high',
-        recommendation: `Estas experimentando un síntoma de urgencia debes acudir a un centro de salud de inmediato, de acuerdo a tu ubicación el centro mas cercano es: "${recommendedClinic.name}" (${sectorTag}).`,
-        reasoning: `Caso de urgencia analizado para suscripción ${membership.toUpperCase()}. Centros elegibles: ${allowedFacilities.length}. Centro recomendado: ${recommendedClinic.name} a ${finalDistance.toFixed(1)} km.`,
-        locationInfo: {
-          nearestFacility: recommendedClinic.name,
-          distanceKm: finalDistance,
-          travelTime: estimateTravelTime(finalDistance),
-          isEmergency: isEmergency,
-          clinic: recommendedClinic,
-          userLat: userLat,
-          userLng: userLng
-        },
-        error: false
-      };
+    // 5. Mapear niveles de urgencia dinámicos de la IA
+    let severity: 'low' | 'medium' | 'high' | 'critical' = 'medium';
+    if (aiTriage.urgency === 'emergency') {
+      severity = 'critical';
+    } else if (aiTriage.urgency === 'high') {
+      severity = 'high';
+    } else if (aiTriage.urgency === 'low') {
+      severity = 'low';
     }
 
+    const isUrgent = severity === 'critical' || severity === 'high';
+    let recommendation = aiTriage.recommendation || '';
+
+    // 6. Aplicar la frase exacta exigida si es de urgencia, de lo contrario concatenar el centro más cercano
+    if (isUrgent && closestClinic) {
+      const sectorTag = closestClinic.sector === 'private' ? 'Centro Privado Premium' : 'Red Pública (MINSA)';
+      recommendation = `Estas experimentando un síntoma de urgencia debes acudir a un centro de salud de inmediato, de acuerdo a tu ubicación el centro mas cercano es: "${closestClinic.name}" (${sectorTag}).`;
+    } else if (closestClinic) {
+      const sectorTag = closestClinic.sector === 'private' ? 'Centro Privado Premium' : 'Red Pública (MINSA)';
+      recommendation = `${recommendation} De acuerdo a tu ubicación, el centro de salud más cercano es: "${closestClinic.name}" (${sectorTag}).`;
+    }
+
+    const finalDistance = minDistance === Infinity ? 0 : minDistance;
+
     return {
-      severity: 'high',
-      recommendation: 'Estas experimentando un síntoma de urgencia debes acudir a un centro de salud de inmediato. Por favor, acuda al centro asistencial más cercano.',
-      reasoning: 'Caso de alta prioridad detectado. No hay clínicas geolocalizadas disponibles en la red.',
-      error: false
+      severity,
+      recommendation,
+      reasoning: aiTriage.reasoning || `Triaje analizado para suscripción ${membership.toUpperCase()}. Distancia al centro más cercano: ${finalDistance.toFixed(1)} km.`,
+      medication: aiTriage.medication ? {
+        name: aiTriage.medication,
+        dosage: aiTriage.dosage || '',
+        frequency: aiTriage.frequency || '',
+        duration: aiTriage.duration || ''
+      } : undefined,
+      locationInfo: closestClinic ? {
+        nearestFacility: closestClinic.name,
+        distanceKm: finalDistance,
+        travelTime: estimateTravelTime(finalDistance),
+        isEmergency: isUrgent,
+        clinic: closestClinic,
+        userLat,
+        userLng
+      } : undefined,
+      error: !!aiTriage.error
     };
   } catch (error) {
     console.error('Error en triaje:', error);
