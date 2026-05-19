@@ -29,6 +29,8 @@ interface SearchProps {
 export default function Search({ onOpenRegistration }: SearchProps) {
   const [activeCategory, setActiveCategory] = React.useState<string | null>(null);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [locationQuery, setLocationQuery] = React.useState('');
 
   React.useEffect(() => {
     const handleCategory = (e: any) => {
@@ -131,9 +133,33 @@ export default function Search({ onOpenRegistration }: SearchProps) {
     }
   ];
 
-  const filteredItems = activeCategory 
-    ? allItems.filter(item => item.category === activeCategory)
-    : allItems;
+  const filteredItems = (() => {
+    let items = activeCategory 
+      ? allItems.filter(item => item.category === activeCategory)
+      : allItems;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      items = items.filter(item => {
+        const nameMatch = item.name?.toLowerCase().includes(q);
+        const descMatch = item.description?.toLowerCase().includes(q);
+        const servicesMatch = item.services?.some(s => s.toLowerCase().includes(q));
+        return nameMatch || descMatch || servicesMatch;
+      });
+    }
+
+    if (locationQuery.trim()) {
+      const loc = locationQuery.toLowerCase().trim();
+      items = items.filter(item => {
+        const descMatch = item.description?.toLowerCase().includes(loc);
+        const nameMatch = item.name?.toLowerCase().includes(loc);
+        const distMatch = item.distance?.toLowerCase().includes(loc);
+        return descMatch || nameMatch || distMatch;
+      });
+    }
+
+    return items;
+  })();
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice(
@@ -166,6 +192,11 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                 className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" 
                 placeholder="Buscar doctor, especialidad, síntomas..." 
                 type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
             <div className="relative flex-1 group/location">
@@ -174,6 +205,11 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                 className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" 
                 placeholder="Localidad..." 
                 type="text"
+                value={locationQuery}
+                onChange={(e) => {
+                  setLocationQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
           </div>
