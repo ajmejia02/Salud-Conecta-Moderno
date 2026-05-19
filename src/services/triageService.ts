@@ -85,6 +85,12 @@ export interface TriageWithLocationResult {
     clinic?: Clinic; // Triage result carries the full clinic object for routing
     userLat?: number;
     userLng?: number;
+    closestHospital?: Clinic;
+    closestHospitalDistanceKm?: number;
+    closestHospitalTravelTime?: string;
+    closestCenter?: Clinic;
+    closestCenterDistanceKm?: number;
+    closestCenterTravelTime?: string;
   };
   error?: boolean;
 }
@@ -119,16 +125,38 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
     // 3. Evaluar los síntomas y determinar la urgencia con la IA (Gemini)
     const aiTriage = await getSmartTriage(symptoms, membership);
 
-    // 4. Calcular el centro de salud más cercano matemáticamente usando la fórmula Haversine basada en el GPS real del usuario
+    // 4. Calcular el centro de salud y el hospital más cercano matemáticamente usando la fórmula Haversine basada en el GPS real del usuario
     let closestClinic = null;
     let minDistance = Infinity;
+
+    let closestHospital = null;
+    let minHospitalDistance = Infinity;
+
+    let closestCenter = null;
+    let minCenterDistance = Infinity;
 
     for (const clinic of allowedFacilities) {
       if (clinic.location) {
         const dist = calculateDistance(userLat, userLng, clinic.location.lat, clinic.location.lng);
+        
+        // Overall closest clinic
         if (dist < minDistance) {
           minDistance = dist;
           closestClinic = clinic;
+        }
+
+        // Closest Hospital vs Closest Health Center
+        const isHospital = clinic.type.startsWith('hospital') || clinic.type === 'hospital';
+        if (isHospital) {
+          if (dist < minHospitalDistance) {
+            minHospitalDistance = dist;
+            closestHospital = clinic;
+          }
+        } else {
+          if (dist < minCenterDistance) {
+            minCenterDistance = dist;
+            closestCenter = clinic;
+          }
         }
       }
     }
@@ -174,7 +202,13 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
         isEmergency: isUrgent,
         clinic: closestClinic,
         userLat,
-        userLng
+        userLng,
+        closestHospital: closestHospital || undefined,
+        closestHospitalDistanceKm: minHospitalDistance === Infinity ? undefined : minHospitalDistance,
+        closestHospitalTravelTime: minHospitalDistance === Infinity ? undefined : estimateTravelTime(minHospitalDistance),
+        closestCenter: closestCenter || undefined,
+        closestCenterDistanceKm: minCenterDistance === Infinity ? undefined : minCenterDistance,
+        closestCenterTravelTime: minCenterDistance === Infinity ? undefined : estimateTravelTime(minCenterDistance),
       } : undefined,
       error: !!aiTriage.error
     };

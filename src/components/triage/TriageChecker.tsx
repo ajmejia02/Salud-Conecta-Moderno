@@ -170,35 +170,22 @@ export default function TriageChecker() {
     }
   };
 
-  const handleViewOnMap = () => {
-    if (!triageResult?.locationInfo?.clinic?.location) {
+  const handleViewOnMap = (clinicToNavigate?: Clinic) => {
+    const targetClinic = clinicToNavigate || triageResult?.locationInfo?.clinic;
+    if (!targetClinic?.location) {
       triggerToast("No hay información de ubicación disponible.", "error");
       return;
     }
 
-    const { clinic, userLat, userLng } = triageResult.locationInfo;
-    const destLat = clinic.location.lat;
-    const destLng = clinic.location.lng;
+    const { userLat, userLng } = triageResult?.locationInfo || {};
+    const destLat = targetClinic.location.lat;
+    const destLng = targetClinic.location.lng;
     const originLat = userLat || 12.1328;
     const originLng = userLng || -86.2504;
 
-    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-    
-    // URL nativa para app oficial y URL universal como respaldo
-    const nativeUrl = isiOS 
-      ? `comgooglemaps://?saddr=${originLat},${originLng}&daddr=${destLat},${destLng}&directionsmode=driving`
-      : `google.navigation:q=${destLat},${destLng}`;
-
     const universalUrl = `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${destLat},${destLng}&travelmode=driving`;
 
-    const start = Date.now();
-    window.location.href = nativeUrl;
-
-    setTimeout(() => {
-      if (Date.now() - start < 2000) {
-        window.open(universalUrl, '_blank');
-      }
-    }, 1500);
+    window.open(universalUrl, '_blank');
   };
 
   const toggleListening = () => {
@@ -477,37 +464,80 @@ export default function TriageChecker() {
                     </div>
                   )}
 
-                  {/* Proximity facility geolocation card */}
+                  {/* Proximity facility geolocation cards */}
                   {triageResult.locationInfo && (
-                    <div className="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-blue-500">
-                          <MapPin size={16} />
-                          <span className="text-[10px] font-black uppercase tracking-widest">Centro Más Cercano</span>
-                        </div>
-                        <span className="text-[9px] font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg border border-blue-500/20">
-                          {triageResult.locationInfo.distanceKm.toFixed(1)} KM
-                        </span>
+                    <div className="space-y-3">
+                      <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
+                        Centros Asistenciales Recomendados 📍
                       </div>
-                      <div>
-                        <h5 className="text-xs font-black text-slate-800 dark:text-white leading-tight">
-                          {triageResult.locationInfo.nearestFacility}
-                        </h5>
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500">
-                            <Clock size={12} className="text-blue-500" /> {triageResult.locationInfo.travelTime}
+                      
+                      {/* Nearest Hospital Card */}
+                      {triageResult.locationInfo.closestHospital && (
+                        <div className="p-4 bg-red-500/5 rounded-2xl border border-red-500/10 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 text-red-505 dark:text-red-400">
+                              <MapPin size={16} className="text-red-500" />
+                              <span className="text-[10px] font-black uppercase tracking-widest">Hospital Más Cercano</span>
+                            </div>
+                            <span className="text-[9px] font-black bg-red-500/10 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-lg border border-red-500/20">
+                              {triageResult.locationInfo.closestHospitalDistanceKm?.toFixed(1)} KM
+                            </span>
                           </div>
-                          <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Disponible</span>
+                          <div>
+                            <h5 className="text-xs font-black text-slate-800 dark:text-white leading-tight">
+                              {triageResult.locationInfo.closestHospital.name}
+                            </h5>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500">
+                                <Clock size={12} className="text-red-500" /> {triageResult.locationInfo.closestHospitalTravelTime}
+                              </div>
+                              <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Urgencias 24h</span>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => handleViewOnMap(triageResult.locationInfo?.closestHospital)}
+                            className="w-full h-10 bg-red-500 hover:bg-red-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-md shadow-red-500/10 hover:shadow-red-500/20"
+                          >
+                            <Compass className="w-3.5 h-3.5" />
+                            Ruta al Hospital en Google Maps
+                          </button>
                         </div>
-                      </div>
-                      <button 
-                        onClick={handleViewOnMap}
-                        className="w-full h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-500/10 hover:shadow-blue-500/20"
-                      >
-                        <Compass className="w-3.5 h-3.5" />
-                        Ver ruta en Google Maps
-                      </button>
+                      )}
+
+                      {/* Nearest Health Center Card */}
+                      {triageResult.locationInfo.closestCenter && (
+                        <div className="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 text-blue-505 dark:text-blue-400">
+                              <MapPin size={16} className="text-blue-500" />
+                              <span className="text-[10px] font-black uppercase tracking-widest">Centro de Salud Más Cercano</span>
+                            </div>
+                            <span className="text-[9px] font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg border border-blue-500/20">
+                              {triageResult.locationInfo.closestCenterDistanceKm?.toFixed(1)} KM
+                            </span>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-black text-slate-800 dark:text-white leading-tight">
+                              {triageResult.locationInfo.closestCenter.name}
+                            </h5>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500">
+                                <Clock size={12} className="text-blue-500" /> {triageResult.locationInfo.closestCenterTravelTime}
+                              </div>
+                              <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Disponible</span>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => handleViewOnMap(triageResult.locationInfo?.closestCenter)}
+                            className="w-full h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-500/10 hover:shadow-blue-500/20"
+                          >
+                            <Compass className="w-3.5 h-3.5" />
+                            Ruta al Centro en Google Maps
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
 
