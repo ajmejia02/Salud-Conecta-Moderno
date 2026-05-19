@@ -70,7 +70,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
         category: 'public_health',
         name: item.name,
         description: item.description || item.address || 'Institución Pública de Salud',
-        image: item.imageUrl || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=400',
+        image: item.imageUrl || '',
         rating: item.rating || 4.0,
         distance: 'Centro MINSA',
         status: item.open24h ? 'Abierto 24h' : 'Horario Regular',
@@ -328,12 +328,20 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                   whileHover={{ x: 4 }}
                   className="bg-surface-container border border-outline-variant/30 rounded-2xl flex flex-col sm:flex-row overflow-hidden shadow-lg hover:shadow-xl transition-shadow relative"
                 >
-                  <div className="w-full sm:w-48 h-48 sm:h-auto shrink-0 relative bg-surface-bright">
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-full sm:w-48 h-48 sm:h-auto shrink-0 relative bg-surface-bright flex items-center justify-center overflow-hidden">
+                    {item.image ? (
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center p-4 bg-gradient-to-br from-primary/10 to-secondary/10 text-center absolute inset-0">
+                        <span className="text-xs font-display font-bold text-primary leading-tight">
+                          {item.name}
+                        </span>
+                      </div>
+                    )}
                     <div className="absolute top-3 left-3 flex gap-2">
                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-md backdrop-blur-md ${
                         item.statusType === 'available' 
@@ -465,11 +473,19 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                   transition={{ duration: 0.8 }}
                   className="absolute inset-0"
                 >
-                  <img 
-                    src={topFeaturedItems[currentSlide].image} 
-                    alt={topFeaturedItems[currentSlide].name}
-                    className="w-full h-full object-cover select-none"
-                  />
+                  {topFeaturedItems[currentSlide].image ? (
+                    <img 
+                      src={topFeaturedItems[currentSlide].image} 
+                      alt={topFeaturedItems[currentSlide].name}
+                      className="w-full h-full object-cover select-none"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center p-8 bg-gradient-to-br from-primary/20 to-secondary/20 text-center absolute inset-0">
+                      <span className="text-xl font-display font-black text-primary leading-tight">
+                        {topFeaturedItems[currentSlide].name}
+                      </span>
+                    </div>
+                  )}
                   {/* Glassmorphic and dark overlays for readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/25" />
                 </motion.div>
@@ -647,12 +663,20 @@ function EstablishmentDetailModal({ item, onClose, likedItems, onToggleLike }: D
         className="bg-surface-container border border-outline-variant/30 rounded-[32px] overflow-hidden w-full max-w-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]"
       >
         {/* Cover Image & Close */}
-        <div className="relative h-60 w-full bg-surface-bright shrink-0">
-          <img 
-            src={item.image} 
-            alt={item.name}
-            className="w-full h-full object-cover"
-          />
+        <div className="relative h-60 w-full bg-surface-bright shrink-0 flex items-center justify-center overflow-hidden">
+          {item.image ? (
+            <img 
+              src={item.image} 
+              alt={item.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center p-6 bg-gradient-to-br from-primary/15 to-secondary/15 text-center absolute inset-0">
+              <span className="text-lg font-display font-black text-primary leading-tight max-w-md">
+                {item.name}
+              </span>
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           
           <button 
