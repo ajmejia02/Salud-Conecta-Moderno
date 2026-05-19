@@ -127,11 +127,11 @@ export const NICARAGUA_HOSPITALS: Omit<Clinic, 'id'>[] = [
   },
   {
     name: "Centro de Salud Jorge Sinforoso Bravo",
-    address: "Calle Atravesada, Granada, Nicaragua",
+    address: "Barrio Estación, frente al Parque Sandino, Granada, Nicaragua",
     phone: "+505 2552 4000",
     type: "health-center",
     sector: "public",
-    location: { lat: 11.93285, lng: -85.95537 },
+    location: { lat: 11.93983, lng: -85.95026 },
     rating: 4.6,
     reviews: 10,
     imageUrl: "https://images.unsplash.com/photo-1519494083224-703c185c80a5?auto=format&fit=crop&q=80&w=1000",
