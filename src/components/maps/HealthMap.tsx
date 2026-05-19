@@ -312,12 +312,14 @@ function Directions({
   routesLib, 
   userLocation, 
   destination, 
-  onRouteInfo 
+  onRouteInfo,
+  setRouteStatus
 }: { 
   routesLib: any; 
   userLocation: { lat: number; lng: number }; 
   destination: { lat: number; lng: number };
   onRouteInfo: (info: { distance: string; duration: string } | null) => void;
+  setRouteStatus: (status: 'idle' | 'loading' | 'success' | 'error') => void;
 }) {
   const map = useMap();
   const [directionsRenderer, setDirectionsRenderer] = useState<any>(null);
@@ -342,6 +344,7 @@ function Directions({
   useEffect(() => {
     if (!routesLib || !directionsRenderer || !userLocation || !destination) return;
 
+    setRouteStatus('loading');
     const service = new routesLib.DirectionsService();
     service.route(
       {
@@ -358,17 +361,21 @@ function Directions({
               distance: route.legs[0].distance?.text || '',
               duration: route.legs[0].duration?.text || ''
             });
+            setRouteStatus('success');
             if (route.bounds) {
               map.fitBounds(route.bounds);
             }
+          } else {
+            setRouteStatus('error');
           }
         } else {
           console.error("Directions request failed: " + status);
           onRouteInfo(null);
+          setRouteStatus('error');
         }
       }
     );
-  }, [routesLib, directionsRenderer, userLocation, destination, map]);
+  }, [routesLib, directionsRenderer, userLocation, destination, map, onRouteInfo, setRouteStatus]);
 
   return null;
 }
@@ -386,6 +393,7 @@ export default function HealthMap() {
   const [userLocation, setUserLocation] = useState(NICARAGUA_CENTER);
   const [isNavigating, setIsNavigating] = useState(false);
   const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
+  const [routeStatus, setRouteStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [filter, setFilter] = useState<FilterType>('all');
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -852,6 +860,7 @@ export default function HealthMap() {
                 userLocation={userLocation}
                 destination={selectedClinic.location}
                 onRouteInfo={setRouteInfo}
+                setRouteStatus={setRouteStatus}
               />
             )}
           </GoogleMap>
@@ -911,6 +920,7 @@ export default function HealthMap() {
                   onClick={() => {
                     setIsNavigating(false);
                     setRouteInfo(null);
+                    setRouteStatus('idle');
                   }}
                   className="p-1.5 hover:bg-white/10 rounded-full transition-all"
                   title="Salir de navegación"
@@ -941,18 +951,64 @@ export default function HealthMap() {
               </div>
 
               {/* Travel Time & Distance info */}
-              <div className="p-5 flex items-center justify-between bg-white shrink-0">
-                <div className="flex flex-col">
-                  <span className="text-2xl font-display font-black text-emerald-600">
-                    {routeInfo ? routeInfo.duration : 'Calculando...'}
-                  </span>
-                  <span className="text-xs text-gray-500 font-bold mt-0.5">
-                    {routeInfo ? `Distancia: ${routeInfo.distance}` : 'Obteniendo ruta...'}
-                  </span>
+              <div className="p-5 flex items-center justify-between bg-white shrink-0 border-b border-gray-100">
+                <div className="flex flex-col flex-grow min-w-0">
+                  {routeStatus === 'loading' && (
+                    <>
+                      <span className="text-xl font-display font-black text-gray-400 animate-pulse">
+                        Calculando...
+                      </span>
+                      <span className="text-xs text-gray-400 font-bold mt-0.5">
+                        Obteniendo mejor ruta...
+                      </span>
+                    </>
+                  )}
+                  {routeStatus === 'error' && (
+                    <>
+                      <span className="text-sm font-bold text-red-500 leading-snug">
+                        Fallo al calcular ruta local
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-medium mt-0.5 leading-tight">
+                        Por favor, usa el botón de abajo para abrir la app oficial.
+                      </span>
+                    </>
+                  )}
+                  {routeStatus === 'success' && routeInfo && (
+                    <>
+                      <span className="text-2xl font-display font-black text-emerald-600">
+                        {routeInfo.duration}
+                      </span>
+                      <span className="text-xs text-gray-500 font-bold mt-0.5">
+                        Distancia: {routeInfo.distance}
+                      </span>
+                    </>
+                  )}
+                  {routeStatus === 'idle' && (
+                    <>
+                      <span className="text-2xl font-display font-black text-gray-400">
+                        --:--
+                      </span>
+                      <span className="text-xs text-gray-400 font-bold mt-0.5">
+                        Iniciando...
+                      </span>
+                    </>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center border border-emerald-100">
-                    <Clock className="w-5 h-5 text-emerald-600" />
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border transition-colors ${
+                    routeStatus === 'error' 
+                      ? 'bg-red-50 border-red-100 text-red-500' 
+                      : routeStatus === 'loading' 
+                      ? 'bg-blue-50 border-blue-100 text-blue-500'
+                      : 'bg-emerald-50 border-emerald-100 text-emerald-600'
+                  }`}>
+                    {routeStatus === 'loading' ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                    ) : routeStatus === 'error' ? (
+                      <ShieldAlert className="w-5 h-5 text-red-500" />
+                    ) : (
+                      <Clock className="w-5 h-5 text-emerald-600" />
+                    )}
                   </div>
                 </div>
               </div>
