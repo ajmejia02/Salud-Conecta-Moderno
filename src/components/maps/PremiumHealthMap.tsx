@@ -87,8 +87,8 @@ export default function PremiumHealthMap() {
   });
 
   const getNavigationUrl = (facility: Clinic) => {
-    if (!userLocation) return `https://www.openstreetmap.org/directions?engine=osrm_car&route=${facility.location.lat},${facility.location.lng}`;
-    return `https://www.openstreetmap.org/directions?engine=osrm_car&route=${userLocation.lat},${userLocation.lng};${facility.location.lat},${facility.location.lng}`;
+    if (!userLocation) return `https://www.google.com/maps/dir/?api=1&destination=${facility.location.lat},${facility.location.lng}&travelmode=driving`;
+    return `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${facility.location.lat},${facility.location.lng}&travelmode=driving`;
   };
 
   const getTypeLabel = (type: string) => {

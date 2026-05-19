@@ -504,10 +504,10 @@ function EstablishmentDetailModal({ item, onClose }: DetailModalProps) {
 
   const handleDirections = () => {
     if (hasCoordinates) {
-      const url = `https://www.openstreetmap.org/?mlat=${item.location.lat}&mlon=${item.location.lng}#map=17/${item.location.lat}/${item.location.lng}`;
+      const url = `https://www.google.com/maps/search/?api=1&query=${item.location.lat},${item.location.lng}`;
       window.open(url, '_blank');
     } else {
-      const url = `https://www.openstreetmap.org/search?query=${encodeURIComponent(item.name)}`;
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + ', ' + item.address)}`;
       window.open(url, '_blank');
     }
   };

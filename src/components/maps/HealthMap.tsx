@@ -487,10 +487,10 @@ export default function HealthMap() {
         // If startNavigation was requested, open Google Maps externally
         if (customEvent.detail.startNavigation && targetClinic.location) {
           navigator.geolocation?.getCurrentPosition((pos) => {
-            const url = `https://www.openstreetmap.org/directions?engine=osrm_car&route=${pos.coords.latitude},${pos.coords.longitude};${targetClinic.location.lat},${targetClinic.location.lng}`;
+            const url = `https://www.google.com/maps/dir/?api=1&origin=${pos.coords.latitude},${pos.coords.longitude}&destination=${targetClinic.location.lat},${targetClinic.location.lng}&travelmode=driving`;
             window.open(url, '_blank');
           }, () => {
-            const url = `https://www.openstreetmap.org/directions?engine=osrm_car&route=${targetClinic.location.lat},${targetClinic.location.lng}`;
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${targetClinic.location.lat},${targetClinic.location.lng}&travelmode=driving`;
             window.open(url, '_blank');
           });
         }
@@ -636,7 +636,7 @@ export default function HealthMap() {
                     {/* Directions button — opens Google Maps externally */}
                     {selectedClinic ? (
                       <a
-                        href={`https://www.openstreetmap.org/directions?engine=osrm_car&route=${userLocation.lat},${userLocation.lng};${selectedClinic.location.lat},${selectedClinic.location.lng}`}
+                        href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${selectedClinic.location.lat},${selectedClinic.location.lng}&travelmode=driving`}
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Cómo llegar"
@@ -840,7 +840,7 @@ export default function HealthMap() {
                             {/* Rapid directions button — opens Google Maps */}
                             <div className="shrink-0 flex items-center justify-center">
                               <a
-                                href={`https://www.openstreetmap.org/directions?engine=osrm_car&route=${userLocation.lat},${userLocation.lng};${clinic.location.lat},${clinic.location.lng}`}
+                                href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${clinic.location.lat},${clinic.location.lng}&travelmode=driving`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
@@ -994,7 +994,7 @@ export default function HealthMap() {
               <div className="flex justify-around px-3 py-4 border-b border-gray-100">
                 {/* Indicaciones — Abre Google Maps externo directamente */}
                 <a
-                  href={`https://www.openstreetmap.org/directions?engine=osrm_car&route=${userLocation.lat},${userLocation.lng};${selectedClinic.location.lat},${selectedClinic.location.lng}`}
+                  href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${selectedClinic.location.lat},${selectedClinic.location.lng}&travelmode=driving`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex flex-col items-center gap-1.5 group"
