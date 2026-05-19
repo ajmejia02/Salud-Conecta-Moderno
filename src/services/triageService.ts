@@ -68,7 +68,7 @@ export const getUserTriages = async (userId: string): Promise<TriageRecord[]> =>
 };
 
 export interface TriageWithLocationResult {
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: 'low' | 'medium' | 'high' | 'emergency';
   recommendation: string;
   reasoning: string;
   medication?: {
@@ -133,23 +133,23 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
       }
     }
 
-    // 5. Mapear niveles de urgencia dinámicos de la IA
-    let severity: 'low' | 'medium' | 'high' | 'critical' = 'medium';
+    // 5. Mapear niveles de urgencia dinámicos de la IA (unificado: emergency en lugar de critical)
+    let severity: 'low' | 'medium' | 'high' | 'emergency' = 'medium';
     if (aiTriage.urgency === 'emergency') {
-      severity = 'critical';
+      severity = 'emergency';
     } else if (aiTriage.urgency === 'high') {
       severity = 'high';
     } else if (aiTriage.urgency === 'low') {
       severity = 'low';
     }
 
-    const isUrgent = severity === 'critical' || severity === 'high';
+    const isUrgent = severity === 'emergency' || severity === 'high';
     let recommendation = aiTriage.recommendation || '';
 
     // 6. Aplicar la frase exacta exigida si es de urgencia, de lo contrario concatenar el centro más cercano
     if (isUrgent && closestClinic) {
       const sectorTag = closestClinic.sector === 'private' ? 'Centro Privado Premium' : 'Red Pública (MINSA)';
-      recommendation = `Estas experimentando un síntoma de urgencia debes acudir a un centro de salud de inmediato, de acuerdo a tu ubicación el centro mas cercano es: "${closestClinic.name}" (${sectorTag}).`;
+      recommendation = `Estás experimentando un síntoma de urgencia, debes acudir a un centro de salud de inmediato. De acuerdo a tu ubicación, el centro más cercano es: "${closestClinic.name}" (${sectorTag}).`;
     } else if (closestClinic) {
       const sectorTag = closestClinic.sector === 'private' ? 'Centro Privado Premium' : 'Red Pública (MINSA)';
       recommendation = `${recommendation} De acuerdo a tu ubicación, el centro de salud más cercano es: "${closestClinic.name}" (${sectorTag}).`;
