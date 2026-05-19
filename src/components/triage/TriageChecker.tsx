@@ -93,30 +93,29 @@ export default function TriageChecker() {
     try {
       const result = await getEnhancedTriageWithLocation(text, membership);
       
-      if (!result.error) {
-        setTriageResult(result);
-        
-        // Agregar la respuesta de la IA al historial del chat para mantener el flujo conversacional
-        const assistantResponse = `He analizado sus síntomas. Aquí está mi evaluación preliminar:\n\n**Recomendación:** ${result.recommendation}\n\n**Justificación clínica:** ${result.reasoning}`;
-        
-        setMessages(prev => [...prev, {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: assistantResponse,
-          timestamp: new Date()
-        }]);
+      setTriageResult(result);
+      
+      // Agregar la respuesta de la IA al historial del chat para mantener el flujo conversacional
+      const assistantResponse = result.error
+        ? `He calculado su evaluación preliminar usando nuestro sistema de respaldo local debido a contingencia en el servidor:\n\n**Recomendación:** ${result.recommendation}\n\n**Justificación:** ${result.reasoning}`
+        : `He analizado sus síntomas. Aquí está mi evaluación preliminar:\n\n**Recomendación:** ${result.recommendation}\n\n**Justificación clínica:** ${result.reasoning}`;
+      
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: assistantResponse,
+        timestamp: new Date()
+      }]);
 
-        // Disparar evento de alerta si es de urgencia crítica
-        if (result.severity === 'emergency') {
-          window.dispatchEvent(new CustomEvent('emergencyMode', { 
-            detail: result 
-          }));
-          triggerToast("¡Síntoma de urgencia detectado! Mantenga la calma.", "error");
-        } else {
-          triggerToast("Evaluación de triaje completada con éxito.", "success");
-        }
+      if (result.error) {
+        triggerToast("Cálculo realizado con contingencia local (GPS y Centros).", "error");
+      } else if (result.severity === 'emergency') {
+        window.dispatchEvent(new CustomEvent('emergencyMode', { 
+          detail: result 
+        }));
+        triggerToast("¡Síntoma de urgencia detectado! Mantenga la calma.", "error");
       } else {
-        triggerToast("Fallo al obtener el triaje. Por favor, acuda a su médico.", "error");
+        triggerToast("Evaluación de triaje completada con éxito.", "success");
       }
     } catch (e) { 
       console.error(e); 
@@ -402,7 +401,7 @@ export default function TriageChecker() {
 
           {/* Right Column: Detailed Diagnostic Result and Actions (Desktop) */}
           <div className="w-full lg:w-[420px] shrink-0 flex flex-col gap-6">
-            {triageResult && !triageResult.error ? (
+            {triageResult ? (
               <motion.div 
                 initial={{ opacity: 0, x: 25 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -415,7 +414,14 @@ export default function TriageChecker() {
                   </div>
                   <div>
                     <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-80">Resultado Clínico</span>
-                    <h4 className="text-sm font-bold uppercase tracking-wider">Severidad: {triageResult.severity}</h4>
+                    <h4 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                      Severidad: {triageResult.severity}
+                      {triageResult.error && (
+                        <span className="px-1.5 py-0.5 rounded text-[8px] bg-amber-500 text-white font-black uppercase tracking-wider shrink-0 animate-pulse">
+                          Respaldo
+                        </span>
+                      )}
+                    </h4>
                   </div>
                   {triageResult.severity === 'emergency' && (
                     <Zap className="w-5 h-5 text-red-500 ml-auto animate-bounce shrink-0" />
