@@ -191,6 +191,8 @@ export default function Search({ onOpenRegistration }: SearchProps) {
     currentPage * itemsPerPage
   );
 
+  const featuredItem = paginatedItems[0] || allItems[0];
+
   return (
     <div className="flex flex-col gap-8 pb-20 md:pb-0">
       {/* Search & Filters Hero */}
@@ -449,35 +451,53 @@ export default function Search({ onOpenRegistration }: SearchProps) {
 
           <div className="relative z-10 p-6 flex flex-col h-full justify-between pointer-events-none">
             <div className="flex justify-end pointer-events-auto">
-              <button className="bg-surface/80 backdrop-blur-xl p-4 rounded-2xl border border-outline-variant/30 text-on-surface-variant hover:text-primary transition-all shadow-xl">
+              <button 
+                onClick={() => {
+                  if (featuredItem) {
+                    const hasCoordinates = !!featuredItem.location;
+                    const url = hasCoordinates
+                      ? `https://www.google.com/maps/search/?api=1&query=${featuredItem.location.lat},${featuredItem.location.lng}`
+                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(featuredItem.name + ', ' + featuredItem.address)}`;
+                    window.open(url, '_blank');
+                  }
+                }}
+                className="bg-surface/80 backdrop-blur-xl p-4 rounded-2xl border border-outline-variant/30 text-on-surface-variant hover:text-primary transition-all shadow-xl active:scale-95"
+                title="Cómo llegar"
+              >
                 <Navigation className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="space-y-4 pointer-events-auto">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-surface/90 backdrop-blur-2xl border border-outline-variant/30 rounded-3xl p-5 shadow-2xl"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center text-secondary">
-                    <Hospital className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="font-display font-bold text-lg text-on-surface">Clínica Santa Clara</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-                      <span className="text-[10px] font-mono font-black text-secondary uppercase tracking-widest">Guardia Activa</span>
+            {featuredItem && (
+              <div className="space-y-4 pointer-events-auto">
+                <motion.div 
+                  key={featuredItem.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-surface/90 backdrop-blur-2xl border border-outline-variant/30 rounded-3xl p-5 shadow-2xl"
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center text-secondary">
+                      <Hospital className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-display font-bold text-base text-on-surface truncate">{featuredItem.name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+                        <span className="text-[10px] font-mono font-black text-secondary uppercase tracking-widest truncate">{featuredItem.status}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <button className="w-full py-3 bg-primary text-on-primary rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-lg">
-                  Ver Detalles
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </motion.div>
-            </div>
+                  <button 
+                    onClick={() => setSelectedItem(featuredItem)}
+                    className="w-full py-3 bg-primary text-on-primary rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-lg active:scale-95"
+                  >
+                    Ver Detalles
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </motion.div>
+              </div>
+            )}
           </div>
         </aside>
       </div>
