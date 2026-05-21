@@ -1,11 +1,16 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import type { TranslationKey } from '../locales/types';
+import { i18nLogger } from '../lib/i18nLogger';
+import { languageSyncService } from '../lib/languageSyncService';
 
 export type Language = 'es' | 'en';
 
+/**
+ * Translations object with full TypeScript support
+ * All keys must be in TranslationKey type and exist in both languages
+ */
 interface Translations {
-  [key: string]: {
-    [key: string]: string;
-  };
+  [key in Language]: Record<TranslationKey, string>;
 }
 
 const translations: Translations = {
@@ -544,7 +549,153 @@ const translations: Translations = {
     'maps.premium.direct_phone': 'Teléfono de Contacto Directo',
     'maps.premium.location_coords': 'Ubicación',
     'maps.premium.open_maps': 'Abrir en Maps',
-    'maps.premium.schedule_turn': 'Agendar Turno'
+    'maps.premium.schedule_turn': 'Agendar Turno',
+    'maps.city_map_of': 'Mapa de ciudad de',
+    'maps.coming_soon': 'Próximamente',
+    // Módulo de Triaje
+    'triage.title': 'Evaluación de Síntomas',
+    'triage.subtitle': 'Describe tu situación de salud actual',
+    'triage.start': 'Iniciar Evaluación',
+    'triage.analyzing': 'Analizando...',
+    'triage.waiting': 'Esperando Entrada',
+    'triage.waiting_desc': 'Por favor describe tus síntomas para comenzar.',
+    'triage.clinical_result': 'Evaluación Clínica',
+    'triage.severity': 'Nivel de Severidad',
+    'triage.backup': 'Evaluación de Respaldo',
+    'triage.ai_rec': 'Recomendación de IA',
+    'triage.medical_reasoning': 'Razonamiento Médico',
+    'triage.otc_sug': 'Sugerencias sin Receta',
+    'triage.medication': 'Medicamento',
+    'triage.dosage': 'Dosis',
+    'triage.frequency': 'Frecuencia',
+    'triage.rec_centers': 'Centros Médicos Recomendados',
+    'triage.nearest_hospital': 'Hospital Más Cercano',
+    'triage.er_24h': 'Sala de Emergencias 24h',
+    'triage.route_hospital': 'Ruta al Hospital',
+    'triage.nearest_center': 'Centro Médico Más Cercano',
+    'triage.available': 'Disponible Ahora',
+    'triage.route_center': 'Ruta al Centro',
+    'triage.save': 'Guardar Evaluación',
+    'triage.new': 'Nueva Evaluación',
+    'triage.reset_btn': 'Reiniciar',
+    'triage.input_placeholder': 'Describe tus síntomas...',
+    'triage.assistant.intro': '¡Hola! Soy tu asistente de salud IA de Salud Conecta. Por favor describe tus síntomas o preocupaciones de salud.',
+    'triage.assistant.fallback': 'Basado en tus síntomas: {rec}. Análisis Médico: {res}',
+    'triage.assistant.success': 'Evaluación Completa. Recomendación: {rec}. Análisis: {res}',
+    'triage.assistant.reset': 'Evaluación reiniciada. Listo para nueva evaluación.',
+    'triage.toast.fallback': 'Evaluación de respaldo activada.',
+    'triage.toast.emergency': '¡Síntomas de emergencia detectados! Busca atención médica inmediata.',
+    'triage.toast.success': 'Evaluación guardada exitosamente.',
+    'triage.toast.error': 'Error durante la evaluación. Por favor intenta de nuevo.',
+    'triage.toast.login_req': 'Por favor inicia sesión para guardar evaluaciones.',
+    'triage.toast.save_success': 'Evaluación guardada en tu pasaporte de salud.',
+    'triage.toast.save_error': 'No se pudo guardar la evaluación. Intenta de nuevo.',
+    'triage.toast.no_location': 'Se requiere acceso a ubicación para encontrar centros cercanos.',
+    'triage.toast.no_voice': 'Se requiere acceso al micrófono para entrada de voz.',
+    'triage.toast.listening': 'Escuchando... Habla ahora.',
+    // Mapa de Salud
+    'maps.health.searching_centers': 'Buscando centros médicos...',
+    'maps.health.search_centers': 'Buscar Centros Médicos',
+    'maps.health.search_placeholder': 'Busca por nombre, especialidad o área...',
+    'maps.health.close_panel': 'Cerrar Detalles',
+    'maps.health.open_menu': 'Menú',
+    'maps.health.emergency_mode': 'Modo Emergencia Activo',
+    'maps.health.emergency_desc': 'Mostrando servicios de emergencia más cercanos.',
+    'maps.health.medical_centers': 'Centros Médicos',
+    'maps.health.no_centers': 'Sin centros encontrados en esta área.',
+    'maps.health.directions': 'Direcciones',
+    'maps.health.directions_btn': 'Obtener Direcciones',
+    'maps.health.save_btn': 'Guardar Centro',
+    'maps.health.near_btn': 'Buscar Cercanos',
+    'maps.health.call_btn': 'Llamar Ahora',
+    'maps.health.report_btn': 'Reportar Problema',
+    'maps.health.report_problem': 'Reportar un Problema',
+    'maps.health.open': 'Abierto',
+    'maps.health.closed': 'Cerrado',
+    'maps.health.open_now': 'Abierto Ahora',
+    'maps.health.closed_now': 'Cerrado Ahora',
+    'maps.health.open_24h': 'Abierto 24 Horas',
+    'maps.health.public': 'Centro de Salud Público',
+    'maps.health.verified': 'Centro Verificado',
+    'maps.health.in_review': 'En Revisión',
+    'maps.health.reported': 'Problema Reportado',
+    'maps.health.desc_general': 'Descripción General',
+    'maps.health.reviews': 'Reseñas y Calificaciones',
+    'maps.health.about': 'Acerca de Este Centro',
+    // Modal de Reporte
+    'maps.report.user_report': 'Reportar un Problema',
+    'maps.report.what_is_problem': '¿Cuál es el problema?',
+    'maps.report.select_type': 'Selecciona tipo de problema...',
+    'maps.report.confirm_correct': 'La Información es Correcta',
+    'maps.report.confirm_desc': 'La información del centro es exacta y completa.',
+    'maps.report.wrong_loc': 'Ubicación Incorrecta',
+    'maps.report.wrong_loc_desc': 'Las coordenadas de ubicación son incorrectas.',
+    'maps.report.wrong_loc_hint': 'Por favor describe la ubicación correcta.',
+    'maps.report.not_exist': 'No Existe',
+    'maps.report.not_exist_desc': 'Este centro ya no está en funcionamiento.',
+    'maps.report.wrong_type': 'Tipo Incorrecto',
+    'maps.report.wrong_type_desc': 'El tipo de centro está clasificado incorrectamente.',
+    'maps.report.wrong_type_hint': '¿Cómo debería clasificarse este centro?',
+    'maps.report.missing': 'Información Faltante',
+    'maps.report.missing_desc': 'Información importante falta en este perfil.',
+    'maps.report.optional': 'Opcional',
+    'maps.report.additional_comment': 'Comentarios Adicionales',
+    'maps.report.comment_placeholder': 'Proporciona más detalles sobre el problema...',
+    'maps.report.back': 'Atrás',
+    'maps.report.sending': 'Enviando Reporte...',
+    'maps.report.submit_report': 'Enviar Reporte',
+    'maps.report.sent_title': 'Reporte Enviado Exitosamente',
+    'maps.report.sent_desc': 'Gracias por ayudarnos a mejorar la calidad de la red de salud.',
+    'maps.report.try_again': 'Intentar de Nuevo',
+    'maps.report.correct_type': 'Tipo Correcto',
+    // Utilidades de Mapas
+    'maps.utils.clinic_label': 'Clínica',
+    'maps.utils.emergency_label': 'Sala de Emergencias',
+    'maps.utils.dental_label': 'Clínica Dental',
+    'maps.utils.mental_health_label': 'Salud Mental',
+    'maps.utils.laboratory_label': 'Laboratorio',
+    'maps.utils.pharmacy_label': 'Farmacia',
+    // Módulo de Búsqueda
+    'search.hero_title': 'Encuentra atención médica de calidad',
+    'search.hero_subtitle': 'Busca hospitales, clínicas, farmacias y laboratorios cerca de ti',
+    'search.search_placeholder': 'Busca por nombre, especialidad o centro...',
+    'search.location_placeholder': 'Ingresa ubicación o usa tu ubicación actual',
+    'search.cat_public': 'Salud Pública',
+    'search.cat_doctors': 'Doctores',
+    'search.cat_clinics': 'Clínicas',
+    'search.cat_pharmacies': 'Farmacias',
+    'search.cat_labs': 'Laboratorios',
+    'search.results_for': 'Resultados para',
+    'search.featured_results': 'Resultados Destacados',
+    'search.view_all': 'Ver Todos',
+    'search.no_results': 'Sin resultados encontrados',
+    'search.page': 'Página',
+    'search.of': 'de',
+    'search.prev': 'Anterior',
+    'search.next': 'Siguiente',
+    'search.join_network': 'Únete a Nuestra Red',
+    'search.join_desc': '¿Eres profesional de la salud? Registra tu práctica o establecimiento.',
+    'search.join_doctor': 'Registrarse como Profesional',
+    'search.join_clinic': 'Registrarse como Clínica',
+    'search.featured_network': 'Red Destacada',
+    'search.save_favorites': 'Guardar en Favoritos',
+    'search.recommendations': 'recomendaciones',
+    'search.general_location': 'Ubicación General',
+    'search.map': 'Mapa',
+    'search.details': 'Detalles',
+    'search.view_slide': 'Ver diapositiva',
+    'search.book_appointment': 'Agendar Cita',
+    'search.view_profile': 'Ver Perfil',
+    'search.minsa_network': 'Red Pública MINSA',
+    'search.premium_clinic': 'Centro Privado Premium',
+    'search.registered_medical_pro': 'Profesional Médico Registrado',
+    'search.medical_establishment': 'Establecimiento Médico',
+    'search.about_us': 'Acerca de Nosotros',
+    'search.available_services': 'Servicios Disponibles',
+    'search.direct_contact': 'Contacto Directo',
+    'search.location_address': 'Ubicación y Dirección',
+    'search.directions': 'Obtener Direcciones',
+    'search.request_turn': 'Solicitar Cita'
   },
   en: {
     'nav.triage': 'Triage',
@@ -1081,40 +1232,281 @@ const translations: Translations = {
     'maps.premium.direct_phone': 'Direct Contact Phone',
     'maps.premium.location_coords': 'Location',
     'maps.premium.open_maps': 'Open in Maps',
-    'maps.premium.schedule_turn': 'Schedule Appointment'
+    'maps.premium.schedule_turn': 'Schedule Appointment',
+    'maps.city_map_of': 'City map of',
+    'maps.coming_soon': 'Coming Soon',
+    // Triage Module
+    'triage.title': 'Symptom Assessment',
+    'triage.subtitle': 'Describe your current health situation',
+    'triage.start': 'Start Assessment',
+    'triage.analyzing': 'Analyzing...',
+    'triage.waiting': 'Waiting for Input',
+    'triage.waiting_desc': 'Please describe your symptoms to get started.',
+    'triage.clinical_result': 'Clinical Assessment',
+    'triage.severity': 'Severity Level',
+    'triage.backup': 'Backup Assessment',
+    'triage.ai_rec': 'AI Recommendation',
+    'triage.medical_reasoning': 'Medical Reasoning',
+    'triage.otc_sug': 'Over-the-Counter Suggestions',
+    'triage.medication': 'Medication',
+    'triage.dosage': 'Dosage',
+    'triage.frequency': 'Frequency',
+    'triage.rec_centers': 'Recommended Medical Centers',
+    'triage.nearest_hospital': 'Nearest Hospital',
+    'triage.er_24h': '24h Emergency Room',
+    'triage.route_hospital': 'Route to Hospital',
+    'triage.nearest_center': 'Nearest Medical Center',
+    'triage.available': 'Available Now',
+    'triage.route_center': 'Route to Center',
+    'triage.save': 'Save Assessment',
+    'triage.new': 'New Assessment',
+    'triage.reset_btn': 'Reset',
+    'triage.input_placeholder': 'Describe your symptoms...',
+    'triage.assistant.intro': 'Hello! I am your Salud Conecta AI health assistant. Please describe your symptoms or health concerns.',
+    'triage.assistant.fallback': 'Based on your symptoms: {rec}. Medical Analysis: {res}',
+    'triage.assistant.success': 'Assessment Complete. Recommendation: {rec}. Analysis: {res}',
+    'triage.assistant.reset': 'Assessment reset. Ready for new evaluation.',
+    'triage.toast.fallback': 'Fallback assessment activated.',
+    'triage.toast.emergency': 'Emergency symptoms detected! Seek immediate medical attention.',
+    'triage.toast.success': 'Assessment saved successfully.',
+    'triage.toast.error': 'Error during assessment. Please try again.',
+    'triage.toast.login_req': 'Please log in to save assessments.',
+    'triage.toast.save_success': 'Assessment saved to your health passport.',
+    'triage.toast.save_error': 'Could not save assessment. Try again.',
+    'triage.toast.no_location': 'Location access required to find nearby centers.',
+    'triage.toast.no_voice': 'Microphone access required for voice input.',
+    'triage.toast.listening': 'Listening... Speak now.',
+    // Health Map
+    'maps.health.searching_centers': 'Searching for medical centers...',
+    'maps.health.search_centers': 'Search Medical Centers',
+    'maps.health.search_placeholder': 'Search by name, specialty or area...',
+    'maps.health.close_panel': 'Close Details',
+    'maps.health.open_menu': 'Menu',
+    'maps.health.emergency_mode': 'Emergency Mode Active',
+    'maps.health.emergency_desc': 'Showing nearest emergency services.',
+    'maps.health.medical_centers': 'Medical Centers',
+    'maps.health.no_centers': 'No centers found in this area.',
+    'maps.health.directions': 'Directions',
+    'maps.health.directions_btn': 'Get Directions',
+    'maps.health.save_btn': 'Save Center',
+    'maps.health.near_btn': 'Find Nearby',
+    'maps.health.call_btn': 'Call Now',
+    'maps.health.report_btn': 'Report Issue',
+    'maps.health.report_problem': 'Report a Problem',
+    'maps.health.open': 'Open',
+    'maps.health.closed': 'Closed',
+    'maps.health.open_now': 'Open Now',
+    'maps.health.closed_now': 'Closed Now',
+    'maps.health.open_24h': 'Open 24 Hours',
+    'maps.health.public': 'Public Health Center',
+    'maps.health.verified': 'Verified Center',
+    'maps.health.in_review': 'Under Review',
+    'maps.health.reported': 'Reported Issue',
+    'maps.health.desc_general': 'General Description',
+    'maps.health.reviews': 'Reviews & Ratings',
+    'maps.health.about': 'About This Center',
+    // Report Modal
+    'maps.report.user_report': 'Report an Issue',
+    'maps.report.what_is_problem': 'What is the problem?',
+    'maps.report.select_type': 'Select issue type...',
+    'maps.report.confirm_correct': 'Information is Correct',
+    'maps.report.confirm_desc': 'The center information is accurate and complete.',
+    'maps.report.wrong_loc': 'Wrong Location',
+    'maps.report.wrong_loc_desc': 'The location coordinates are incorrect.',
+    'maps.report.wrong_loc_hint': 'Please describe the correct location.',
+    'maps.report.not_exist': 'Does Not Exist',
+    'maps.report.not_exist_desc': 'This center is no longer in operation.',
+    'maps.report.wrong_type': 'Wrong Type',
+    'maps.report.wrong_type_desc': 'The center type is incorrectly classified.',
+    'maps.report.wrong_type_hint': 'What should this center be classified as?',
+    'maps.report.missing': 'Missing Information',
+    'maps.report.missing_desc': 'Important information is missing from this profile.',
+    'maps.report.optional': 'Optional',
+    'maps.report.additional_comment': 'Additional Comments',
+    'maps.report.comment_placeholder': 'Provide more details about the issue...',
+    'maps.report.back': 'Back',
+    'maps.report.sending': 'Sending Report...',
+    'maps.report.submit_report': 'Submit Report',
+    'maps.report.sent_title': 'Report Sent Successfully',
+    'maps.report.sent_desc': 'Thank you for helping us improve the health network quality.',
+    'maps.report.try_again': 'Try Again',
+    'maps.report.correct_type': 'Correct Type',
+    // Maps Utils
+    'maps.utils.clinic_label': 'Clinic',
+    'maps.utils.emergency_label': 'Emergency Room',
+    'maps.utils.dental_label': 'Dental Clinic',
+    'maps.utils.mental_health_label': 'Mental Health',
+    'maps.utils.laboratory_label': 'Laboratory',
+    'maps.utils.pharmacy_label': 'Pharmacy',
+    // Search Module
+    'search.hero_title': 'Find quality medical care',
+    'search.hero_subtitle': 'Search for hospitals, clinics, pharmacies and labs near you',
+    'search.search_placeholder': 'Search by name, specialty or center...',
+    'search.location_placeholder': 'Enter location or use current location',
+    'search.cat_public': 'Public Health',
+    'search.cat_doctors': 'Doctors',
+    'search.cat_clinics': 'Clinics',
+    'search.cat_pharmacies': 'Pharmacies',
+    'search.cat_labs': 'Laboratories',
+    'search.results_for': 'Results for',
+    'search.featured_results': 'Featured Results',
+    'search.view_all': 'View All',
+    'search.no_results': 'No results found',
+    'search.page': 'Page',
+    'search.of': 'of',
+    'search.prev': 'Previous',
+    'search.next': 'Next',
+    'search.join_network': 'Join Our Network',
+    'search.join_desc': 'Are you a healthcare professional? Register your practice or establishment.',
+    'search.join_doctor': 'Register as Professional',
+    'search.join_clinic': 'Register as Clinic',
+    'search.featured_network': 'Featured Network',
+    'search.save_favorites': 'Save to Favorites',
+    'search.recommendations': 'recommendations',
+    'search.general_location': 'General Location',
+    'search.map': 'Map',
+    'search.details': 'Details',
+    'search.view_slide': 'View slide',
+    'search.book_appointment': 'Book Appointment',
+    'search.view_profile': 'View Profile',
+    'search.minsa_network': 'MINSA Public Network',
+    'search.premium_clinic': 'Premium Private Center',
+    'search.registered_medical_pro': 'Registered Medical Professional',
+    'search.medical_establishment': 'Medical Establishment',
+    'search.about_us': 'About Us',
+    'search.available_services': 'Available Services',
+    'search.direct_contact': 'Direct Contact',
+    'search.location_address': 'Location & Address',
+    'search.directions': 'Get Directions',
+    'search.request_turn': 'Request Appointment',
   }
 };
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: TranslationKey, placeholders?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+/**
+ * Extract placeholder names from translation string
+ * E.g. "Expira en {time} min" -> ['time']
+ */
+function extractPlaceholders(text: string): string[] {
+  const matches = text.match(/\{(\w+)\}/g);
+  return matches ? matches.map(m => m.slice(1, -1)) : [];
+}
+
+/**
+ * Comprehensive translation function with:
+ * - Full TypeScript type safety
+ * - Placeholder substitution {variable}
+ * - Logging for missing keys in development
+ * - Fallback to Spanish if key missing in current language
+ * - Validation of placeholder matching
+ */
+function translate(
+  language: Language,
+  key: TranslationKey,
+  placeholders?: Record<string, string | number>
+): string {
+  let text = translations[language][key];
+
+  // Fallback: si la key no existe en el idioma actual, intenta español
+  if (!text && language !== 'es') {
+    text = translations.es[key];
+    if (!text) {
+      i18nLogger.logMissingKey(key, language, true);
+    }
+  }
+
+  // Si aún no existe, retorna la clave
+  if (!text) {
+    i18nLogger.logMissingKey(key, language, false);
+    return key;
+  }
+
+  // Extraer y validar placeholders si se proporcionan
+  if (placeholders) {
+    const expectedPlaceholders = extractPlaceholders(text);
+    const providedPlaceholders = Object.keys(placeholders);
+
+    i18nLogger.logPlaceholderMismatch(key, expectedPlaceholders, providedPlaceholders);
+
+    // Reemplazar placeholders: {variable} -> value
+    Object.entries(placeholders).forEach(([placeKey, value]) => {
+      text = text.replace(new RegExp(`\\{${placeKey}\\}`, 'g'), String(value));
+    });
+  }
+
+  return text;
+}
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
     return (localStorage.getItem('language') as Language) || 'es';
   });
 
-  const setLanguage = (lang: Language) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Initialize sync service and load preference from Firestore/localStorage
+  useEffect(() => {
+    const initializeLanguage = async () => {
+      try {
+        languageSyncService.initialize();
+        const preferredLanguage = await languageSyncService.loadLanguagePreference();
+        setLanguageState(preferredLanguage);
+      } catch (e) {
+        console.error('[LanguageProvider] Error initializing language:', e);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    initializeLanguage();
+
+    // Listen for changes from other tabs
+    const handleCrossTabChange = (event: CustomEvent) => {
+      const newLanguage = (event.detail?.language as Language) || 'es';
+      setLanguageState(newLanguage);
+    };
+
+    window.addEventListener('languageChangeFromOtherTab', handleCrossTabChange as EventListener);
+
+    return () => {
+      window.removeEventListener('languageChangeFromOtherTab', handleCrossTabChange as EventListener);
+    };
+  }, []);
+
+  const setLanguage = async (lang: Language) => {
+    if (!['es', 'en'].includes(lang)) {
+      console.warn(`[i18n] Invalid language: "${lang}". Using "es"`);
+      lang = 'es';
+    }
     setLanguageState(lang);
-    localStorage.setItem('language', lang);
+    
+    // Save to localStorage + Firestore
+    try {
+      await languageSyncService.saveLanguagePreference(lang);
+    } catch (e) {
+      console.error('[LanguageProvider] Error saving language preference:', e);
+    }
   };
 
-  const t = (key: string) => {
-    return translations[language][key] || key;
+  const t = (key: TranslationKey, placeholders?: Record<string, string | number>) => {
+    return translate(language, key, placeholders);
   };
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
+      {isLoaded ? children : null}
     </LanguageContext.Provider>
   );
 }
 
-export function useLanguage() {
+export function useLanguage(): LanguageContextType {
   const context = useContext(LanguageContext);
   if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
