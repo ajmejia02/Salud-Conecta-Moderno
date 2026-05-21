@@ -172,7 +172,18 @@ export function Profile() {
     };
   };
 
-  const [profile, setProfile] = useState(loadProfileData);
+  interface ProfileState {
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+    bloodType: string;
+    allergies: string;
+    dob: string;
+    photoURL: string;
+  }
+
+  const [profile, setProfile] = useState<ProfileState>(loadProfileData);
 
   const handlePhotoClick = () => {
     if (isValidated) {
@@ -267,13 +278,21 @@ export function Profile() {
 
       localStorage.setItem('userProfile', JSON.stringify(profileData));
 
-      const updatedUser = {
+      if (!user) return;
+
+      // Actualizar user con nueva información del perfil
+      // Nota: FirebaseUser tiene propiedades read-only que no podemos cambiar
+      // Guardamos el JSON actualizado para localStorage, mientras mantenemos la referencia del FirebaseUser
+      const updatedUserObj = {
         ...user,
         displayName: profile.name,
         photoURL: profile.photoURL
       };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      // Actualizamos localStorage con los datos actualizados del perfil
+      localStorage.setItem('user', JSON.stringify(updatedUserObj));
+
+      window.dispatchEvent(new Event('storage'));
 
       window.dispatchEvent(new Event('storage'));
 
@@ -380,7 +399,7 @@ export function Profile() {
             className="mt-4 text-outline-variant hover:text-primary text-[10px] uppercase font-bold tracking-[0.2em] flex items-center gap-2 transition-all transition-colors"
           >
             <Edit className="w-3 h-3" />
-            {t('profile.change_photo')}
+            {t('profile.change_photo' as any)}
           </button>
         </div>
 
@@ -462,7 +481,7 @@ export function Profile() {
         <div className="bg-surface-container rounded-3xl p-6 md:p-8 border border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-8 shadow-sm">
           {/* Nombre Completo */}
           <ProfileInput
-            label={t('profile.name_label')}
+            label={t('profile.name_label' as any)}
             value={profile.name}
             onChange={(val) => setProfile({ ...profile, name: val })}
             disabled={!isValidated}
@@ -753,10 +772,10 @@ export function Profile() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-primary/10 text-on-surface-variant hover:text-primary rounded-xl transition-all" title={t('profile.preview')}>
+                    <button className="p-2 hover:bg-primary/10 text-on-surface-variant hover:text-primary rounded-xl transition-all" title={t('common.preview' as any)}>
                       <Eye className="w-5 h-5" />
                     </button>
-                    <button className="p-2 hover:bg-error/10 text-on-surface-variant hover:text-error rounded-xl transition-all" title={t('profile.delete')}>
+                    <button className="p-2 hover:bg-error/10 text-on-surface-variant hover:text-error rounded-xl transition-all" title={t('common.delete' as any)}>
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
@@ -803,7 +822,7 @@ export function Profile() {
           {/* New Contact Form from Mockup */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col gap-2 relative">
-              <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.name_label')}</label>
+              <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.name_label' as any)}</label>
               <input
                 disabled={!isValidated}
                 className="w-full h-12 px-4 rounded-xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
@@ -812,7 +831,7 @@ export function Profile() {
               {!isValidated && <Lock className="absolute right-3 top-[38px] w-4 h-4 text-outline-variant opacity-50" />}
             </div>
             <div className="flex flex-col gap-2 relative">
-              <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.rel_label')}</label>
+              <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.rel_label' as any)}</label>
               <input
                 disabled={!isValidated}
                 className="w-full h-12 px-4 rounded-xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
@@ -821,7 +840,7 @@ export function Profile() {
               {!isValidated && <Lock className="absolute right-3 top-[38px] w-4 h-4 text-outline-variant opacity-50" />}
             </div>
             <div className="flex flex-col gap-2 relative">
-              <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.phone')}</label>
+              <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.phone' as any)}</label>
               <input
                 disabled={!isValidated}
                 className="w-full h-12 px-4 rounded-xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
@@ -862,7 +881,7 @@ export function Profile() {
                     className="flex-1 sm:flex-none p-2 hover:bg-primary/10 text-on-surface-variant hover:text-primary rounded-xl transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-transparent hover:border-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isValidated ? <Edit className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                    <span className="sm:hidden">{t('profile.edit')}</span>
+                    <span className="sm:hidden">{t('profile.edit' as any)}</span>
                   </button>
                   <button
                     onClick={() => setEmergencyContacts(emergencyContacts.filter(c => c.id !== contact.id))}
@@ -870,7 +889,7 @@ export function Profile() {
                     className="flex-1 sm:flex-none p-2 hover:bg-error/10 text-on-surface-variant hover:text-error rounded-xl transition-all flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-transparent hover:border-error/20 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isValidated ? <Trash2 className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                    <span className="sm:hidden">{t('profile.delete')}</span>
+                    <span className="sm:hidden">{t('common.delete' as any)}</span>
                   </button>
                 </div>
               </div>
@@ -920,7 +939,7 @@ export function Profile() {
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-high border border-outline-variant/30 text-[10px] font-bold text-primary uppercase tracking-widest hover:border-primary/50 transition-all shadow-sm"
             >
               <SettingsIcon className="w-3.5 h-3.5" />
-              {t('settings.notifications')}
+              {t('profile.notifications' as any)}
             </button>
           </div>
         </div>
