@@ -42,7 +42,7 @@ interface Message {
 export default function TriageChecker() {
   const { membership } = useUser();
   const { t, language } = useLanguage();
-  const { t, language } = useLanguage(); // Fix: Extraemos 'language' para evitar el ReferenceError en TriageDisclaimerCard
+  const { t, language } = useLanguage(); // Fix: Garantizamos una única declaración para evitar errores de compilación
   const offlineState = useTriageOfflineState();
   const [messages, setMessages] = useState<Message[]>([
     { 
