@@ -62,15 +62,25 @@ export default function TriageChecker() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  useEffect(() => {
+    // Forzar que la pantalla inicie arriba en dispositivos móviles
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (showToast) {
@@ -362,7 +372,7 @@ export default function TriageChecker() {
           <div className="flex-1 bg-surface-container backdrop-blur-sm border border-outline-variant/30 rounded-[32px] overflow-hidden flex flex-col shadow-sm relative min-h-[450px]">
             
             {/* Chat message space */}
-            <div className="flex-grow overflow-y-auto p-5 md:p-6 space-y-5 scrollbar-none">
+            <div ref={chatContainerRef} className="flex-grow overflow-y-auto p-5 md:p-6 space-y-5 scrollbar-none">
               {messages.map((m) => (
                 <div 
                   key={m.id} 
@@ -416,7 +426,6 @@ export default function TriageChecker() {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Input Form Box */}
