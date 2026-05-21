@@ -339,7 +339,6 @@ export default function TriageChecker() {
                   </span>
                 )}
               </span>
-              </span>
               <p className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">
                 {t('triage.subtitle')} ({membership.toUpperCase()})
               </p>
