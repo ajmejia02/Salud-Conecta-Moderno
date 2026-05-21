@@ -1,30 +1,20 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Heart, 
-  Map as MapIcon, 
   Calendar, 
-  MessageSquare, 
   User, 
-  Menu, 
-  X, 
   Activity, 
   Stethoscope, 
-  Pill, 
-  History,
-  Globe,
   Radio,
   Store,
   Search as SearchIcon,
-  Zap,
   Trophy,
   Flame,
-  Bell,
   Crown,
   Building2
 } from 'lucide-react';
 import { auth, signInWithGoogle, handleRedirectResult } from '../../lib/firebase';
-import { onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { syncUserProfile } from '../../lib/authUtils';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SyncStatusIndicator } from '../common/OfflineBanner';
@@ -115,7 +105,7 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
           <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm shrink-0">
             <Activity className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h1 className="text-sm sm:text-lg font-bold tracking-tight text-primary truncate max-w-[110px] sm:max-w-none">Salud Conecta</h1>
+          <h1 className="text-sm sm:text-lg font-bold tracking-tight text-primary truncate max-w-[110px] sm:max-w-none">Salud Conecta IA</h1>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2">

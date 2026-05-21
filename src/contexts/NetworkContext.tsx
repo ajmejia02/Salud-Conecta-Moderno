@@ -48,8 +48,8 @@ export const NetworkProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [justReconnected, setJustReconnected] = useState(false);
 
   const wasOfflineRef = useRef(false);
-  const reconnectedTimerRef = useRef<ReturnType<typeof setTimeout>>();
-  const syncTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const reconnectedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // ── Refrescar conteo de pendientes ──────────────────────────────────────
   const refreshPendingCount = useCallback(async () => {

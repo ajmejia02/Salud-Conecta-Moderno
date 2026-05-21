@@ -1,4 +1,4 @@
-# Integración de Geolocalización y IA en Salud Conecta
+# Integración de Geolocalización y IA en Salud Conecta IA
 
 ## Descripción del Sistema
 
