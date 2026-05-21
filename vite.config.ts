@@ -126,5 +126,47 @@ export default defineConfig(({mode}) => {
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
     },
+    build: {
+      // Optimizar el output para Vercel
+      outDir: 'dist',
+      emptyOutDir: true,
+      minify: 'terser',
+      target: 'esnext',
+      // Configurar code splitting explícitamente
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            // Chunks para lazy-loaded components
+            if (id.includes('PremiumHealthMap')) {
+              return 'PremiumHealthMap';
+            }
+            if (id.includes('HealthMap')) {
+              return 'HealthMap';
+            }
+            if (id.includes('TriageChecker')) {
+              return 'TriageChecker';
+            }
+            // Vendor chunks
+            if (id.includes('node_modules')) {
+              if (id.includes('firebase')) {
+                return 'firebase';
+              }
+              if (id.includes('motion')) {
+                return 'motion';
+              }
+              if (id.includes('react')) {
+                return 'react-vendor';
+              }
+            }
+          },
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]',
+        },
+      },
+      // Reducir tamaño de chunks
+      chunkSizeWarningLimit: 1000,
+      sourcemap: false,
+    },
   };
 });
