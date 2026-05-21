@@ -3,64 +3,20 @@ import { motion } from 'motion/react';
 import { 
   ArrowLeft, 
   Bell, 
-  Ticket, 
   Smartphone, 
   Save, 
-  Activity, 
   History, 
   Timer,
   Sun,
   Moon,
   Palette,
   Languages,
-  Stethoscope,
   MessageCircle,
   Mail,
   Clock3,
   Check
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
-
-interface SettingItemProps {
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  iconColor?: string;
-  checked: boolean;
-  disabled?: boolean;
-  critical?: boolean;
-  onChange: (checked: boolean) => void;
-}
-
-function SettingItem({ title, description, icon: Icon, iconColor = "text-primary", checked, disabled, critical, onChange }: SettingItemProps) {
-  const { t } = useLanguage();
-  return (
-    <div className={`px-6 py-6 flex items-start justify-between gap-4 transition-all ${disabled ? 'opacity-70' : 'hover:bg-surface-container-high/40'} ${critical ? 'border-l-4 border-l-error' : ''}`}>
-      <div className="flex gap-4">
-        <div className={`p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-center shrink-0`}>
-          <Icon className={`w-6 h-6 ${iconColor}`} />
-        </div>
-        <div className="flex flex-col">
-          <h4 className="text-base font-bold text-on-surface mb-0.5">{title}</h4>
-          <p className="text-xs text-on-surface-variant leading-relaxed max-w-md">
-            {description}
-            {disabled && <span className="block mt-1 italic opacity-60 font-mono text-[9px] uppercase tracking-widest text-primary">{t('settings.notif.critical.label')}</span>}
-          </p>
-        </div>
-      </div>
-      <label className={`relative inline-flex items-center ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} group shrink-0 mt-2`}>
-        <input 
-          type="checkbox" 
-          checked={checked} 
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.checked)}
-          className="sr-only peer" 
-        />
-        <div className="w-12 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-on-surface-variant after:border-outline-variant after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container peer-checked:after:bg-on-primary-container peer-checked:after:border-on-primary-container shadow-inner"></div>
-      </label>
-    </div>
-  );
-}
 
 export function Settings() {
   const { language, setLanguage, t } = useLanguage();

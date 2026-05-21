@@ -38,16 +38,48 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { auth } from '../../lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { BiometricModal } from './BiometricModal';
 import DocumentScanner from '../history/DocumentScanner';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const DEFAULT_PHOTO = "https://lh3.googleusercontent.com/aida-public/AB6AXuCNjxM_kx1krlJpGAVOh-nfFDhGn7s-29GpIE4wJWRsqYWpCfOS2KwA0mDjXP283OFfd0LtGx5JPWVrYMEB1cg1irom_1Hm34eluol-cmYe4YG_wnOcjQSvXjDOPm-gtH24rSMm6i0J8uh2fP2_ixZm9Bq0yqMp4aTljcnyLHm8NYc7BeN6mABRDrlnCT35AHv-EBa3m15B2F8AG3IKN-eRA6aH-P_gNEBQ7te36sc60HjVj0KVBPIT4WPJljYhbiXnLMmBo9Tw9A";
 
+interface ProfileInputProps {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  disabled: boolean;
+  icon: React.ElementType;
+  type?: string;
+  max?: string;
+}
+
+const ProfileInput = ({ label, value, onChange, disabled, icon: Icon, type = "text", max }: ProfileInputProps) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{label}</label>
+    <div className={`relative group ${disabled ? 'opacity-60' : ''}`}>
+      <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant group-focus-within:text-primary transition-colors z-10" />
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        max={max}
+        className={`w-full h-14 pl-12 pr-12 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner ${disabled ? 'cursor-not-allowed' : ''}`}
+      />
+      {disabled ? (
+        <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant" />
+      ) : (
+        <Edit className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant opacity-50" />
+      )}
+    </div>
+  </div>
+);
+
 export function Profile() {
   const { t } = useLanguage();
-  const [user, setUser] = useState<any>(() => {
+  const [user, setUser] = useState<FirebaseUser | null>(() => {
     const firebaseUser = auth.currentUser;
     if (firebaseUser) return firebaseUser;
 
@@ -429,82 +461,42 @@ export function Profile() {
 
         <div className="bg-surface-container rounded-3xl p-6 md:p-8 border border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-8 shadow-sm">
           {/* Nombre Completo */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.name_label')}</label>
-            <div className={`relative group ${!isValidated ? 'opacity-60' : ''}`}>
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant group-focus-within:text-primary transition-colors" />
-              <input
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                disabled={!isValidated}
-                className={`w-full h-14 pl-12 pr-12 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner ${!isValidated ? 'cursor-not-allowed' : ''}`}
-              />
-              {!isValidated ? (
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant" />
-              ) : (
-                <Edit className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant opacity-50" />
-              )}
-            </div>
-          </div>
+          <ProfileInput
+            label={t('profile.name_label')}
+            value={profile.name}
+            onChange={(val) => setProfile({ ...profile, name: val })}
+            disabled={!isValidated}
+            icon={User}
+          />
 
           {/* Fecha de Nacimiento */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.birth')}</label>
-            <div className={`relative group ${!isValidated ? 'opacity-60' : ''}`}>
-              <Cake className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant group-focus-within:text-primary transition-colors z-10" />
-              <input
-                type="date"
-                value={profile.dob || ''}
-                onChange={(e) => setProfile({ ...profile, dob: e.target.value })}
-                disabled={!isValidated}
-                max={getToday()}
-                className={`w-full h-14 pl-12 pr-12 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner ${!isValidated ? 'cursor-not-allowed' : ''}`}
-              />
-              {!isValidated ? (
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant" />
-              ) : (
-                <Edit className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant opacity-50" />
-              )}
-            </div>
-          </div>
+          <ProfileInput
+            label={t('profile.birth')}
+            value={profile.dob || ''}
+            onChange={(val) => setProfile({ ...profile, dob: val })}
+            disabled={!isValidated}
+            icon={Cake}
+            type="date"
+            max={getToday()}
+          />
 
           {/* Teléfono */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.phone')}</label>
-            <div className={`relative group ${!isValidated ? 'opacity-60' : ''}`}>
-              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant group-focus-within:text-primary transition-colors" />
-              <input
-                value={profile.phone}
-                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                disabled={!isValidated}
-                className={`w-full h-14 pl-12 pr-12 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner ${!isValidated ? 'cursor-not-allowed' : ''}`}
-              />
-              {!isValidated ? (
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant" />
-              ) : (
-                <Edit className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant opacity-50" />
-              )}
-            </div>
-          </div>
+          <ProfileInput
+            label={t('profile.phone')}
+            value={profile.phone}
+            onChange={(val) => setProfile({ ...profile, phone: val })}
+            disabled={!isValidated}
+            icon={Phone}
+          />
 
           {/* Correo Electrónico */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.email')}</label>
-            <div className={`relative group ${!isValidated ? 'opacity-60' : ''}`}>
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant group-focus-within:text-primary transition-colors" />
-              <input
-                value={profile.email}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                disabled={!isValidated}
-                className={`w-full h-14 pl-12 pr-12 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner ${!isValidated ? 'cursor-not-allowed' : ''}`}
-              />
-              {!isValidated ? (
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant" />
-              ) : (
-                <Edit className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant opacity-50" />
-              )}
-            </div>
-          </div>
+          <ProfileInput
+            label={t('profile.email')}
+            value={profile.email}
+            onChange={(val) => setProfile({ ...profile, email: val })}
+            disabled={!isValidated}
+            icon={Mail}
+          />
 
           {/* Grupo Sanguíneo (Selección) */}
           <div className="flex flex-col gap-2">
@@ -537,23 +529,13 @@ export function Profile() {
           </div>
 
           {/* Alergias Críticas */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest ml-1">{t('profile.allergies')}</label>
-            <div className={`relative group ${!isValidated ? 'opacity-60' : ''}`}>
-              <ShieldAlert className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant group-focus-within:text-primary transition-colors" />
-              <input
-                value={profile.allergies}
-                onChange={(e) => setProfile({ ...profile, allergies: e.target.value })}
-                disabled={!isValidated}
-                className={`w-full h-14 pl-12 pr-12 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-on-surface font-medium focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner ${!isValidated ? 'cursor-not-allowed' : ''}`}
-              />
-              {!isValidated ? (
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant" />
-              ) : (
-                <Edit className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline-variant opacity-50" />
-              )}
-            </div>
-          </div>
+          <ProfileInput
+            label={t('profile.allergies')}
+            value={profile.allergies}
+            onChange={(val) => setProfile({ ...profile, allergies: val })}
+            disabled={!isValidated}
+            icon={ShieldAlert}
+          />
 
           {/* Ubicación Residencial */}
           <div className="flex flex-col gap-2 md:col-span-2">
