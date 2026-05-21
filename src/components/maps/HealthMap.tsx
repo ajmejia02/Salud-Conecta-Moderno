@@ -1130,7 +1130,7 @@ export default function HealthMap() {
                 </div>
               )}
 
-              {/* --- Report button (community tool, unique to Salud Conecta) --- */}
+              {/* --- Report button (community tool, unique to Salud Conecta IA) --- */}
               <div className="px-5 py-4">
                 <button
                   onClick={() => setSelectedForReport(selectedClinic)}

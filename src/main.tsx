@@ -21,7 +21,7 @@ const updateSW = registerSW({
   onNeedRefresh() {
     // El SW detectó una nueva versión de la app disponible
     const shouldUpdate = confirm(
-      '🔄 Nueva versión de Salud Conecta disponible.\n¿Deseas actualizar ahora?'
+      '🔄 Nueva versión de Salud Conecta IA disponible.\n¿Deseas actualizar ahora?'
     );
     if (shouldUpdate) {
       updateSW(true); // Forzar actualización del SW
@@ -29,7 +29,7 @@ const updateSW = registerSW({
   },
   onOfflineReady() {
     // La app está completamente cacheada y lista para funcionar offline
-    console.log('✅ [PWA] Salud Conecta está lista para funcionar sin conexión');
+    console.log('✅ [PWA] Salud Conecta IA está lista para funcionar sin conexión');
   },
   onRegistered(registration) {
     console.log('📦 [PWA] Service Worker registrado:', registration);
