@@ -41,7 +41,7 @@ interface Message {
 
 export default function TriageChecker() {
   const { membership } = useUser();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const offlineState = useTriageOfflineState();
   const [messages, setMessages] = useState<Message[]>([
     { 
