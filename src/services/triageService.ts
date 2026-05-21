@@ -6,6 +6,9 @@ import { getCurrentLocation, getNearestFacility, getEmergencyFacilities, estimat
 import centrosSaludData from '../data/centros_salud.json';
 import { getSmartTriage } from '../lib/gemini';
 import { buscarSintoma, buscarMultiplesMedicamentos } from '../data/granadaDatabase';
+import { validateSymptoms, sanitizeSymptoms } from '../lib/triageValidator';
+import { getTriageErrorHandler, TriageErrorType } from '../lib/triageErrorHandler';
+import { getTriageCacheManager } from '../lib/triageCacheManager';
 
 const handleFirestoreError = (error: unknown, operationType: OperationType, path: string | null) => {
   const errInfo: FirestoreErrorInfo = {
@@ -96,15 +99,46 @@ export interface TriageWithLocationResult {
 }
  
 export async function getEnhancedTriageWithLocation(symptoms: string, membership: 'free' | 'premium' = 'free'): Promise<TriageWithLocationResult> {
+  const errorHandler = getTriageErrorHandler();
+
   try {
+    // ===== FASE 1: Input Validation =====
+    const sanitized = sanitizeSymptoms(symptoms);
+    const validation = validateSymptoms(sanitized);
+    if (!validation.isValid) {
+      const validationError = validation.errors[0];
+      const error = errorHandler.classifyError(
+        new Error(validationError.message),
+        TriageErrorType.INVALID_INPUT,
+        { phase: 'input_validation', symptoms: sanitized }
+      );
+
+      return {
+        severity: 'medium',
+        recommendation: errorHandler.getUserFriendlyMessage(error),
+        reasoning: `Validación de entrada: ${validationError.code}`,
+        error: true,
+      };
+    }
+
     // Coordenadas por defecto (Granada Centro) alineadas con la base de datos local
     let userLat = 11.93749;
     let userLng = -85.968;
 
-    const userLocation = await getCurrentLocation();
-    if (userLocation) {
-      userLat = userLocation.latitude;
-      userLng = userLocation.longitude;
+    try {
+      const userLocation = await getCurrentLocation();
+      if (userLocation) {
+        userLat = userLocation.latitude;
+        userLng = userLocation.longitude;
+      }
+    } catch (geoError) {
+      // Geolocalización fallida pero continuamos con coordenadas por defecto
+      const error = errorHandler.classifyError(
+        geoError,
+        undefined, // Dejar que se clasifique automáticamente
+        { phase: 'geolocation' }
+      );
+      console.warn(`[TRIAGE] Geolocation warning: ${error.message}`);
     }
 
     // 1. Obtener la red completa combinada (Firestore dinámicas + Red pública y centros de Granada + otros hospitales de Nicaragua)
@@ -142,12 +176,20 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
       ? fullNetwork.filter(c => c.sector === 'public' || c.type === 'pharmacy')
       : fullNetwork;
 
+    // ===== FASE 4: Cache Check =====
+    const cacheManager = getTriageCacheManager();
+    const cachedResult = cacheManager.get(sanitized);
+    if (cachedResult) {
+      console.log('[TRIAGE] Resultado encontrado en cache, usando cached result');
+      return cachedResult;
+    }
+
     // 3. Evaluar los síntomas y determinar la urgencia
     let aiTriage: any;
     let localFallbackUsed = false;
 
     try {
-      aiTriage = await getSmartTriage(symptoms, membership);
+      aiTriage = await getSmartTriage(sanitized, membership);
       if (aiTriage.error) {
         throw new Error("Gemini returned error state or is not configured.");
       }
@@ -267,7 +309,7 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
 
     const finalDistance = minDistance === Infinity ? 0 : minDistance;
 
-    return {
+    const result = {
       severity,
       recommendation,
       reasoning: aiTriage.reasoning || `Consulta analizada localmente. Distancia al centro más cercano: ${finalDistance.toFixed(1)} km.`,
@@ -294,12 +336,24 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
       } : undefined,
       error: !!aiTriage.error
     };
+
+    // ===== FASE 4: Cache Store =====
+    if (!result.error) {
+      cacheManager.set(sanitized, result);
+    }
+
+    return result;
   } catch (error) {
-    console.error('Error en triaje:', error);
+    const classifiedError = errorHandler.classifyError(
+      error,
+      undefined,
+      { phase: 'enhanced_triage_processing', symptoms: symptoms?.substring(0, 50) }
+    );
+
     return {
       severity: 'medium',
-      recommendation: 'Consulte con un médico profesional si sus síntomas persisten.',
-      reasoning: 'Error al ejecutar la consulta.',
+      recommendation: errorHandler.getUserFriendlyMessage(classifiedError),
+      reasoning: `Error en triaje: ${classifiedError.type}`,
       error: true
     };
   }

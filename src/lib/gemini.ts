@@ -1,5 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 import { GEMINI_API_KEY } from "./config";
+import {
+  validateSymptoms,
+  validateGeminiResponse,
+  sanitizeSymptoms,
+  type GeminiTriageResponse,
+  logValidationError,
+} from "./triageValidator";
+import {
+  getTriageErrorHandler,
+  TriageErrorType,
+  type TriageError,
+} from "./triageErrorHandler";
 
 let aiInstance: GoogleGenAI | null = null;
 
@@ -69,58 +81,139 @@ export const getHealthAssistant = async (message: string, membership: 'free' | '
 };
 
 // Sistema de triaje
-export const getSmartTriage = async (symptoms: string, membership: 'free' | 'premium' = 'free') => {
+export const getSmartTriage = async (symptoms: string, membership: 'free' | 'premium' = 'free'): Promise<GeminiTriageResponse> => {
+  const errorHandler = getTriageErrorHandler();
+
   try {
+    // ===== FASE 1: Input Validation =====
+    const sanitized = sanitizeSymptoms(symptoms);
+    const symptomsValidation = validateSymptoms(sanitized);
+    
+    if (!symptomsValidation.isValid) {
+      const validationError = symptomsValidation.errors[0];
+      const error = errorHandler.classifyError(
+        new Error(validationError.message),
+        TriageErrorType.INVALID_INPUT,
+        { phase: 'input_validation', symptoms: sanitized }
+      );
+      
+      return {
+        urgency: 'medium',
+        recommendation: errorHandler.getUserFriendlyMessage(error),
+        reasoning: `Validación de entrada: ${validationError.code}`,
+        error: true,
+      };
+    }
+
     const ai = getAI();
     if (!ai) {
-      return { urgency: 'medium', recommendation: 'Busque atención médica profesional.', reasoning: 'Configuración pendiente.', error: true };
+      const error = errorHandler.classifyError(
+        new Error('Gemini API not initialized'),
+        TriageErrorType.GEMINI_CONFIG_ERROR,
+        { phase: 'initialization' }
+      );
+      
+      return {
+        urgency: 'medium',
+        recommendation: errorHandler.getUserFriendlyMessage(error),
+        reasoning: 'Configuración de IA no disponible',
+        error: true,
+      };
     }
 
     const membershipContext = membership === 'free'
       ? 'CONTEXTO SOCIAL: Prioriza siempre la Red Pública (MINSA).'
       : 'CONTEXTO PREMIUM: Acceso a servicios privados y públicos.';
 
-    const systemInstruction = `Motor de triaje médico para Nicaragua. Respóndeme ÚNICAMENTE JSON:
+    const systemInstruction = `Motor de triaje médico para Nicaragua. Respóndeme ÚNICAMENTE JSON con este esquema exacto:
 {
   "urgency": "low" | "medium" | "high" | "emergency",
-  "recommendation": "Acción a tomar",
-  "reasoning": "Justificación breve"
+  "recommendation": "Acción a tomar (texto claro en español)",
+  "reasoning": "Justificación breve (1-2 líneas)"
 }
-${membershipContext}`;
+${membershipContext}
+
+REGLAS CRÍTICAS:
+1. SIEMPRE responde JSON válido
+2. El urgency DEBE ser uno de los 4 valores listados
+3. recommendation y reasoning DEBEN ser strings no vacíos
+4. Si hay medicamento sugerir, incluir objeto "medication": { "name": "...", "dosage": "...", "frequency": "..." }
+5. Para emergencias (ej: pecho, respiración, inconsciente) urgency="emergency"`;
 
     const result = await ai.models.generateContent({
       model: MODEL,
       config: { systemInstruction, responseMimeType: "application/json" },
-      contents: [{ role: 'user', parts: [{ text: symptoms }] }],
+      contents: [{ role: 'user', parts: [{ text: sanitized }] }],
     });
 
     const text = result.text ?? "";
+    
+    // ===== FASE 1: Schema Validation =====
     let parsed: any;
     try {
       parsed = JSON.parse(text);
     } catch (parseError) {
-      console.error("Error parsing Gemini JSON response:", parseError, "Raw:", text);
-      return { urgency: 'medium', recommendation: 'Error al procesar. Busque atención médica.', reasoning: 'JSON inválido.', error: true };
+      const error = errorHandler.classifyError(
+        parseError instanceof Error ? parseError : new Error(String(parseError)),
+        TriageErrorType.INVALID_SCHEMA,
+        { phase: 'json_parsing', symptoms: sanitized }
+      );
+      
+      console.error(`[TRIAGE] ${error.message}. Raw response (first 200 chars):`, text.substring(0, 200));
+
+      return {
+        urgency: 'medium',
+        recommendation: errorHandler.getUserFriendlyMessage(error),
+        reasoning: 'Respuesta de IA inválida',
+        error: true,
+      };
     }
 
-    const requiredFields = ['urgency', 'recommendation', 'reasoning'];
-    if (!requiredFields.every(field => field in parsed)) {
-      throw new Error('Invalid schema');
+    // Validar contra esquema esperado
+    const validation = validateGeminiResponse(parsed);
+    if (!validation.isValid) {
+      const validationError = validation.errors[0];
+      const error = errorHandler.classifyError(
+        new Error(validationError.message),
+        TriageErrorType.INVALID_SCHEMA,
+        { phase: 'schema_validation', symptoms: sanitized }
+      );
+      
+      logValidationError(validationError, 'getSmartTriage');
+
+      return {
+        urgency: 'medium',
+        recommendation: errorHandler.getUserFriendlyMessage(error),
+        reasoning: `Esquema inválido: ${validationError.code}`,
+        error: true,
+      };
     }
 
-    return parsed;
+    return validation.data!;
   } catch (error: any) {
+    const errorHandler = getTriageErrorHandler();
+    
+    // Detectar tipo de error específico
+    let errorType = TriageErrorType.UNKNOWN_ERROR;
     if (error?.status === 429 || String(error).includes('429')) {
-      console.warn("Gemini Quota Exceeded (Triage) - Usando fallback local offline.");
-    } else {
-      console.error("Gemini Triage Error:", error);
+      errorType = TriageErrorType.GEMINI_RATE_LIMIT;
+    } else if (error?.status === 401 || error?.status === 403) {
+      errorType = TriageErrorType.GEMINI_AUTH_ERROR;
+    } else if (error?.status && error.status >= 500) {
+      errorType = TriageErrorType.GEMINI_SERVER_ERROR;
     }
-    const msg = typeof error === 'string' ? error : (error?.message || 'Error');
+
+    const classifiedError = errorHandler.classifyError(
+      error,
+      errorType,
+      { phase: 'gemini_call', symptoms: symptoms?.substring(0, 50) }
+    );
+
     return {
       urgency: 'medium',
-      recommendation: msg.toLowerCase().includes('credits') ? 'Verifique créditos en ai.studio.' : 'Busque atención médica profesional.',
-      reasoning: 'Error al procesar la consulta.',
-      error: true
+      recommendation: errorHandler.getUserFriendlyMessage(classifiedError),
+      reasoning: `Error en IA: ${classifiedError.type}`,
+      error: true,
     };
   }
 };

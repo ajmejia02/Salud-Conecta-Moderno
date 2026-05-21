@@ -16,7 +16,9 @@ import {
   Clock,
   Mic,
   CheckCircle2,
-  HeartPulse
+  HeartPulse,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 import { getEnhancedTriageWithLocation } from '../../services/triageService';
 import { saveTriageRecord } from '../../services/triageService';
@@ -25,6 +27,10 @@ import { auth } from '../../lib/firebase';
 import { TriageWithLocationResult } from '../../services/triageService';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Clinic } from '../../types';
+import { useDebouncedCallback } from '../../hooks/useDebounce';
+import { getTriageRequestManager } from '../../lib/triageRequestManager';
+import { useTriageOfflineState } from '../../hooks/useTriageOfflineState';
+import TriageDisclaimerCard from './TriageDisclaimerCard';
 
 interface Message { 
   id: string; 
@@ -36,6 +42,7 @@ interface Message {
 export default function TriageChecker() {
   const { membership } = useUser();
   const { t } = useLanguage();
+  const offlineState = useTriageOfflineState();
   const [messages, setMessages] = useState<Message[]>([
     { 
       id: '1', 
@@ -78,9 +85,16 @@ export default function TriageChecker() {
     setShowToast(true);
   };
 
-  const handleSend = async (text: string = input) => {
+  // ===== FASE 3: Debounced Send Handler =====
+  const handleSendInternal = async (text: string) => {
     if (!text.trim()) return;
+    if (isTyping) {
+      console.warn('[TRIAGE] Ya hay una evaluación en progreso');
+      return;
+    }
 
+    const manager = getTriageRequestManager();
+    
     const userMsg: Message = { 
       id: Date.now().toString(), 
       role: 'user', 
@@ -94,11 +108,28 @@ export default function TriageChecker() {
     setIsTyping(true);
 
     try {
-      const result = await getEnhancedTriageWithLocation(text, membership);
+      const { context, signal } = manager.createRequest(text);
+      manager.setActiveRequest(context);
+
+      const result = await Promise.race([
+        getEnhancedTriageWithLocation(text, membership),
+        new Promise<TriageWithLocationResult>((_, reject) => {
+          signal.addEventListener('abort', () => {
+            reject(new Error('Triaje cancelado por el usuario'));
+          });
+        })
+      ]);
       
+      // Verificar si el request fue abortado
+      if (signal.aborted) {
+        console.log('[TRIAGE] Request cancelado, descartando resultado');
+        triggerToast('Evaluación cancelada', 'error');
+        return;
+      }
+
       setTriageResult(result);
       
-      // Agregar la respuesta de la IA al historial del chat para mantener el flujo conversacional
+      // Agregar la respuesta de la IA al historial del chat
       const assistantResponse = result.error
         ? t('triage.assistant.fallback').replace('{rec}', result.recommendation || '').replace('{res}', result.reasoning || '')
         : t('triage.assistant.success').replace('{rec}', result.recommendation || '').replace('{res}', result.reasoning || '');
@@ -121,12 +152,27 @@ export default function TriageChecker() {
         triggerToast(t('triage.toast.success'), "success");
       }
     } catch (e) { 
-      console.error(e); 
-      triggerToast(t('triage.toast.error'), "error");
+      if (e instanceof Error && e.message.includes('cancelado')) {
+        console.log('[TRIAGE] Request cancelado:', e.message);
+      } else {
+        console.error('[TRIAGE] Error en triaje:', e); 
+        triggerToast(t('triage.toast.error'), "error");
+      }
     } finally {
       setIsTyping(false);
     }
   };
+
+  // Debounce de 300ms para evitar multiple submissions
+  const handleSend = useDebouncedCallback(handleSendInternal, 300);
+
+  // Cleanup al desmontar
+  useEffect(() => {
+    const manager = getTriageRequestManager();
+    return () => {
+      manager.cancelActiveRequest('Componente desmontado');
+    };
+  }, []);
 
   const handleReset = () => { 
     setMessages([
@@ -273,6 +319,26 @@ export default function TriageChecker() {
             <div>
               <span className="font-display font-black text-on-surface flex items-center gap-1.5">
                 {t('triage.title')}
+                {/* ===== FASE 5: Offline Badge ===== */}
+                {!offlineState.isOnline && (
+                  <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 border border-amber-500/30 text-amber-600 rounded-lg">
+                    <WifiOff className="w-3 h-3" />
+                    OFFLINE
+                  </span>
+                )}
+                {offlineState.isRateLimited && (
+                  <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 text-[10px] font-bold bg-error/20 border border-error/30 text-error rounded-lg animate-pulse">
+                    <Zap className="w-3 h-3" />
+                    RATE LIMITED
+                  </span>
+                )}
+                {offlineState.pendingSync > 0 && (
+                  <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 text-[10px] font-bold bg-secondary/20 border border-secondary/30 text-secondary rounded-lg">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    SYNCING ({offlineState.pendingSync})
+                  </span>
+                )}
+              </span>
               </span>
               <p className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">
                 {t('triage.subtitle')} ({membership.toUpperCase()})
@@ -363,7 +429,7 @@ export default function TriageChecker() {
                     placeholder={t('triage.input_placeholder')} 
                     value={input} 
                     onChange={e => setInput(e.target.value)} 
-                    onKeyDown={e => e.key === 'Enter' && handleSend()}
+                    onKeyDown={e => e.key === 'Enter' && handleSend(input)}
                     disabled={isTyping}
                   />
                   <button 
@@ -379,7 +445,7 @@ export default function TriageChecker() {
                   </button>
                 </div>
                 <button 
-                  onClick={() => handleSend()} 
+                  onClick={() => handleSend(input)} 
                   disabled={!input.trim() || isTyping}
                   className="w-12 h-12 bg-primary hover:brightness-110 text-on-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/15 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                 >
@@ -563,6 +629,14 @@ export default function TriageChecker() {
                     <RotateCcw size={14} />
                     {t('triage.new')}
                   </button>
+                </div>
+
+                {/* ===== FASE 6: Disclaimer Card ===== */}
+                <div className="px-6 pb-6">
+                  <TriageDisclaimerCard 
+                    severity={triageResult.severity as any}
+                    language={language as 'es' | 'en'}
+                  />
                 </div>
               </motion.div>
             ) : (
