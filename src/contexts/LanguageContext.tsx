@@ -9,9 +9,7 @@ export type Language = 'es' | 'en';
  * Translations object with full TypeScript support
  * All keys must be in TranslationKey type and exist in both languages
  */
-interface Translations {
-  [key in Language]: Record<TranslationKey, string>;
-}
+type Translations = Record<Language, Record<TranslationKey, string>>;
 
 const translations: Translations = {
   es: {

@@ -205,7 +205,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
       items = items.filter(item => {
         const nameMatch = item.name?.toLowerCase().includes(q);
         const descMatch = item.description?.toLowerCase().includes(q);
-        const servicesMatch = item.services?.some(s => s.toLowerCase().includes(q));
+        const servicesMatch = item.services?.some((s: string) => s.toLowerCase().includes(q));
         return nameMatch || descMatch || servicesMatch;
       });
     }
@@ -639,7 +639,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                   {topFeaturedItems.map((_, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setCurrentPage && setCurrentSlide(idx)}
+                      onClick={() => setCurrentSlide(idx)}
                       className={`h-2 rounded-full transition-all duration-300 ${
                         idx === currentSlide 
                           ? 'w-6 bg-primary' 
