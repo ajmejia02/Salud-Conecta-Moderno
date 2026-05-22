@@ -142,12 +142,13 @@ export const PointsService = {
   addPoints(
     points: number,
     action: string,
-    type: 'gain' | 'redeem' = 'gain'
+    type: 'gain' | 'redeem' = 'gain',
+    providedData?: PointsData
   ): PointsTransaction {
-    const data = this.getAllData();
+    const data = providedData || this.getAllData();
     const today = this.getToday();
     const transaction: PointsTransaction = {
-      id: `tx-${Date.now()}`,
+      id: `tx-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       action,
       date: today,
       points,
@@ -161,7 +162,9 @@ export const PointsService = {
     }
     data.transactions.push(transaction);
 
-    this.saveData(data);
+    if (!providedData) {
+      this.saveData(data);
+    }
     return transaction;
   },
 
@@ -177,38 +180,25 @@ export const PointsService = {
     }
 
     const yesterday = this.getYesterday();
-    let newStreak = 1;
-
-    // Check if yesterday was completed
-    if (data.streakDates[yesterday]) {
-      newStreak = data.currentStreak + 1;
+    
+    // Check if yesterday was completed (meaning user completed at least 1 challenge yesterday)
+    // If not completed, the streak resets to 0. If yes, it maintains it.
+    if (!data.streakDates[yesterday]) {
+      data.currentStreak = 0;
     }
 
-    data.currentStreak = newStreak;
-    data.maxStreak = Math.max(data.maxStreak, newStreak);
     data.lastLoginDate = today;
     data.consecutiveLogins = (data.consecutiveLogins || 0) + 1;
-    data.streakDates[today] = true;
 
-    // Add login bonus
-    this.addPoints(10, `Login Diario Día ${data.consecutiveLogins}`);
+    // Add login bonus of 10 points
+    this.addPoints(10, `Login Diario Día ${data.consecutiveLogins}`, 'gain', data);
 
-    // Check for streak bonuses
-    const streakBonus = this.checkStreakBonuses(newStreak);
-    if (streakBonus.earned) {
-      this.addPoints(
-        streakBonus.points,
-        `Bono de Racha - ${newStreak} días`
-      );
-    }
-
-    data.totalPoints += (streakBonus.earned ? streakBonus.points : 0);
     this.saveData(data);
 
     return {
       earned: true,
-      points: 10 + (streakBonus.earned ? streakBonus.points : 0),
-      message: `¡Bienvenido! +10 pts${streakBonus.earned ? ` + ${streakBonus.points} bono` : ''}`
+      points: 10,
+      message: `¡Bienvenido! +10 pts`
     };
   },
 
@@ -255,19 +245,64 @@ export const PointsService = {
     // Add challenge to completed list
     data.completedChallengesToday[today].push(challengeId);
 
-    // Add points
-    this.addPoints(challenge.points, challenge.title);
+    // Add points for the specific challenge
+    this.addPoints(challenge.points, challenge.title, 'gain', data);
 
-    // Mark that today was active (for streaks)
-    data.streakDates[today] = true;
+    let message = `¡Desafío completado! +${challenge.points} pts`;
+    let earnedPoints = challenge.points;
+
+    // Mark today as active for streaks ONLY when a challenge is completed
+    if (!data.streakDates[today]) {
+      data.streakDates[today] = true;
+      
+      const yesterday = this.getYesterday();
+      if (data.streakDates[yesterday]) {
+        data.currentStreak += 1;
+      } else {
+        data.currentStreak = 1;
+      }
+      data.maxStreak = Math.max(data.maxStreak, data.currentStreak);
+
+      // Check for streak bonuses in real time
+      const streakBonus = this.checkStreakBonuses(data.currentStreak);
+      if (streakBonus.earned) {
+        this.addPoints(
+          streakBonus.points,
+          `Bono de Racha - ${data.currentStreak} días`,
+          'gain',
+          data
+        );
+        earnedPoints += streakBonus.points;
+        message += ` | ¡Bono de Racha de ${data.currentStreak} días! +${streakBonus.points} pts`;
+      }
+    }
+
+    // Check if user completed all 5 daily challenges (Desafío Diario Completo)
+    const completedToday = data.completedChallengesToday[today];
+    if (completedToday.length === 5) {
+      this.addPoints(30, 'Desafío Diario Completo', 'gain', data);
+      earnedPoints += 30;
+      message += ` | ¡Desafío Diario Completo! +30 pts`;
+    }
 
     this.saveData(data);
 
     return {
       success: true,
-      message: `¡Desafío completado! +${challenge.points} pts`,
-      points: challenge.points
+      message,
+      points: earnedPoints
     };
+  },
+
+  /**
+   * Check if the daily challenge bonus is earned today
+   */
+  isDailyChallengeBonusEarned(): boolean {
+    const data = this.getAllData();
+    const today = this.getToday();
+    return data.transactions.some(
+      tx => tx.date === today && tx.action === 'Desafío Diario Completo'
+    );
   },
 
   /**
@@ -306,11 +341,10 @@ export const PointsService = {
       };
     }
 
-    this.addPoints(15, 'Registro de Vitales');
     const data = this.getAllData();
+    this.addPoints(15, 'Registro de Vitales', 'gain', data);
     data.vitalCompletedToday = true;
-    const today = this.getToday();
-    data.streakDates[today] = true;
+    
     this.saveData(data);
 
     return {
@@ -346,7 +380,8 @@ export const PointsService = {
     }
 
     const code = this.generateRedemptionCode();
-    this.addPoints(-rewardPoints, rewardTitle, 'redeem');
+    this.addPoints(-rewardPoints, rewardTitle, 'redeem', data);
+    this.saveData(data);
 
     return {
       success: true,
@@ -395,7 +430,10 @@ export const PointsService = {
     const days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
     const today = new Date();
     const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay() + 1);
+    // Find the Monday of the current week (1 for Mon, 2 for Tue... 0 for Sun)
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    weekStart.setDate(diff);
 
     const data = this.getAllData();
 
@@ -416,7 +454,7 @@ export const PointsService = {
   },
 
   /**
-   * Reset daily challenges for new day
+   * Reset daily challenges for new day and handle monthly points reset
    */
   resetDailyIfNeeded(): void {
     const data = this.getAllData();
@@ -425,6 +463,20 @@ export const PointsService = {
     // Auto-reset vitals completed flag each day
     if (data.lastLoginDate !== today) {
       data.vitalCompletedToday = false;
+    }
+
+    // Dynamic month change calculation to reset monthly points
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+
+    if (data.lastLoginDate) {
+      const lastParts = data.lastLoginDate.split('-');
+      const lastYear = parseInt(lastParts[0]);
+      const lastMonth = parseInt(lastParts[1]) - 1; // 0-indexed
+
+      if (lastYear !== currentYear || lastMonth !== currentMonth) {
+        data.pointsThisMonth = 0;
+      }
     }
 
     this.saveData(data);
@@ -450,8 +502,11 @@ export const PointsService = {
   getClinicSearchBonus(): { available: boolean; message: string } {
     const data = this.getAllData();
     const today = new Date();
+    // Monday of current week
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay() + 1);
+    weekStart.setDate(diff);
     const weekStartStr = weekStart.toISOString().split('T')[0];
 
     const bonusKey = `clinicSearch-${weekStartStr}`;
@@ -469,8 +524,11 @@ export const PointsService = {
   useClinicSearchBonus(): { success: boolean; points: number } {
     const data = this.getAllData();
     const today = new Date();
+    // Monday of current week
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay() + 1);
+    weekStart.setDate(diff);
     const weekStartStr = weekStart.toISOString().split('T')[0];
     const bonusKey = `clinicSearch-${weekStartStr}`;
 
@@ -479,7 +537,7 @@ export const PointsService = {
     }
 
     data.bonusesEarned[bonusKey] = true;
-    this.addPoints(50, 'Uso del Buscador Clínico');
+    this.addPoints(50, 'Uso del Buscador Clínico', 'gain', data);
     this.saveData(data);
 
     return { success: true, points: 50 };

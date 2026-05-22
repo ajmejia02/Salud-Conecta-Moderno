@@ -21,7 +21,11 @@ const CHALLENGE_ICONS: { [key: string]: any } = {
   'challenge-5': Brain
 };
 
-export default function HealthChallenges() {
+interface HealthChallengesProps {
+  onComplete?: () => void;
+}
+
+export default function HealthChallenges({ onComplete }: HealthChallengesProps) {
   const [challenges, setChallenges] = useState<any[]>([]);
   const [completedIds, setCompletedIds] = useState<string[]>([]);
 
@@ -42,6 +46,7 @@ export default function HealthChallenges() {
     if (result.success) {
       toastManager.success(result.message);
       setCompletedIds(prev => [...prev, challengeId]);
+      onComplete?.();
     } else {
       toastManager.info(result.message);
     }

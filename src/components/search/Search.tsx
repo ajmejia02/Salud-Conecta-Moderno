@@ -3,6 +3,8 @@ import { AnimatePresence } from 'motion/react';
 import { useUser } from '../../contexts/UserContext';
 import centrosSaludData from '../../data/centros_salud.json';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { PointsService } from '../../lib/pointsService';
+import { toastManager } from '../../lib/toastService';
 
 import { motion } from 'motion/react';
 import { 
@@ -51,6 +53,15 @@ export default function Search({ onOpenRegistration }: SearchProps) {
     window.addEventListener('setSearchCategory', handleCategory);
     return () => window.removeEventListener('setSearchCategory', handleCategory);
   }, []);
+
+  React.useEffect(() => {
+    // Award search bonus if it is the first search of the week
+    const result = PointsService.useClinicSearchBonus();
+    if (result.success) {
+      toastManager.success(`¡Bono Semanal! +50 pts por usar el Buscador Clínico`);
+    }
+  }, []);
+
   const itemsPerPage = 10;
   const { isPremium } = useUser();
 
