@@ -106,8 +106,7 @@ const translations: Translations = {
     'checkout.terms_link': 'Términos de Servicio',
     'checkout.and': ' y ',
     'checkout.privacy_link': 'Política de Privacidad',
-    'checkout.social_proof': 'Únete a más de 12,000 profesionales médicos que optimizan su práctica diaria con Salud Conecta IA.',
-    'reports.download': 'Descargar PDF',
+    'checkout.social_proof': 'Únete a más de 12,000 profesionales médicos que optimizan su práctica diaria con Salud Conecta AI.',
     'profile.preview': 'Vista Previa',
     'profile.confirm': 'Confirmar',
     'profile.cancel': 'Cancelar',
@@ -790,7 +789,6 @@ const translations: Translations = {
     'checkout.and': ' and ',
     'checkout.privacy_link': 'Privacy Policy',
     'checkout.social_proof': 'Join over 12,000 medical professionals who optimize their daily practice with Salud Conecta AI.',
-    'reports.download': 'Download PDF',
     'profile.preview': 'Preview',
     'profile.confirm': 'Confirm',
     'profile.cancel': 'Cancel',
@@ -1484,7 +1482,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       lang = 'es';
     }
     setLanguageState(lang);
-    
+
     // Save to localStorage + Firestore
     try {
       await languageSyncService.saveLanguagePreference(lang);

@@ -1,0 +1,11 @@
+src/components/search/Search.tsx(557,22): error TS2345: Argument of type '"search.featured_network"' is not assignable to parameter of type 'TranslationKey'.
+src/components/search/Search.tsx(648,35): error TS2345: Argument of type '"search.view_slide"' is not assignable to parameter of type 'TranslationKey'.
+src/components/search/Search.tsx(782,101): error TS2345: Argument of type '"search.about_us"' is not assignable to parameter of type 'TranslationKey'.
+src/components/search/Search.tsx(790,103): error TS2345: Argument of type '"search.available_services"' is not assignable to parameter of type 'TranslationKey'.
+src/components/search/Search.tsx(803,103): error TS2345: Argument of type '"search.direct_contact"' is not assignable to parameter of type 'TranslationKey'.
+src/components/search/Search.tsx(810,103): error TS2345: Argument of type '"search.location_address"' is not assignable to parameter of type 'TranslationKey'.
+src/components/search/Search.tsx(826,16): error TS2345: Argument of type '"search.directions"' is not assignable to parameter of type 'TranslationKey'.
+src/contexts/LanguageContext.tsx(15,3): error TS2741: Property '"checkout.social_proof"' is missing in type '{ 'nav.triage': string; 'nav.pharmacy': string; 'nav.search': string; 'nav.rewards': string; 'nav.activity': string; 'nav.history': string; 'nav.appointments': string; 'nav.membership': string; 'nav.dashboard': string; ... 665 more ...; 'maps.utils.pharmacy_label': string; }' but required in type 'Record<TranslationKey, string>'.
+src/lib/i18nLogger.ts(6,25): error TS2459: Module '"../contexts/LanguageContext"' declares 'Translations' locally, but it is not exported.
+src/lib/triageDisclaimers.ts(81,7): error TS2322: Type 'string' is not assignable to type '"Formulario de triaje m├®dico. Ingrese sus s├¡ntomas para obtener una evaluaci├│n inicial." | "Nivel de severidad: {severity}" | "Medicamento recomendado: {name}. Dosis: {dosage}. Frecuencia: {frequency}" | ... 8 more ... | "No internet connection. Data will sync when connection is restored."'.
+src/lib/triageValidator.ts(167,5): error TS2741: Property 'errors' is missing in type '{ isValid: true; data: { urgency: any; recommendation: any; reasoning: any; medication: any; error: any; }; }' but required in type '{ isValid: boolean; data?: GeminiTriageResponse; errors: TriageValidationError[]; }'.
