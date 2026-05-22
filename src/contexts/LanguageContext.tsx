@@ -1416,7 +1416,7 @@ function translate(
 
   // Fallback: si la key no existe en el idioma actual, intenta español
   if (!text && language !== 'es') {
-    text = translations.es[key];
+    text = translations['es'][key];
     if (!text) {
       i18nLogger.logMissingKey(key, language, true);
     }
