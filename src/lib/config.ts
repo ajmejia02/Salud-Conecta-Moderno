@@ -21,6 +21,7 @@ const getApiKey = (envVars: string | string[], fallback: string, name: string): 
   }
   
   if (!val) {
+    console.warn(`[Config] ${name} key not found in environment variables`);
     return fallback;
   }
   
@@ -40,10 +41,13 @@ const getApiKey = (envVars: string | string[], fallback: string, name: string): 
   }
   
   console.log(`[Config] ${name} loaded successfully`);
-  return trimmed; //
+  return trimmed;
 };
 
 export const GEMINI_API_KEY = getApiKey('VITE_GEMINI_API_KEY', '', 'Gemini');
+
+// Export a flag to check if Gemini is available (gracefully handles missing API key)
+export const isGeminiAvailable = !!(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 0 && GEMINI_API_KEY !== 'MISSING');
 
 export const APP_CONFIG = {
   isDevelopment: import.meta.env.DEV,
