@@ -14,6 +14,9 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate', // SW se actualiza automáticamente sin intervención
         includeAssets: ['icon-192.png', 'icon-512.png'], // Assets estáticos a precachear
+        devOptions: {
+          enabled: true
+        },
 
         // ── Manifest (reemplaza public/manifest.json) ─────────────────────
         manifest: {
