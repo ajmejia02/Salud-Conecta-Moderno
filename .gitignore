@@ -7,3 +7,6 @@ coverage/
 .env*
 !.env.example
 config/*.json
+*.pem
+*.p12
+service-account*.json

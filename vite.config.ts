@@ -125,6 +125,14 @@ export default defineConfig(({mode}) => {
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
+      proxy: {
+        // Redirigir peticiones /api/* al servidor Express backend
+        // para que el frontend pueda acceder a Healthcare API de forma transparente
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+        },
+      },
     },
     build: {
       // Optimizar el output para Vercel
