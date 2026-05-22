@@ -3,11 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import Shell from './components/layout/Shell';
 import Hero from './components/home/Hero';
@@ -17,10 +12,6 @@ import History from './components/history/History';
 import MessagingSimulation from './components/chat/MessagingSimulation';
 import { Profile } from './components/profile/Profile';
 import { Settings } from './components/profile/Settings';
-
-const HealthMap = lazy(() => import('./components/maps/HealthMap'));
-const PremiumHealthMap = lazy(() => import('./components/maps/PremiumHealthMap'));
-const TriageChecker = lazy(() => import('./components/triage/TriageChecker'));
 
 import Search from './components/search/Search';
 import EntityRegistration from './components/registration/EntityRegistration';
@@ -43,6 +34,10 @@ import Login from './components/auth/Login';
 import { auth, handleRedirectResult } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { syncUserProfile } from './lib/authUtils';
+
+const HealthMap = lazy(() => import('./components/maps/HealthMap'));
+const PremiumHealthMap = lazy(() => import('./components/maps/PremiumHealthMap'));
+const TriageChecker = lazy(() => import('./components/triage/TriageChecker'));
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
