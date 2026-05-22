@@ -1,7 +1,7 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════════════
+ * ═════════════════════════════════════════════════════════════════════════════════
  * SALUD CONECTA IA — Healthcare API Client (Frontend)
- * ═══════════════════════════════════════════════════════════════════════════════
+ * ════════════════════════════════════════════════════════════════════════════════
  * 
  * Cliente HTTP tipado para consumir la API FHIR del backend Express.
  * Todas las peticiones pasan por el proxy de Vite (/api → localhost:3001).
@@ -15,6 +15,8 @@
  * 
  * @module src/services/healthcareApi
  */
+
+import { getAuth } from 'firebase/auth';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TIPOS — Interfaces TypeScript para datos FHIR
@@ -151,21 +153,34 @@ const API_BASE = '/api/fhir';
  * Incluye manejo de errores centralizado y logging.
  */
 async function request<T>(
-  endpoint: string,
-  options: RequestInit = {}
+   endpoint: string,
+   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
-  const url = `${API_BASE}${endpoint}`;
+   const url = `${API_BASE}${endpoint}`;
 
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        // TODO: Agregar token Firebase cuando se implemente auth completa
-        // 'Authorization': `Bearer ${await getFirebaseIdToken()}`,
-        ...options.headers,
-      },
-      ...options,
-    });
+   try {
+     // Get Firebase ID token if user is authenticated
+     let authHeader = {};
+     try {
+       const auth = getAuth();
+       const user = auth.currentUser;
+       if (user) {
+         const token = await user.getIdToken();
+         authHeader = { Authorization: `Bearer ${token}` };
+       }
+     } catch (authError) {
+       // If there's an error getting the token (e.g., Firebase not initialized, user not logged in), we just don't add the token.
+       console.warn('[HealthcareAPI] Could not get Firebase token:', authError);
+     }
+
+     const response = await fetch(url, {
+       headers: {
+         'Content-Type': 'application/json',
+         ...authHeader,
+         ...options.headers,
+       },
+       ...options,
+     });
 
     const data = await response.json();
 
