@@ -102,8 +102,8 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => setActiveTab('home')}
         >
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm shrink-0">
-            <Activity className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
+            <img src="/logo.png" alt="Salud Conecta IA Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-sm sm:text-lg font-bold tracking-tight text-primary truncate max-w-[110px] sm:max-w-none">Salud Conecta IA</h1>
         </div>
@@ -239,7 +239,7 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Activity className="w-5 h-5 text-primary" />
+                <img src="/logo.png" alt="Salud Conecta IA Logo" className="w-6 h-6 object-contain" />
                 <span className="text-xl font-bold text-primary">Salud Conecta IA</span>
               </div>
               <p className="text-on-surface-variant text-sm leading-relaxed max-w-sm">
