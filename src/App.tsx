@@ -34,6 +34,7 @@ import PharmacyDiscounts from './components/membership/PharmacyDiscounts';
 import ActivityLogs from './components/membership/ActivityLogs';
 import PointsConfig from './components/membership/PointsConfig';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
+import ToastContainer from './components/common/ToastContainer';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { UserProvider } from './contexts/UserContext';
 import { NetworkProvider } from './contexts/NetworkContext';
@@ -181,6 +182,7 @@ export default function App() {
   return (
     <NetworkProvider>
       <UserProvider>
+        <ToastContainer />
         {!isAuthenticated ? (
           <Login onLogin={handleLogin} />
         ) : (
