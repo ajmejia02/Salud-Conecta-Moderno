@@ -26,7 +26,8 @@ import {
   PhoneCall,
   ExternalLink,
   Heart,
-  X as XIcon
+  X as XIcon,
+  Menu
 } from 'lucide-react';
 
 interface SearchProps {
@@ -42,6 +43,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
   const [selectedItem, setSelectedItem] = React.useState<any | null>(null);
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const [likedItems, setLikedItems] = React.useState<Record<string, boolean>>({});
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
 
 
@@ -231,27 +233,56 @@ export default function Search({ onOpenRegistration }: SearchProps) {
 
   return (
     <div className="flex flex-col gap-8 pb-20 md:pb-0">
+      {/* Mobile Menu Toggle */}
+      <div className="lg:hidden flex items-center justify-between bg-surface-container border border-outline-variant/30 p-4 rounded-2xl shadow-sm sticky top-[72px] z-40 cursor-pointer" onClick={() => setIsMobileMenuOpen(true)}>
+        <div className="flex-1 overflow-hidden mr-4">
+          <h2 className="font-display font-bold text-lg text-on-surface flex items-center gap-2 truncate">
+            <SearchIcon className="w-5 h-5 text-primary shrink-0" />
+            <span className="truncate">{searchQuery || t('search.search_placeholder')}</span>
+          </h2>
+        </div>
+        <button 
+          className="p-2 bg-primary/10 text-primary rounded-xl flex items-center gap-2 shrink-0"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Search & Filters Overlay (Mobile) / Normal (Desktop) */}
+      <div className={`
+        ${isMobileMenuOpen ? 'fixed inset-0 z-[100] bg-surface/95 backdrop-blur-sm p-4 flex flex-col gap-6 overflow-y-auto' : 'hidden'}
+        lg:contents
+      `}>
+        {isMobileMenuOpen && (
+          <div className="flex items-center justify-between lg:hidden shrink-0">
+            <h2 className="text-2xl font-display font-bold text-on-surface">Filtros de Búsqueda</h2>
+            <button onClick={(e) => { e.stopPropagation(); setIsMobileMenuOpen(false); }} className="p-2 bg-surface-container-high rounded-full">
+              <XIcon className="w-6 h-6 text-on-surface" />
+            </button>
+          </div>
+        )}
+
       {/* Search & Filters Hero */}
-      <section className="bg-surface-container border border-outline-variant/30 rounded-3xl p-8 md:p-10 relative overflow-hidden group shadow-2xl">
+      <section className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 lg:p-10 relative overflow-hidden group shadow-xl lg:shadow-2xl shrink-0">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
         <div className="relative z-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-on-surface mb-2 tracking-tight">
+              <h1 className="text-2xl lg:text-4xl font-display font-bold text-on-surface mb-2 tracking-tight">
               {t('search.hero_title')}
             </h1>
-            <p className="text-on-surface-variant text-base font-medium opacity-70 mb-8">
+              <p className="text-on-surface-variant text-sm lg:text-base font-medium opacity-70 mb-6 lg:mb-8">
               {t('search.hero_subtitle')}
             </p>
           </motion.div>
 
-          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col lg:flex-row gap-4">
             <div className="relative flex-[2] group/search">
               <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within/search:text-primary transition-colors w-5 h-5" />
               <input 
-                className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" 
+                  className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-3 lg:py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" 
                 placeholder={t('search.search_placeholder')} 
                 type="text"
                 value={searchQuery}
@@ -264,7 +295,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
             <div className="relative flex-1 group/location">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within/location:text-primary transition-colors w-5 h-5" />
               <input 
-                className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" 
+                  className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-3 lg:py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" 
                 placeholder={t('search.location_placeholder')} 
                 type="text"
                 value={locationQuery}
@@ -279,7 +310,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
       </section>
 
       {/* Sticky Categories Bar */}
-      <div className="sticky top-[72px] md:top-[116px] z-30 bg-surface-container/90 backdrop-blur-xl border border-outline-variant/30 rounded-[28px] p-5 shadow-lg flex flex-wrap gap-2">
+      <div className="lg:sticky lg:top-[116px] z-30 bg-surface-container/90 backdrop-blur-xl border border-outline-variant/30 rounded-[28px] p-4 lg:p-5 shadow-lg flex flex-wrap gap-2 shrink-0">
         {categories.map((cat) => {
           const isLocked = !cat.isPublic && !isPremium;
           return (
@@ -287,13 +318,14 @@ export default function Search({ onOpenRegistration }: SearchProps) {
               key={cat.id}
               onClick={() => {
                 if (isLocked) {
+                  setIsMobileMenuOpen(false);
                   window.dispatchEvent(new CustomEvent('changeTab', { detail: 'membership' }));
                   return;
                 }
                 setActiveCategory(activeCategory === cat.id ? null : cat.id);
                 setCurrentPage(1);
               }}
-              className={`px-5 py-2.5 rounded-full flex items-center gap-2 font-display font-medium text-xs transition-all border ${
+              className={`px-4 py-2 lg:px-5 lg:py-2.5 rounded-full flex items-center gap-2 font-display font-medium text-xs transition-all border ${
                 activeCategory === cat.id 
                   ? 'bg-primary text-on-primary border-primary shadow-lg shadow-primary/20 scale-105' 
                   : isLocked 
@@ -309,7 +341,16 @@ export default function Search({ onOpenRegistration }: SearchProps) {
         })}
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+        {isMobileMenuOpen && (
+          <div className="mt-auto pt-6 pb-4 shrink-0">
+            <button onClick={(e) => { e.stopPropagation(); setIsMobileMenuOpen(false); }} className="w-full py-4 bg-primary text-on-primary font-bold rounded-2xl shadow-lg active:scale-95 transition-all">
+              Ver Resultados ({filteredItems.length})
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col-reverse lg:flex-row gap-8">
         {/* Left column: Results */}
         <div className="flex-1 flex flex-col gap-8">
           <section className="flex flex-col gap-6">
