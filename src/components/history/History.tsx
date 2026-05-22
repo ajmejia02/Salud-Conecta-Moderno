@@ -27,10 +27,12 @@ import { auth, signInWithGoogle } from '../../lib/firebase';
 import { getUserTriages } from '../../services/triageService';
 import { onAuthStateChanged } from 'firebase/auth';
 import DocumentScanner from './DocumentScanner';
+import { healthcareApi, MedicalHistory } from '../../services/healthcareApi';
 
 export default function History() {
   const [user, setUser] = useState<any>(null);
   const [triages, setTriages] = useState<TriageRecord[]>([]);
+  const [medicalHistory, setMedicalHistory] = useState<MedicalHistory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showPrepGuide, setShowPrepGuide] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -60,10 +62,19 @@ export default function History() {
   const fetchTriages = async (uid: string) => {
     setIsLoading(true);
     try {
+      // 1. Local Fallback History
       const trgs = await getUserTriages(uid);
       setTriages(trgs);
+
+      // 2. FHIR Medical History (Cloud)
+      const fhirPatient = await healthcareApi.searchByIdentifier(uid);
+      if (fhirPatient) {
+        const history = await healthcareApi.getMedicalHistory(fhirPatient.id);
+        setMedicalHistory(history);
+        console.log('[History] FHIR Medical History loaded', history);
+      }
     } catch (e) {
-      console.error(e);
+      console.error('[History] Error loading data:', e);
     } finally {
       setIsLoading(false);
     }
@@ -145,6 +156,34 @@ export default function History() {
               </div>
             </div>
           </section>
+
+          {/* MEDICAL HISTORY SUMMARY (FHIR) */}
+          {medicalHistory && medicalHistory._geminiReady && (
+            <section className="bg-primary/5 rounded-3xl p-8 border border-primary/20 shadow-sm relative overflow-hidden">
+              <div className="flex items-center gap-3 mb-4">
+                <Sparkles className="w-6 h-6 text-primary" />
+                <h3 className="text-xl font-display font-bold text-on-surface">Resumen Clínico Inteligente</h3>
+                <span className="bg-primary text-on-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ml-auto">
+                  Gemini Ready
+                </span>
+              </div>
+              <p className="text-on-surface-variant font-medium leading-relaxed italic text-sm">
+                "{medicalHistory.summary}"
+              </p>
+              
+              <div className="flex gap-4 mt-6 pt-6 border-t border-primary/10">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest">Signos Vitales</span>
+                  <span className="text-xl font-black text-on-surface">{medicalHistory.vitalSigns.length} Registros</span>
+                </div>
+                <div className="w-px bg-primary/10" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-mono font-bold text-primary uppercase tracking-widest">Consultas FHIR</span>
+                  <span className="text-xl font-black text-on-surface">{medicalHistory.encounters.length} Registros</span>
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* PREPARATION GUIDES SECTION */}
           <section className="space-y-6">
