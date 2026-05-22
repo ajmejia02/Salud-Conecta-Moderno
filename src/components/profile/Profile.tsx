@@ -42,6 +42,7 @@ import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { BiometricModal } from './BiometricModal';
 import DocumentScanner from '../history/DocumentScanner';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { healthcareApi } from '../../services/healthcareApi';
 
 const DEFAULT_PHOTO = "https://lh3.googleusercontent.com/aida-public/AB6AXuCNjxM_kx1krlJpGAVOh-nfFDhGn7s-29GpIE4wJWRsqYWpCfOS2KwA0mDjXP283OFfd0LtGx5JPWVrYMEB1cg1irom_1Hm34eluol-cmYe4YG_wnOcjQSvXjDOPm-gtH24rSMm6i0J8uh2fP2_ixZm9Bq0yqMp4aTljcnyLHm8NYc7BeN6mABRDrlnCT35AHv-EBa3m15B2F8AG3IKN-eRA6aH-P_gNEBQ7te36sc60HjVj0KVBPIT4WPJljYhbiXnLMmBo9Tw9A";
 
@@ -89,7 +90,7 @@ export function Profile() {
 
   // Listen for auth changes to sync profile
   React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
       if (u) {
         setUser(u);
         const savedProfile = localStorage.getItem('userProfile');
@@ -100,6 +101,26 @@ export function Profile() {
             email: u.email || prev.email,
             photoURL: u.photoURL || prev.photoURL
           }));
+        }
+        
+        // Try to load data from FHIR Store
+        try {
+          const fhirPatient = await healthcareApi.searchByIdentifier(u.uid);
+          if (fhirPatient) {
+            setProfile(prev => ({
+              ...prev,
+              name: fhirPatient.name?.[0]?.text || prev.name,
+              phone: fhirPatient.telecom?.find(t => t.system === 'phone')?.value || prev.phone,
+              email: fhirPatient.telecom?.find(t => t.system === 'email')?.value || prev.email,
+              address: fhirPatient.address?.[0]?.text || prev.address,
+              dob: fhirPatient.birthDate || prev.dob,
+              // bloodType and allergies are typically Observations/AllergyIntolerances, 
+              // keeping them in state for now
+            }));
+            setIsValidated(true); // Consider FHIR synced patients as validated
+          }
+        } catch (error) {
+          console.error('[Profile] Error loading FHIR patient:', error);
         }
       }
     });
@@ -259,12 +280,10 @@ export function Profile() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      setIsPreviewMode(false);
-
+    
+    try {
       const profileData = {
         name: profile.name,
         phone: profile.phone,
@@ -276,31 +295,55 @@ export function Profile() {
         photoURL: profile.photoURL
       };
 
+      // 1. Local Storage fallback
       localStorage.setItem('userProfile', JSON.stringify(profileData));
 
-      if (!user) return;
+      if (user) {
+        // 2. Sync with FHIR Store
+        const names = profile.name.split(' ');
+        const fhirData = {
+          firstName: names[0] || 'Unknown',
+          lastName: names.slice(1).join(' ') || 'Unknown',
+          birthDate: profile.dob || '1990-01-01',
+          gender: 'unknown' as const,
+          identifier: user.uid, // Use Firebase UID to link
+          phone: profile.phone,
+          email: profile.email,
+          address: profile.address,
+        };
 
-      // Actualizar user con nueva información del perfil
-      // Nota: FirebaseUser tiene propiedades read-only que no podemos cambiar
-      // Guardamos el JSON actualizado para localStorage, mientras mantenemos la referencia del FirebaseUser
-      const updatedUserObj = {
-        ...user,
-        displayName: profile.name,
-        photoURL: profile.photoURL
-      };
+        const existing = await healthcareApi.searchByIdentifier(user.uid);
+        if (existing) {
+          await healthcareApi.updatePatient(existing.id, fhirData);
+          console.log('[Profile] Patient updated in FHIR Store');
+        } else {
+          await healthcareApi.createPatient(fhirData);
+          console.log('[Profile] Patient created in FHIR Store');
+        }
 
-      // Actualizamos localStorage con los datos actualizados del perfil
-      localStorage.setItem('user', JSON.stringify(updatedUserObj));
+        // Update local user object
+        const updatedUserObj = {
+          ...user,
+          displayName: profile.name,
+          photoURL: profile.photoURL
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUserObj));
+        window.dispatchEvent(new Event('storage'));
+      }
 
-      window.dispatchEvent(new Event('storage'));
-
-      window.dispatchEvent(new Event('storage'));
-
+      setIsPreviewMode(false);
       setToastMessage(t('profile.profile_updated'));
       setToastType('success');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
-    }, 1000);
+    } catch (error) {
+      console.error('[Profile] Error saving profile:', error);
+      setToastMessage('Error al sincronizar con la nube médica');
+      setToastType('error');
+      setShowToast(true);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAddContact = () => {

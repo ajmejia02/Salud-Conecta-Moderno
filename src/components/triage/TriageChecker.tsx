@@ -26,6 +26,7 @@ import { useUser } from '../../contexts/UserContext';
 import { auth } from '../../lib/firebase';
 import { TriageWithLocationResult } from '../../services/triageService';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { healthcareApi } from '../../services/healthcareApi';
 import { Clinic } from '../../types';
 import { useDebouncedCallback } from '../../hooks/useDebounce';
 import { getTriageRequestManager } from '../../lib/triageRequestManager';
@@ -209,6 +210,37 @@ export default function TriageChecker() {
       .join(' | ');
 
     try {
+      // 1. Ensure patient exists in FHIR Store
+      let fhirPatient = await healthcareApi.searchByIdentifier(auth.currentUser.uid);
+      if (!fhirPatient) {
+        // Auto-create basic patient profile if it doesn't exist
+        const names = (auth.currentUser.displayName || 'Unknown Patient').split(' ');
+        fhirPatient = await healthcareApi.createPatient({
+          firstName: names[0] || 'Unknown',
+          lastName: names.slice(1).join(' ') || 'Patient',
+          birthDate: '1990-01-01',
+          gender: 'unknown',
+          identifier: auth.currentUser.uid,
+          email: auth.currentUser.email || undefined,
+        });
+      }
+
+      // 2. Map urgency to FHIR Encounter Class
+      const encounterClass = 
+        triageResult.severity === 'emergency' ? 'EMER' :
+        triageResult.severity === 'high' ? 'IMP' : 'AMB';
+
+      // 3. Create Full Consultation
+      await healthcareApi.createFullConsultation({
+        patientId: fhirPatient.id,
+        reason: symptomsText || 'Consulta de síntomas',
+        diagnosis: triageResult.recommendation,
+        class: encounterClass,
+        practitionerName: 'Salud-Conecta AI Triage',
+        // We could pass vitals here if the user had entered them
+      });
+
+      // 4. Fallback/Local backup just in case
       await saveTriageRecord({ 
         userId: auth.currentUser.uid, 
         symptoms: symptomsText || 'Consulta de síntomas', 
@@ -220,9 +252,10 @@ export default function TriageChecker() {
         duration: triageResult.medication?.duration || '', 
         instructions: triageResult.reasoning || '' 
       });
+
       triggerToast(t('triage.toast.save_success'), "success");
     } catch (e) {
-      console.error(e);
+      console.error('[Triage] Error saving to FHIR:', e);
       triggerToast(t('triage.toast.save_error'), "error");
     } finally {
       setIsSaving(false);

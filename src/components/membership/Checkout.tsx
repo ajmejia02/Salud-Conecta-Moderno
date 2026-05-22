@@ -13,6 +13,7 @@ import {
   Activity,
   Headset
 } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface CheckoutProps {
   plan: {
@@ -23,7 +24,6 @@ interface CheckoutProps {
   onBack: () => void;
   onComplete: () => void;
 }
-import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Checkout({ plan, onBack, onComplete }: CheckoutProps) {
   const { t } = useLanguage();

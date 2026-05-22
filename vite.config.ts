@@ -14,6 +14,9 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate', // SW se actualiza automáticamente sin intervención
         includeAssets: ['icon-192.png', 'icon-512.png'], // Assets estáticos a precachear
+        devOptions: {
+          enabled: true
+        },
 
         // ── Manifest (reemplaza public/manifest.json) ─────────────────────
         manifest: {
@@ -125,6 +128,14 @@ export default defineConfig(({mode}) => {
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
+      proxy: {
+        // Redirigir peticiones /api/* al servidor Express backend
+        // para que el frontend pueda acceder a Healthcare API de forma transparente
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+        },
+      },
     },
     build: {
       // Optimizar el output para Vercel
