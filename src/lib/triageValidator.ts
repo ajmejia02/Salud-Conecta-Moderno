@@ -173,6 +173,7 @@ export function validateGeminiResponse(data: any): { isValid: boolean; data?: Ge
         medication: data.medication,
         error: data.error ?? false,
       },
+      errors: [],
     };
   }
 

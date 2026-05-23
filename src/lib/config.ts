@@ -44,7 +44,7 @@ const getApiKey = (envVars: string | string[], fallback: string, name: string): 
   return trimmed;
 };
 
-export const GEMINI_API_KEY = getApiKey('VITE_GEMINI_API_KEY', '', 'Gemini');
+export const GEMINI_API_KEY = getApiKey(['VITE_GEMINI_API_KEY', 'GEMINI_API_KEY'], '', 'Gemini');
 
 // Export a flag to check if Gemini is available (gracefully handles missing API key)
 export const isGeminiAvailable = !!(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 0 && GEMINI_API_KEY !== 'MISSING');
