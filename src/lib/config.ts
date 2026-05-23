@@ -1,4 +1,7 @@
 /// <reference types="vite/client" />
+declare const __GEMINI_API_KEY__: string | undefined;
+declare const __GOOGLE_MAPS_PLATFORM_KEY__: string | undefined;
+
 /**
  * CENTRALIZED CONFIGURATION FOR API KEYS
  * 
@@ -9,14 +12,21 @@
 const getApiKey = (envVars: string | string[], fallback: string, name: string): string => {
   // @ts-ignore - import.meta.env is automatically available in Vite
   const env = import.meta.env;
+  const injected = name === 'Gemini'
+    ? (typeof __GEMINI_API_KEY__ !== 'undefined' ? __GEMINI_API_KEY__ : undefined)
+    : name === 'Google Maps'
+      ? (typeof __GOOGLE_MAPS_PLATFORM_KEY__ !== 'undefined' ? __GOOGLE_MAPS_PLATFORM_KEY__ : undefined)
+      : undefined;
   
   const vars = Array.isArray(envVars) ? envVars : [envVars];
-  let val: string | undefined;
+  let val: string | undefined = injected;
 
-  for (const key of vars) {
-    if (env[key]) {
-      val = env[key] as string;
-      break;
+  if (!val) {
+    for (const key of vars) {
+      if (env[key]) {
+        val = env[key] as string;
+        break;
+      }
     }
   }
   
