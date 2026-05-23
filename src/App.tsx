@@ -12,6 +12,7 @@ import History from './components/history/History';
 import MessagingSimulation from './components/chat/MessagingSimulation';
 import { Profile } from './components/profile/Profile';
 import { Settings } from './components/profile/Settings';
+import PrivacyTerms from './components/legal/PrivacyTerms';
 
 import Search from './components/search/Search';
 import EntityRegistration from './components/registration/EntityRegistration';
@@ -131,6 +132,8 @@ export default function App() {
         return <Profile />;
       case 'settings':
         return <Settings />;
+      case 'privacy':
+        return <PrivacyTerms />;
       case 'points-config':
         return <PointsConfig />;
       case 'membership':

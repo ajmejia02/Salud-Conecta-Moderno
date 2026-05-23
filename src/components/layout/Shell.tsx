@@ -258,8 +258,22 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
               <div>
                 <h4 className="font-bold text-sm mb-4 uppercase tracking-widest">{t('footer.legal')}</h4>
                 <ul className="text-sm text-on-surface-variant space-y-2">
-                  <li>{t('footer.legal.privacy')}</li>
-                  <li>{t('footer.legal.terms')}</li>
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('privacy')}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {t('footer.legal.privacy')}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('privacy')}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {t('footer.legal.terms')}
+                    </button>
+                  </li>
                   <li>{t('footer.legal.acc')}</li>
                 </ul>
               </div>
