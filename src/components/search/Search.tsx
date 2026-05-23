@@ -7,14 +7,14 @@ import { PointsService } from '../../lib/pointsService';
 import { toastManager } from '../../lib/toastService';
 
 import { motion } from 'motion/react';
-import { 
-  Search as SearchIcon, 
-  Stethoscope, 
-  Hospital, 
-  Store, 
-  FlaskConical, 
-  Star, 
-  MapPin, 
+import {
+  Search as SearchIcon,
+  Stethoscope,
+  Hospital,
+  Store,
+  FlaskConical,
+  Star,
+  MapPin,
   Calendar,
   PlusSquare,
   Navigation,
@@ -77,22 +77,22 @@ export default function Search({ onOpenRegistration }: SearchProps) {
 
   const publicItems = useMemo(() => {
     return centrosSaludData.map((item: any, index: number) => {
-        const rawType = (item.type || '').toLowerCase();
-        return {
-          id: `public-${index}`,
-          category: 'public_health',
-          name: item.name,
-          description: item.sector || item.address || 'Institución Pública de Salud',
-          image: '',
-          rating: 4.5,
-          distance: 'Centro MINSA',
-          status: rawType.includes('hospital') ? 'Abierto 24h' : 'Horario Regular',
-          statusType: 'available',
-          services: item.services || ['Atención General'],
-          phone: item.phone || '+505 2222-2222',
-          address: item.address || 'Nicaragua',
-          location: { lat: item.location.lat, lng: item.location.lng }
-        };
+      const rawType = (item.type || '').toLowerCase();
+      return {
+        id: `public-${index}`,
+        category: 'public_health',
+        name: item.name,
+        description: item.sector || item.address || 'Institución Pública de Salud',
+        image: '',
+        rating: 4.5,
+        distance: 'Centro MINSA',
+        status: rawType.includes('hospital') ? 'Abierto 24h' : 'Horario Regular',
+        statusType: 'available',
+        services: item.services || ['Atención General'],
+        phone: item.phone || '+505 2222-2222',
+        address: item.address || 'Nicaragua',
+        location: { lat: item.location.lat, lng: item.location.lng }
+      };
     });
   }, []);
 
@@ -196,7 +196,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
   };
 
   const filteredItems = (() => {
-    let items = activeCategory 
+    let items = activeCategory
       ? allItems.filter(item => item.category === activeCategory)
       : allItems;
 
@@ -241,7 +241,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
             <span className="truncate">{searchQuery || t('search.search_placeholder')}</span>
           </h2>
         </div>
-        <button 
+        <button
           className="p-2 bg-primary/10 text-primary rounded-xl flex items-center gap-2 shrink-0"
         >
           <Menu className="w-6 h-6" />
@@ -262,84 +262,83 @@ export default function Search({ onOpenRegistration }: SearchProps) {
           </div>
         )}
 
-      {/* Search & Filters Hero */}
-      <section className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 lg:p-10 relative overflow-hidden group shadow-xl lg:shadow-2xl shrink-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
-        <div className="relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+        {/* Search & Filters Hero */}
+        <section className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 lg:p-10 relative overflow-hidden group shadow-xl lg:shadow-2xl shrink-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
+          <div className="relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               <h1 className="text-2xl lg:text-4xl font-display font-bold text-on-surface mb-2 tracking-tight">
-              {t('search.hero_title')}
-            </h1>
+                {t('search.hero_title')}
+              </h1>
               <p className="text-on-surface-variant text-sm lg:text-base font-medium opacity-70 mb-6 lg:mb-8">
-              {t('search.hero_subtitle')}
-            </p>
-          </motion.div>
+                {t('search.hero_subtitle')}
+              </p>
+            </motion.div>
 
             <div className="flex flex-col lg:flex-row gap-4">
-            <div className="relative flex-[2] group/search">
-              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within/search:text-primary transition-colors w-5 h-5" />
-              <input 
-                  className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-3 lg:py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" 
-                placeholder={t('search.search_placeholder')} 
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </div>
-            <div className="relative flex-1 group/location">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within/location:text-primary transition-colors w-5 h-5" />
-              <input 
-                  className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-3 lg:py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" 
-                placeholder={t('search.location_placeholder')} 
-                type="text"
-                value={locationQuery}
-                onChange={(e) => {
-                  setLocationQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
+              <div className="relative flex-[2] group/search">
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within/search:text-primary transition-colors w-5 h-5" />
+                <input
+                  className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-3 lg:py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none"
+                  placeholder={t('search.search_placeholder')}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
+              <div className="relative flex-1 group/location">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within/location:text-primary transition-colors w-5 h-5" />
+                <input
+                  className="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface placeholder-on-surface-variant/50 rounded-xl pl-12 pr-4 py-3 lg:py-4 focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none"
+                  placeholder={t('search.location_placeholder')}
+                  type="text"
+                  value={locationQuery}
+                  onChange={(e) => {
+                    setLocationQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Sticky Categories Bar */}
-      <div className="lg:sticky lg:top-[116px] z-30 bg-surface-container/90 backdrop-blur-xl border border-outline-variant/30 rounded-[28px] p-4 lg:p-5 shadow-lg flex flex-wrap gap-2 shrink-0">
-        {categories.map((cat) => {
-          const isLocked = !cat.isPublic && !isPremium;
-          return (
-            <button 
-              key={cat.id}
-              onClick={() => {
-                if (isLocked) {
-                  setIsMobileMenuOpen(false);
-                  window.dispatchEvent(new CustomEvent('changeTab', { detail: 'membership' }));
-                  return;
-                }
-                setActiveCategory(activeCategory === cat.id ? null : cat.id);
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-2 lg:px-5 lg:py-2.5 rounded-full flex items-center gap-2 font-display font-medium text-xs transition-all border ${
-                activeCategory === cat.id 
-                  ? 'bg-primary text-on-primary border-primary shadow-lg shadow-primary/20 scale-105' 
-                  : isLocked 
-                    ? 'bg-surface-container-low text-on-surface-variant/50 border-outline-variant/20 opacity-80'
-                    : 'bg-surface-container-high text-on-surface-variant border-outline-variant/40 hover:border-primary/50'
-              }`}
-            >
-              <cat.icon className="w-4 h-4" />
-              {cat.label}
-              {isLocked && <Lock className="w-3 h-3 ml-1" />}
-            </button>
-          );
-        })}
-      </div>
+        {/* Sticky Categories Bar */}
+        <div className="lg:sticky lg:top-[116px] z-30 bg-surface-container/90 backdrop-blur-xl border border-outline-variant/30 rounded-[28px] p-4 lg:p-5 shadow-lg flex flex-wrap gap-2 shrink-0">
+          {categories.map((cat) => {
+            const isLocked = !cat.isPublic && !isPremium;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  if (isLocked) {
+                    setIsMobileMenuOpen(false);
+                    window.dispatchEvent(new CustomEvent('changeTab', { detail: 'membership' }));
+                    return;
+                  }
+                  setActiveCategory(activeCategory === cat.id ? null : cat.id);
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 lg:px-5 lg:py-2.5 rounded-full flex items-center gap-2 font-display font-medium text-xs transition-all border ${activeCategory === cat.id
+                    ? 'bg-primary text-on-primary border-primary shadow-lg shadow-primary/20 scale-105'
+                    : isLocked
+                      ? 'bg-surface-container-low text-on-surface-variant/50 border-outline-variant/20 opacity-80'
+                      : 'bg-surface-container-high text-on-surface-variant border-outline-variant/40 hover:border-primary/50'
+                  }`}
+              >
+                <cat.icon className="w-4 h-4" />
+                {cat.label}
+                {isLocked && <Lock className="w-3 h-3 ml-1" />}
+              </button>
+            );
+          })}
+        </div>
 
         {isMobileMenuOpen && (
           <div className="mt-auto pt-6 pb-4 shrink-0">
@@ -357,13 +356,13 @@ export default function Search({ onOpenRegistration }: SearchProps) {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-display font-bold text-on-surface flex items-center gap-3">
                 <Star className="w-6 h-6 text-secondary fill-secondary" />
-                {activeCategory 
+                {activeCategory
                   ? `${t('search.results_for')} ${categories.find(c => c.id === activeCategory)?.label}`
                   : t('search.featured_results')
                 }
               </h2>
               {activeCategory && (
-                <button 
+                <button
                   onClick={() => setActiveCategory(null)}
                   className="text-xs font-bold text-primary hover:underline"
                 >
@@ -374,7 +373,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
 
             <div className="flex flex-col gap-6">
               {paginatedItems.map((item) => (
-                <motion.div 
+                <motion.div
                   key={item.id}
                   layout
                   initial={{ opacity: 0, y: 10 }}
@@ -384,8 +383,8 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                 >
                   <div className="w-full sm:w-48 h-48 sm:h-auto shrink-0 relative bg-surface-bright flex items-center justify-center overflow-hidden">
                     {item.image ? (
-                      <img 
-                        src={item.image} 
+                      <img
+                        src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
@@ -397,14 +396,13 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                       </div>
                     )}
                     <div className="absolute top-3 left-3 flex gap-2">
-                       <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-md backdrop-blur-md ${
-                        item.statusType === 'available' 
-                          ? 'bg-secondary/90 text-on-secondary' 
+                      <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-md backdrop-blur-md ${item.statusType === 'available'
+                          ? 'bg-secondary/90 text-on-secondary'
                           : 'bg-surface-container-highest/90 text-on-surface-variant'
-                       }`}>
-                         {item.statusType === 'available' && <span className="w-1.5 h-1.5 rounded-full bg-on-secondary animate-pulse"></span>}
-                         {item.status}
-                       </span>
+                        }`}>
+                        {item.statusType === 'available' && <span className="w-1.5 h-1.5 rounded-full bg-on-secondary animate-pulse"></span>}
+                        {item.status}
+                      </span>
                     </div>
                   </div>
                   <div className="p-5 flex flex-col flex-grow justify-between gap-4">
@@ -420,7 +418,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                           </span>
                         </div>
                       </div>
-                      
+
                       {item.services && item.services.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-4">
                           {item.services.slice(0, 3).map((service: string, idx: number) => (
@@ -436,12 +434,12 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center justify-between pt-4 border-t border-outline-variant/20 mt-auto">
                       <span className="flex items-center gap-1.5 text-xs font-medium text-on-surface-variant">
                         <MapPin className="w-4 h-4 text-primary" /> {item.distance}
                       </span>
-                      <button 
+                      <button
                         onClick={() => setSelectedItem(item)}
                         className="bg-primary text-on-primary hover:brightness-110 px-6 py-2 rounded-xl text-sm font-bold transition-all shadow-md active:scale-95"
                       >
@@ -464,9 +462,9 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                   <ChevronRight className="w-4 h-4 rotate-180" /> {t('search.prev')}
                 </button>
                 <div className="flex gap-2">
-                   <span className="text-sm font-medium text-on-surface-variant">
-                     {t('search.page')} <strong className="text-on-surface">{currentPage}</strong> {t('search.of')} {totalPages}
-                   </span>
+                  <span className="text-sm font-medium text-on-surface-variant">
+                    {t('search.page')} <strong className="text-on-surface">{currentPage}</strong> {t('search.of')} {totalPages}
+                  </span>
                 </div>
                 <button
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
@@ -498,13 +496,13 @@ export default function Search({ onOpenRegistration }: SearchProps) {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 relative z-10 w-full md:w-auto">
-              <button 
+              <button
                 onClick={() => onOpenRegistration('doctor')}
                 className="px-8 py-4 bg-surface-container-highest text-on-surface font-display font-bold text-sm rounded-2xl hover:bg-surface-bright transition-all border border-outline-variant/50 shadow-lg"
               >
                 {t('search.join_doctor')}
               </button>
-              <button 
+              <button
                 onClick={() => onOpenRegistration('clinic')}
                 className="px-8 py-4 bg-primary text-on-primary font-display font-bold text-sm rounded-2xl hover:brightness-110 transition-all shadow-xl shadow-primary/20"
               >
@@ -528,8 +526,8 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                   className="absolute inset-0"
                 >
                   {topFeaturedItems[currentSlide].image ? (
-                    <img 
-                      src={topFeaturedItems[currentSlide].image} 
+                    <img
+                      src={topFeaturedItems[currentSlide].image}
                       alt={topFeaturedItems[currentSlide].name}
                       className="w-full h-full object-cover select-none"
                     />
@@ -554,16 +552,15 @@ export default function Search({ onOpenRegistration }: SearchProps) {
               <div className="flex justify-between items-center w-full">
                 <span className="bg-primary/95 text-on-primary backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg flex items-center gap-1.5">
                   <Star className="w-3.5 h-3.5 fill-on-primary text-on-primary animate-pulse" />
-                  {t('search.featured_network')}
+                  {t('search.featured_results')}
                 </span>
-                
-                <button 
+
+                <button
                   onClick={(e) => toggleLike(topFeaturedItems[currentSlide].id, e)}
-                  className={`p-3.5 rounded-full border transition-all shadow-xl active:scale-90 ${
-                    likedItems[topFeaturedItems[currentSlide].id] 
-                      ? 'bg-red-500 border-red-500 text-white scale-110' 
+                  className={`p-3.5 rounded-full border transition-all shadow-xl active:scale-90 ${likedItems[topFeaturedItems[currentSlide].id]
+                      ? 'bg-red-500 border-red-500 text-white scale-110'
                       : 'bg-black/35 backdrop-blur-md border-white/20 text-white hover:bg-black/55'
-                  }`}
+                    }`}
                   title={t('search.save_favorites')}
                 >
                   <Heart className={`w-5 h-5 ${likedItems[topFeaturedItems[currentSlide].id] ? 'fill-white' : ''}`} />
@@ -573,7 +570,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
               {/* Bottom Card details inside carousel */}
               <div className="space-y-5">
                 <AnimatePresence mode="wait">
-                  <motion.div 
+                  <motion.div
                     key={currentSlide}
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -587,7 +584,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                         <span className="flex items-center text-amber-300 gap-1.5 text-xs font-black bg-amber-400/10 border border-amber-300/20 px-2.5 py-1 rounded-md">
                           ★ {topFeaturedItems[currentSlide].rating.toFixed(1)}
                         </span>
-                        
+
                         <span className="text-[10px] font-bold text-red-300 flex items-center gap-1">
                           <Heart className="w-3.5 h-3.5 fill-red-400 text-red-400" />
                           {Math.round((topFeaturedItems[currentSlide].rating * 14) + (likedItems[topFeaturedItems[currentSlide].id] ? 1 : 0))} {t('search.recommendations')}
@@ -597,7 +594,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                       <h3 className="font-display font-black text-xl leading-tight text-white mb-1.5 drop-shadow">
                         {topFeaturedItems[currentSlide].name}
                       </h3>
-                      
+
                       <p className="text-white/80 text-xs font-medium line-clamp-2">
                         {topFeaturedItems[currentSlide].description}
                       </p>
@@ -609,7 +606,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                     </div>
 
                     <div className="flex gap-2">
-                      <button 
+                      <button
                         onClick={() => {
                           const hasCoordinates = !!topFeaturedItems[currentSlide].location;
                           const url = hasCoordinates
@@ -623,7 +620,7 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                         {t('search.map')}
                       </button>
 
-                      <button 
+                      <button
                         onClick={() => setSelectedItem(topFeaturedItems[currentSlide])}
                         className="flex-1 py-3 bg-primary text-on-primary hover:brightness-110 rounded-xl text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center justify-center gap-1.5"
                       >
@@ -640,11 +637,10 @@ export default function Search({ onOpenRegistration }: SearchProps) {
                     <button
                       key={idx}
                       onClick={() => setCurrentSlide(idx)}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        idx === currentSlide 
-                          ? 'w-6 bg-primary' 
+                      className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide
+                          ? 'w-6 bg-primary'
                           : 'w-2 bg-white/40 hover:bg-white/70'
-                      }`}
+                        }`}
                       title={`${t('search.view_slide')} ${idx + 1}`}
                     />
                   ))}
@@ -656,9 +652,9 @@ export default function Search({ onOpenRegistration }: SearchProps) {
       </div>
       <AnimatePresence>
         {selectedItem && (
-          <EstablishmentDetailModal 
-            item={selectedItem} 
-            onClose={() => setSelectedItem(null)} 
+          <EstablishmentDetailModal
+            item={selectedItem}
+            onClose={() => setSelectedItem(null)}
             likedItems={likedItems}
             onToggleLike={toggleLike}
           />
@@ -702,7 +698,7 @@ function EstablishmentDetailModal({ item, onClose, likedItems, onToggleLike }: D
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -711,7 +707,7 @@ function EstablishmentDetailModal({ item, onClose, likedItems, onToggleLike }: D
       />
 
       {/* Modal Card */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -720,8 +716,8 @@ function EstablishmentDetailModal({ item, onClose, likedItems, onToggleLike }: D
         {/* Cover Image & Close */}
         <div className="relative h-60 w-full bg-surface-bright shrink-0 flex items-center justify-center overflow-hidden">
           {item.image ? (
-            <img 
-              src={item.image} 
+            <img
+              src={item.image}
               alt={item.name}
               className="w-full h-full object-cover"
             />
@@ -733,8 +729,8 @@ function EstablishmentDetailModal({ item, onClose, likedItems, onToggleLike }: D
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          
-          <button 
+
+          <button
             onClick={onClose}
             className="absolute top-4 right-4 bg-black/40 backdrop-blur-md text-white hover:bg-black/60 p-2.5 rounded-full transition-all border border-white/20"
           >
@@ -743,22 +739,20 @@ function EstablishmentDetailModal({ item, onClose, likedItems, onToggleLike }: D
 
           {/* Floating Badges */}
           <div className="absolute bottom-4 left-6 right-6 flex flex-wrap gap-2 items-center justify-between">
-            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-              isPublic 
-                ? 'bg-hospital-green text-white' 
+            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isPublic
+                ? 'bg-hospital-green text-white'
                 : 'bg-amber-500 text-black'
-            }`}>
+              }`}>
               {isPublic ? t('search.minsa_network') : t('search.premium_clinic')}
             </span>
             <div className="flex gap-2">
               <span className="flex items-center text-amber-400 gap-1 text-sm font-black bg-black/40 px-3 py-1 rounded-lg backdrop-blur-sm">
                 ★ {item.rating}
               </span>
-              <button 
+              <button
                 onClick={(e) => onToggleLike(item.id, e)}
-                className={`flex items-center gap-1.5 text-xs font-black bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-sm border transition-all active:scale-95 ${
-                  likedItems[item.id] ? 'text-red-400 border-red-500/30' : 'text-white/80 border-white/10'
-                }`}
+                className={`flex items-center gap-1.5 text-xs font-black bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-sm border transition-all active:scale-95 ${likedItems[item.id] ? 'text-red-400 border-red-500/30' : 'text-white/80 border-white/10'
+                  }`}
               >
                 <Heart className={`w-3.5 h-3.5 ${likedItems[item.id] ? 'fill-red-400 text-red-400' : ''}`} />
                 {Math.round((item.rating * 14) + (likedItems[item.id] ? 1 : 0))}
@@ -818,15 +812,15 @@ function EstablishmentDetailModal({ item, onClose, likedItems, onToggleLike }: D
 
         {/* Footer actions */}
         <div className="p-6 bg-surface-container-high/50 border-t border-outline-variant/20 shrink-0 flex flex-col sm:flex-row gap-3">
-          <button 
+          <button
             onClick={handleDirections}
             className="flex-1 py-4 border border-outline-variant/80 hover:bg-surface-container-highest/50 text-on-surface rounded-2xl text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95"
           >
             <ExternalLink className="w-4 h-4" />
             {t('search.directions')}
           </button>
-          
-          <button 
+
+          <button
             onClick={handleAction}
             className="flex-1 py-4 bg-primary text-on-primary hover:brightness-110 rounded-2xl text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-primary/20"
           >
