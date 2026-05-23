@@ -13,6 +13,7 @@ import MessagingSimulation from './components/chat/MessagingSimulation';
 import { Profile } from './components/profile/Profile';
 import { Settings } from './components/profile/Settings';
 import PrivacyTerms from './components/legal/PrivacyTerms';
+import Accessibility from './components/legal/Accessibility';
 
 import Search from './components/search/Search';
 import EntityRegistration from './components/registration/EntityRegistration';
@@ -134,6 +135,8 @@ export default function App() {
         return <Settings />;
       case 'privacy':
         return <PrivacyTerms />;
+      case 'accessibility':
+        return <Accessibility />;
       case 'points-config':
         return <PointsConfig />;
       case 'membership':

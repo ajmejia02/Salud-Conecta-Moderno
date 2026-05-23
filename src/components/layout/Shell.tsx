@@ -274,7 +274,14 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
                       {t('footer.legal.terms')}
                     </button>
                   </li>
-                  <li>{t('footer.legal.acc')}</li>
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('accessibility')}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {t('footer.legal.acc')}
+                    </button>
+                  </li>
                 </ul>
               </div>
             </div>
