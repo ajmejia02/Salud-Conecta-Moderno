@@ -233,10 +233,10 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
         ))}
       </nav>
 
-      {/* Global Footer (Desktop Only) */}
+      {/* Global Footer */}
       {!['map', 'dashboard', 'settings', 'profile', 'triage', 'search', 'premium-health', 'messages'].includes(activeTab) && (
-        <footer className="hidden md:block w-full border-t border-outline-variant/10 py-16 mt-12 bg-surface-container-lowest">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <footer className="w-full border-t border-outline-variant/10 pt-10 pb-28 md:py-16 mt-12 bg-surface-container-lowest">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <img src="/logo.png" alt="Salud Conecta IA Logo" className="w-6 h-6 object-contain" />
