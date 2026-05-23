@@ -83,6 +83,8 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
     { id: 'activity', label: t('nav.activity'), icon: Flame },
   ];
 
+  const showLegalLinks = !['map', 'dashboard', 'settings', 'profile', 'triage', 'search', 'premium-health', 'messages'].includes(activeTab);
+
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col font-sans">
       {/* TopAppBar */}
@@ -194,7 +196,7 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
       </div>
 
       {/* Main Content Area */}
-      <main className={`flex-grow ${activeTab === 'map' ? 'pt-16 pb-20 md:pt-16 md:pb-0' : 'pt-16 pb-20 md:pt-[132px] md:pb-0'} flex flex-col items-center w-full ${activeTab === 'map' ? 'max-w-none' : 'max-w-7xl mx-auto'}`}>
+      <main className={`flex-grow ${activeTab === 'map' ? 'pt-16 pb-20 md:pt-16 md:pb-0' : `pt-16 ${showLegalLinks ? 'pb-32' : 'pb-20'} md:pt-[132px] md:pb-0`} flex flex-col items-center w-full ${activeTab === 'map' ? 'max-w-none' : 'max-w-7xl mx-auto'}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -208,6 +210,32 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Mobile Legal Quick Links */}
+      {showLegalLinks && (
+        <div className="md:hidden fixed bottom-20 left-0 w-full z-40 bg-surface-container-low/95 backdrop-blur-lg border-t border-outline-variant/20 px-3 py-2">
+          <div className="max-w-md mx-auto grid grid-cols-3 gap-2 text-[10px] font-bold text-on-surface-variant">
+            <button
+              onClick={() => setActiveTab('privacy')}
+              className="h-9 rounded-xl bg-surface-container border border-outline-variant/20 hover:text-primary transition-colors"
+            >
+              {t('footer.legal.privacy')}
+            </button>
+            <button
+              onClick={() => setActiveTab('privacy')}
+              className="h-9 rounded-xl bg-surface-container border border-outline-variant/20 hover:text-primary transition-colors"
+            >
+              {t('footer.legal.terms')}
+            </button>
+            <button
+              onClick={() => setActiveTab('accessibility')}
+              className="h-9 rounded-xl bg-surface-container border border-outline-variant/20 hover:text-primary transition-colors"
+            >
+              {t('footer.legal.acc')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* BottomNavBar (Mobile Only) */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 bg-surface-container-high/95 backdrop-blur-lg border-t border-outline-variant/20 shadow-[0_-4px_16px_rgba(0,0,0,0.4)] rounded-t-[32px] pb-2">
@@ -234,7 +262,7 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
       </nav>
 
       {/* Global Footer */}
-      {!['map', 'dashboard', 'settings', 'profile', 'triage', 'search', 'premium-health', 'messages'].includes(activeTab) && (
+      {showLegalLinks && (
         <footer className="w-full border-t border-outline-variant/10 pt-10 pb-28 md:py-16 mt-12 bg-surface-container-lowest">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
             <div>
