@@ -34,6 +34,49 @@ const getAI = () => {
 
 export const MODEL = "gemini-2.0-flash";
 
+const getServerTriage = async (
+  symptoms: string,
+  membership: 'free' | 'premium'
+): Promise<GeminiTriageResponse | null> => {
+  if (typeof fetch === 'undefined') {
+    return null;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const response = await fetch('/api/triage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symptoms, membership }),
+      signal: controller.signal,
+    });
+
+    if (response.status === 404 || response.status === 405) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(`Server triage failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const validation = validateGeminiResponse(data);
+    if (!validation.isValid) {
+      logValidationError(validation.errors[0], 'getServerTriage');
+      return null;
+    }
+
+    return validation.data!;
+  } catch (error) {
+    console.warn('[TRIAGE] Server Gemini endpoint unavailable, trying client fallback:', error);
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
 // Export a function to check if Gemini is available
 export const isAIServiceAvailable = (): boolean => {
   return isGeminiAvailable && getAI() !== null;
@@ -134,6 +177,11 @@ export const getSmartTriage = async (symptoms: string, membership: 'free' | 'pre
         reasoning: `Validación de entrada: ${validationError.code}`,
         error: true,
       };
+    }
+
+    const serverTriage = await getServerTriage(sanitized, membership);
+    if (serverTriage) {
+      return serverTriage;
     }
 
     const ai = getAI();
