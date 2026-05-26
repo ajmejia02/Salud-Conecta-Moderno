@@ -130,7 +130,7 @@ export function Profile() {
   }, []);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isValidated, setIsValidated] = useState(false);
+  const [isValidated, setIsValidated] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
