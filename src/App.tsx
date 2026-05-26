@@ -40,8 +40,8 @@ const PremiumHealthMap = lazy(() => import('./components/maps/PremiumHealthMap')
 const TriageChecker = lazy(() => import('./components/triage/TriageChecker'));
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [isInitializing, setIsInitializing] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
   const [regType, setRegType] = useState<'doctor' | 'clinic' | 'lab_pharmacy'>('lab_pharmacy');
 
@@ -71,7 +71,7 @@ export default function App() {
 
     // Listen for auth changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(true);
+      setIsAuthenticated(!!user);
       setIsInitializing(false);
     });
 
