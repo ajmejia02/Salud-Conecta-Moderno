@@ -35,11 +35,11 @@ import {
   CheckCircle2,
   AlertTriangle,
   Scan,
-  ChevronDown
+  ChevronDown,
+  ArrowLeft
 } from 'lucide-react';
 import { auth } from '../../lib/firebase';
 import { onAuthStateChanged, User as FirebaseUser, signOut, updateProfile } from 'firebase/auth';
-import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { BiometricModal } from './BiometricModal';
 import DocumentScanner from '../history/DocumentScanner';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -238,19 +238,8 @@ export function Profile() {
       setShowToast(true);
 
       try {
-        // Subir a Firebase Storage inmediatamente
-        const storage = getStorage();
-        const timestamp = Date.now();
-        const storageRef = ref(storage, `profiles/${user.uid}/avatar_${timestamp}.jpg`);
-        
-        // Subir el archivo original (no base64)
-        await uploadString(storageRef, base64Data, 'data_url');
-        
-        // Obtener URL descargable
-        const downloadURL = await getDownloadURL(storageRef);
-
-        // Actualizar perfil con URL permanente
-        const updatedProfile = { ...profile, photoURL: downloadURL };
+        // Actualizar perfil con URL base64
+        const updatedProfile = { ...profile, photoURL: base64Data };
         setProfile(updatedProfile);
 
         // Guardar en localStorage inmediatamente
@@ -270,7 +259,7 @@ export function Profile() {
         try {
           await updateProfile(user, {
             displayName: profile.name,
-            photoURL: downloadURL
+            photoURL: base64Data
           });
         } catch (authError) {
           console.warn('[Profile] Advertencia al actualizar Firebase Auth:', authError);
@@ -280,7 +269,7 @@ export function Profile() {
         const updatedUserObj = {
           ...user,
           displayName: profile.name,
-          photoURL: downloadURL
+          photoURL: base64Data
         };
         localStorage.setItem('user', JSON.stringify(updatedUserObj));
         window.dispatchEvent(new Event('storage'));
@@ -294,7 +283,7 @@ export function Profile() {
         }, 2000);
 
       } catch (uploadError) {
-        console.error('[Profile] Error al subir foto a Storage:', uploadError);
+        console.error('[Profile] Error al guardar foto localmente:', uploadError);
         setToastMessage('Error al guardar la foto. Intenta de nuevo.');
         setToastType('error');
         setShowToast(true);
@@ -365,19 +354,6 @@ export function Profile() {
     
     try {
       let finalPhotoURL = profile.photoURL;
-
-      // Si la foto está en base64 (caso inesperado, ya debería estar subida), subirla
-      if (user && finalPhotoURL.startsWith('data:')) {
-        try {
-          const storage = getStorage();
-          const timestamp = Date.now();
-          const storageRef = ref(storage, `profiles/${user.uid}/avatar_${timestamp}.jpg`);
-          await uploadString(storageRef, finalPhotoURL, 'data_url');
-          finalPhotoURL = await getDownloadURL(storageRef);
-        } catch (uploadError) {
-          console.error('[Profile] Error al subir foto a Storage:', uploadError);
-        }
-      }
 
       const profileData = {
         name: profile.name,
@@ -482,6 +458,17 @@ export function Profile() {
 
   return (
     <div className="flex-1 w-full max-w-[800px] mx-auto px-4 md:px-6 py-10 pb-32 flex flex-col gap-10">
+      
+      {/* Back Button and Title */}
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={() => window.dispatchEvent(new CustomEvent('goBack'))}
+          className="w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-2xl font-display font-bold text-on-surface tracking-tight">{t('profile.title')}</h1>
+      </div>
       {/* Header Section: Profile Overview */}
       <section className="bg-surface-container rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden group shadow-xl border border-outline-variant/30">
         <div className="absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
