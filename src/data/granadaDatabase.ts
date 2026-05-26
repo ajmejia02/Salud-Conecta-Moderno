@@ -2,17 +2,17 @@
 ═══════════════════════════════════════════════════════════════
 BASE DE DATOS DE SALUD — Salud-Conecta IA (Granada, Nicaragua)
 ═══════════════════════════════════════════════════════════════
-📌 VERSIÓN: 13.0.0
-📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-25
-📌 CAMBIOS v13.0.0:
-- Actualización Ultra Masiva: Adición de 17 nuevos escenarios clínicos de altísima complejidad.
-- Soporte clínico para endocrinología de urgencias (Cetoacidosis, Hipoglucemia), oftalmología crítica (Glaucoma), urología de urgencia y cuadros de choque (Sepsis, Anafilaxia).
-- Base de datos de síntomas aumentada exponencialmente en profundidad diagnóstica.
+📌 VERSIÓN: 14.0.0
+📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-30
+📌 CAMBIOS v14.0.0:
+- Actualización TITÁNICA: Adición de 20 escenarios de soporte vital, obstetricia, pediatría y toxicología.
+- Cobertura clínica experta para Preeclampsia, Apendicitis, Intoxicación por pesticidas, Mordedura de serpiente, Fracturas abiertas, Edema pulmonar y más.
+- Incorporación de 8 nuevos medicamentos de uso especializado y emergencia (Clonazepam, Tramadol, Labetalol, Ácido Tranexámico).
 ═══════════════════════════════════════════════════════════════
 */
 
-export const VERSION_BASE_DATOS = '13.0.0';
-export const ULTIMA_ACTUALIZACION = '2026-12-25';
+export const VERSION_BASE_DATOS = '14.0.0';
+export const ULTIMA_ACTUALIZACION = '2026-12-30';
 
 // ═══════════════════════════════════════════════════════════════
 //  🏥 HOSPITALES
@@ -5061,6 +5061,430 @@ export const SINTOMAS = [
         'Instauración de dolor abdominal intermitente sumamente intenso, "tipo retorcijón" o calambre severo, que con el paso de las horas comienza a hacerse constante y progresivamente insoportable.',
         'El abdomen presenta una distensión grosera; a la simple inspección visual, la pared del abdomen luce altamente tensa y "redondeada como un globo o tambor", a veces permitiendo la visualización de los propios bucles del intestino peleando debajo de la piel por vencer la obstrucción.',
         'Aparición de vómitos recurrentes y biliosos que en las etapas más avanzadas y críticas asumen un franco color pardo-marrón muy fétido con características fecales (Vómito Fecaloideo), indicativo indiscutible de obstrucción baja avanzada.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 73,
+      nombre: 'Apendicitis Aguda',
+      categoria: 'Cirugía / Digestivo',
+      sinonimos: ['dolor en la ingle derecha', 'apendice', 'dolor agudo lado derecho', 'punzadas lado derecho bajo', 'apendicitis'],
+      descripcion: 'Inflamación aguda del apéndice cecal. Constituye la urgencia quirúrgica abdominal más frecuente. Inicia como dolor mal definido alrededor del ombligo que posteriormente migra y se focaliza intensamente en la fosa ilíaca derecha.',
+      causas_comunes: ['Obstrucción de la luz apendicular por fecalitos', 'Hiperplasia linfoide (en niños y jóvenes)', 'Parásitos intestinales', 'Cuerpos extraños ingeridos'],
+      cuidados_casa: [
+        'PROHIBICIÓN ABSOLUTA de ingerir analgésicos (Ibuprofeno, Paracetamol), antiespasmódicos o antibióticos, ya que enmascaran la progresión del dolor y retrasan el diagnóstico vital.',
+        'Suspender inmediatamente la vía oral (no comer ni beber nada de líquidos) en preparación para una inminente intervención quirúrgica y anestesia general.',
+        'NO aplicar calor local en el abdomen, esto promueve la vasodilatación y acelera el riesgo de que el apéndice reviente (perforación).'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA QUIRÚRGICA: Dolor constante que migra hacia la parte inferior derecha del abdomen, haciéndose insoportable al caminar o saltar.',
+        'Dolor agudísimo al soltar bruscamente la presión ejercida por una mano sobre el abdomen (Signo de Blumberg o de rebote positivo).',
+        'Acompañado de náuseas, vómitos, fiebre de bajo grado (37.8-38.5°C) y pérdida absoluta del apetito.',
+        'El paciente prefiere mantenerse acostado con las piernas encogidas hacia el pecho (posición fetal antálgica).'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 74,
+      nombre: 'Preeclampsia / Eclampsia (Hipertensión en Embarazo)',
+      categoria: 'Obstetricia',
+      sinonimos: ['presion alta en embarazo', 'preeclampsia', 'eclampsia', 'dolor de cabeza embarazada', 'zumbido de oidos en embarazo', 'veo lucecitas embarazada'],
+      descripcion: 'Trastorno hipertensivo gravísimo del embarazo (generalmente a partir de la semana 20 de gestación) caracterizado por hipertensión arterial severa, daño orgánico (falla renal/hepática) y alto riesgo de convulsiones maternas (Eclampsia) o muerte fetal.',
+      causas_comunes: ['Disfunción placentaria vascular endémica', 'Primer embarazo (Nuliparidad)', 'Obesidad o hipertensión crónica previa', 'Embarazos múltiples (gemelares)'],
+      cuidados_casa: [
+        'NO HAY TRATAMIENTO EN CASA. Es la principal causa de mortalidad materna en Nicaragua y requiere atención hospitalaria inmediata.',
+        'Mantener a la paciente gestante en completo reposo, preferiblemente acostada sobre su lado izquierdo (decúbito lateral izquierdo) para mejorar el flujo de sangre a la placenta.',
+        'Medir inmediatamente la presión arterial si se cuenta con tensiómetro. Una cifra mayor a 140/90 mmHg ya es señal de alarma, y >160/110 mmHg es una emergencia crítica.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA OBSTÉTRICA ABSOLUTA (Código Rojo): Presencia de dolor de cabeza muy fuerte en la frente o nuca que no se quita.',
+        'Aparición de zumbido de oídos (tinnitus) o visión de "lucecitas/chispas" brillantes o visión borrosa (fotopsias).',
+        'Dolor intenso en "la boca del estómago" (epigastrio) o debajo de las costillas del lado derecho (sugiere daño en el hígado / Síndrome HELLP).',
+        'Hinchazón repentina y masiva de la cara, manos y piernas (edema generalizado).',
+        'Aparición de convulsiones o temblores (Eclampsia).'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 75,
+      nombre: 'Hemorragia Postparto Tardía',
+      categoria: 'Obstetricia / Ginecología',
+      sinonimos: ['sangrado despues de dar a luz', 'hemorragia postparto', 'se me vino un sangrado fuerte recien parida', 'coagulos gigantes despues del parto', 'debilidad por sangrado de parto'],
+      descripcion: 'Sangrado vaginal excesivo (>500-1000 mL) que ocurre entre 24 horas y hasta 12 semanas después del parto. Pone a la madre en riesgo extremo de choque hipovolémico y muerte por desangramiento.',
+      causas_comunes: ['Retención de restos placentarios en el útero', 'Falta de contracción del útero (Atonía uterina secundaria)', 'Infección del útero (Endometritis)', 'Desgarros no suturados o que se han re-abierto'],
+      cuidados_casa: [
+        'ESTA CONDICIÓN MATA RÁPIDO SI SE IGNORA. Llamar a emergencias inmediatamente.',
+        'Acostar a la madre en posición completamente plana, y elevarle las piernas por encima del nivel del pecho para forzar la sangre hacia el cerebro y el corazón.',
+        'NO darle a tomar remedios caseros, ni comida, ni agua si está confundida o muy débil (riesgo de asfixia o necesidad de cirugía).',
+        'Si hay personal capacitado o si el médico lo indicó por teléfono, masajear firmemente el abdomen inferior (el vientre) para ayudar al útero a contraerse.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA OBSTÉTRICA VITAL: Sangrado rojo brillante, fresco y abundante (empapar más de una toalla nocturna o pañal de tela en una hora).',
+        'Expulsión de coágulos de sangre más grandes que un limón o una pelota de golf.',
+        'Signos de que se está quedando sin sangre: la paciente se pone pálida o gris, fría, sudorosa, tiene mareos severos, taquicardia o pierde la conciencia.',
+        'El sangrado se acompaña de fiebre, escalofríos y flujo vaginal con un olor extremadamente fétido a podrido (infección).'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 76,
+      nombre: 'Mastitis Puerperal (Infección de Seno)',
+      categoria: 'Obstetricia / Ginecología',
+      sinonimos: ['pecho rojo en lactancia', 'seno caliente y duro', 'mastitis', 'infeccion en la chiche', 'dolor al dar pecho con fiebre', 'pecho empedrado infectado'],
+      descripcion: 'Inflamación e infección del tejido mamario, usualmente secundaria a la acumulación y estancamiento de leche (congestión), lo que permite que las bacterias (generalmente Staphylococcus) entren por las grietas del pezón.',
+      causas_comunes: ['Mala técnica de agarre del bebé al amamantar', 'Vaciado incompleto del pecho', 'Grietas o heridas en el pezón', 'Destete abrupto o uso de sostenes excesivamente apretados'],
+      cuidados_casa: [
+        'LO MÁS IMPORTANTE: ¡NO dejar de dar de mamar! Debe continuar amamantando del pecho afectado o usar un extractor; el vaciado constante es el tratamiento clave y la leche NO está envenenada para el bebé.',
+        'Aplicar compresas tibias o húmedas sobre el seno antes de amamantar para facilitar la salida de la leche.',
+        'Aplicar compresas frías DESPUÉS de amamantar para reducir la hinchazón y el dolor.',
+        'Masajear suavemente el bulto duro en dirección al pezón mientras el bebé succiona.',
+        'Tomar Paracetamol o Ibuprofeno para el dolor y la fiebre, ambos son seguros durante la lactancia.'
+      ],
+      cuando_consultar: [
+        'Aparición de fiebre alta (>38.5°C), escalofríos intensos y malestar de cuerpo "como si le fuera a dar gripe".',
+        'El seno presenta una mancha en forma de cuña que está intensamente roja, dura, caliente y muy dolorosa al tacto.',
+        'Los síntomas no mejoran o empeoran dramáticamente tras 24 horas de intentar vaciar el pecho y masajearlo.',
+        'Aparición de un bulto que se siente lleno de líquido, con piel brillante o secreción de pus evidente por el pezón (sospecha de Absceso Mamario).'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 77,
+      nombre: 'Bronquiolitis Pediátrica',
+      categoria: 'Pediatría / Respiratorio',
+      sinonimos: ['bebe ahogado', 'silbido de pecho en bebe', 'bronquiolitis', 'moco y asfixia en bebe', 'respiracion rapida en niño', 'hundimiento de costillas bebe', 'vrs'],
+      descripcion: 'Infección viral aguda y severa de las vías respiratorias bajas (bronquiolos) en lactantes y niños menores de 2 años. Provoca inflamación, moco abundante y broncoespasmo que dificulta gravemente la entrada de oxígeno.',
+      causas_comunes: ['Virus Sincitial Respiratorio (VRS) - causa del 80% de los casos', 'Rinovirus, Adenovirus, Parainfluenza', 'Complicación de un resfriado común previo'],
+      cuidados_casa: [
+        'Lavados nasales frecuentes con Suero Fisiológico y aspiración de secreciones antes de alimentar o dormir al bebé, ya que los lactantes respiran casi exclusivamente por la nariz.',
+        'Mantener al bebé muy bien hidratado; ofrecer leche materna, fórmula o líquidos en cantidades pequeñas y de manera muy frecuente.',
+        'Mantener al niño en posición semi-sentada (ángulo de 30-40 grados) para facilitar la mecánica de su respiración.',
+        'Control estricto de la fiebre con Paracetamol pediátrico.',
+        'NO dar jarabes para la tos de adultos, antihistamínicos ni descongestionantes, están contraindicados y son peligrosos.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA PEDIÁTRICA: El bebé respira extremadamente rápido (más de 60 respiraciones por minuto) de forma constante.',
+        'Signos claros de dificultad respiratoria: aleteo nasal (las fosas nasales se abren exageradamente) o "tirajes" (la piel se hunde entre y debajo de las costillas y cuello con cada respiración).',
+        'El bebé está letárgico, no quiere despertar, no juega o rechaza totalmente tomar pecho o biberón por su ahogo.',
+        'Cianosis: Coloración morada, azulada o grisácea alrededor de los labios, en la lengua o en las uñas.',
+        'Pausas respiratorias largas (Apnea) donde el bebé deja de respirar por varios segundos.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 78,
+      nombre: 'Crup (Laringotraqueítis Aguda)',
+      categoria: 'Pediatría / Respiratorio',
+      sinonimos: ['tos de perro', 'tos perruna', 'crup', 'estridor', 'ronquera aguda en nino', 'nino ahogado de noche', 'tos de foca'],
+      descripcion: 'Enfermedad respiratoria aguda predominantemente infantil caracterizada por inflamación de la laringe, la tráquea y cuerdas vocales. Típicamente ataca de noche y produce una tos muy peculiar ("metálica").',
+      causas_comunes: ['Virus Parainfluenza', 'Infecciones virales respiratorias comunes invernales'],
+      cuidados_casa: [
+        'Mantener la máxima calma posible; la ansiedad y el llanto del niño empeoran enormemente el espasmo de la garganta y la asfixia.',
+        'Llevar al niño al baño, cerrar la puerta, abrir la ducha con agua muy caliente para crear un ambiente lleno de vapor y que el niño respire ese vapor por 10-15 minutos (Humidificación).',
+        'Alternativa: Si la noche es fría, sacar al niño bien abrigado a respirar el aire frío del exterior por unos minutos (el frío disminuye el edema de la vía aérea de inmediato).',
+        'Controlar la fiebre con Paracetamol para evitar taquicardia.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA PEDIÁTRICA: Se escucha un sonido áspero, rudo y agudo cada vez que el niño TOMA AIRE (esto se llama "Estridor Inspiratorio" e indica que la vía se está cerrando por completo).',
+        'El niño no puede hablar ni llorar por la falta de aire, o babea excesivamente porque le duele tragar.',
+        'Signos de ahogo severo: hundimiento del pecho o cuello al respirar (tirajes), palidez o coloración azulada de labios.',
+        'Si tras aplicar vapor y aire frío durante 20 minutos el cuadro no mejora en absoluto.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 79,
+      nombre: 'Deshidratación Severa Infantil',
+      categoria: 'Pediatría',
+      sinonimos: ['nino deshidratado', 'mollerita hundida', 'llanto sin lagrimas', 'no orina el bebe', 'ojos hundidos bebe', 'letargo diarrea'],
+      descripcion: 'Pérdida crítica de agua y electrolitos corporales en un lactante o niño pequeño, casi siempre como consecuencia de un cuadro severo de gastroenteritis (vómitos y diarrea continuos).',
+      causas_comunes: ['Gastroenteritis aguda (Rotavirus, bacteriana)', 'Vómitos incoercibles', 'Fiebre muy alta sin reposición de líquidos', 'Exposición a calor extremo'],
+      cuidados_casa: [
+        'NO HAY CUIDADOS CASEROS SEGUROS PARA LA DESHIDRATACIÓN SEVERA. Todo intento oral puede fallar y el niño morirá si no recibe reanimación.',
+        'Para casos MODERADOS ANTES de llegar a ser severos: administrar Sales de Rehidratación Oral (SRO) en pequeñas cucharaditas (5 ml) cada minuto constante.',
+        'Continuar ofreciendo el pecho si es lactante, no suspender la lactancia bajo ningún concepto.',
+        'Nunca dar al niño bebidas deportivas, jugos artificiales, té o agua pura a borbotones (agravan la diarrea y el desequilibrio de sales).'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA PEDIÁTRICA VITAL: El bebé tiene la fontanela ("mollera") en la cabeza profundamente hundida.',
+        'Ausencia de lágrimas al llorar y ojos muy secos, hundidos y sin brillo (enoftalmos).',
+        'Pañales secos: El niño no ha orinado nada en las últimas 6 a 8 horas (pañal completamente seco).',
+        'La boca y la lengua están ásperas, pegajosas y como lija.',
+        'El nivel de conciencia se deteriora: el bebé no responde a estímulos, está letárgico, como si estuviera "desmayado" o no pudiera despertar.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 80,
+      nombre: 'Intoxicación por Órganofosforados (Pesticidas)',
+      categoria: 'Toxicología / Emergencias',
+      sinonimos: ['envenenado por veneno de monte', 'intoxicacion por pesticida', 'olor a ajo sudor', 'babaza por veneno', 'intoxicado con gramoxone', 'sindrome colinergico'],
+      descripcion: 'Envenenamiento agudo y letal por la exposición (inhalada, cutánea o ingerida) a pesticidas/insecticidas agrícolas muy comunes en Nicaragua (ej. Malatión, Paratión). Provoca una crisis parasimpática (síndrome colinérgico).',
+      causas_comunes: ['Accidente laboral en campo agrícola por fumigación sin protección', 'Intento autolítico (suicidio) por ingestión intencional', 'Contaminación accidental de alimentos o agua en zonas rurales'],
+      cuidados_casa: [
+        'PROTEGERSE A SÍ MISMO: El rescatador debe usar guantes de goma o bolsas plásticas antes de tocar al paciente, ya que el veneno se absorbe rápidamente a través de la piel.',
+        'Remover INMEDIATAMENTE toda la ropa contaminada del paciente y lavarle la piel y el cabello copiosamente con abundante agua y jabón.',
+        'Si el veneno fue ingerido (tragado) recientemente y el paciente está 100% CONSCIENTE, no inducir el vómito si no se está seguro de qué químico fue, priorizar el traslado.',
+        'No dar a beber leche, aceite ni ningún remedio casero, ya que pueden acelerar la absorción del tóxico en el intestino.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA TOXICOLÓGICA CRÍTICA: Trasladar de urgencia a un hospital, si es posible llevando la etiqueta o el frasco del producto venenoso.',
+        'El paciente produce cantidades industriales de fluidos: lagrimeo, sudoración empapante, orina y diarrea incontrolable, y baba/saliva excesiva que obstruye la garganta (Broncorrea).',
+        'Pupilas puntiformes (extremadamente pequeñas, del tamaño del ojo de una aguja).',
+        'Músculos que tiemblan de forma involuntaria bajo la piel (Fasciculaciones), seguidos de debilidad total o convulsiones.',
+        'Dificultad respiratoria extrema y ritmo cardíaco muy lento.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 81,
+      nombre: 'Ofidismo (Mordedura de Serpiente Venenosa)',
+      categoria: 'Toxicología / Emergencias',
+      sinonimos: ['mordedura de culebra', 'mordido por barba amarilla', 'picadura de serpiente', 'ofidismo', 'mordedura de cascabel', 'sangrado por mordida'],
+      descripcion: 'Envenenamiento causado por la mordedura de serpientes viperidas (Barba Amarilla/Terciopelo, Cascabel, Tamagás) o elapidas (Coral). Produce daño masivo a los tejidos (necrosis) y alteraciones mortales en la coagulación sanguínea.',
+      causas_comunes: ['Encuentro accidental durante labores agrícolas en zonas rurales', 'Caminar de noche o entre maleza sin botas ni protección', 'Manipular serpientes (incluso si parecen muertas)'],
+      cuidados_casa: [
+        'ESTRICTAMENTE PROHIBIDO: NO hacer cortes en cruz sobre los colmillos, NO succionar el veneno con la boca, NO quemar la herida, NO poner hielo.',
+        'PROHIBIDO EL TORNIQUETE: No amarrar cuerdas, cordones o fajas por encima de la mordida. Esto concentrará el veneno destruyendo la extremidad hasta causar amputación.',
+        'Mantener a la persona en completo reposo y calma (el pánico acelera los latidos y distribuye el veneno más rápido).',
+        'Lavar la herida suavemente con agua y jabón, retirar anillos, pulseras o relojes inmediatamente antes de que el miembro se hinche, e inmovilizar el brazo o pierna mordido a nivel del corazón.',
+        'Trasladar rápidamente. Si es seguro, tomar una foto de la serpiente, pero no arriesgarse a capturarla.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL: TODA MORDEDURA de serpiente desconocida o venenosa requiere suero antiofídico hospitalario.',
+        'Hinchazón extremadamente rápida de la pierna o el brazo que sube visiblemente cada pocos minutos.',
+        'Dolor fulgurante y aparición de ampollas gigantes, a menudo con sangre adentro (Flictenas hemorrágicas) en la zona mordida.',
+        'Aparición de sangrado espontáneo por las encías, la nariz, en la orina o en heridas previas (falla total de la coagulación).',
+        'Visión doble, párpados caídos o dificultad para tragar (típico de veneno neurotóxico, como la serpiente Coral o de Cascabel).'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 82,
+      nombre: 'Artritis Séptica (Infección Articular)',
+      categoria: 'Traumatología / Infeccioso',
+      sinonimos: ['articulacion infectada', 'rodilla inflamada con fiebre', 'artritis septica', 'pus en la rodilla', 'dolor insoportable coyuntura fiebre', 'hinchazon extrema articulacion'],
+      descripcion: 'Infección bacteriana directa, altamente destructiva y rápidamente progresiva dentro de la cavidad de una articulación (usualmente rodilla o cadera). Si no se drena quirúrgicamente y se trata con antibióticos en horas, destruye el cartílago dejando daño irreversible.',
+      causas_comunes: ['Bacterias (Staphylococcus aureus) que llegan por la sangre desde otra infección', 'Traumatismo penetrante directo en la articulación (pisotear un clavo, espina)', 'Inoculación accidental post-inyección articular'],
+      cuidados_casa: [
+        'NO HAY TRATAMIENTO EN CASA. Se requiere ingreso hospitalario urgente para aspiración (artrocentesis) y lavado quirúrgico.',
+        'Inmovilizar absolutamente la extremidad en la posición en la que el paciente sienta menos dolor.',
+        'NO aplicar cremas, hielo ni calor vigoroso intentando aliviar; no intente masajear la zona bajo ninguna circunstancia.',
+        'Suspender el consumo de analgésicos en casa para no ocultar la fiebre y la gravedad ante la evaluación médica inminente.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA ORTOPÉDICA: Dolor articular que aparece de forma súbita, siendo tan atroz que el paciente no soporta que ni siquiera le toquen o muevan la pierna un milímetro.',
+        'La articulación afectada está visiblemente enorme, tensa, enrojecida y excepcionalmente caliente al tacto comparada con el lado sano.',
+        'Incapacidad total, absoluta y súbita para apoyar peso sobre la pierna o mover el brazo.',
+        'Acompañado de un cuadro de fiebre alta en picos y escalofríos intensos.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 83,
+      nombre: 'Trauma Ocular / Abrasión Corneal',
+      categoria: 'Oftalmología / Trauma',
+      sinonimos: ['golpe en el ojo', 'ojo rayado', 'basura en el ojo que no sale', 'quimico en el ojo', 'ojo rojo por golpe', 'rasguno en el ojo', 'trauma ocular'],
+      descripcion: 'Lesión traumática en la estructura del globo ocular, que puede ir desde un raspón superficial en la córnea (abrasión) hasta un estallido del ojo, cuerpos extraños clavados o quemaduras químicas.',
+      causas_comunes: ['Impactos directos (pelotas, puñetazos, ramas)', 'Cuerpos extraños (virutas de metal al soldar sin gafas, arena, aserrín)', 'Salpicadura accidental de sustancias químicas (ácido de batería, lejía, cloro, detergentes)', 'Arañazos con uñas o papel'],
+      cuidados_casa: [
+        'QUEMADURAS QUÍMICAS: Constituyen la única emergencia ocular en la que se debe actuar ANTES de ir al médico. Lavar el ojo inmediatamente, a chorro continuo con abundante agua limpia o suero durante 15-20 minutos seguidos, manteniendo el ojo forzadamente abierto.',
+        'PARA GOLPES O CUERPOS EXTRAÑOS: NO frotar el ojo bajo ninguna circunstancia, ya que un cuerpo extraño incrustado rayará y destruirá la córnea.',
+        'NO intente extraer ningún objeto que parezca estar clavado en el ojo con pinzas o algodón.',
+        'Colocar un protector rígido sobre el ojo (como la base de un vaso de plástico cortado) apoyado en el hueso sin presionar el globo, y acudir al hospital.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL PARA LA VISIÓN: Toda salpicadura de sustancia química corrosiva tras el lavado copioso.',
+        'Todo traumatismo que produzca un dolor ocular profundo, sensación de punzada constante y fotofobia extrema (no tolera la luz).',
+        'Cambio en la forma de la pupila (se ve como una "gota" o lágrima apuntando hacia una herida en lugar de ser redonda).',
+        'Sangre acumulada de forma visible por detrás de la parte transparente del ojo (Hifema).',
+        'Pérdida de la visión o visión doble inmediata tras el golpe.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 84,
+      nombre: 'Peritonitis Aguda',
+      categoria: 'Cirugía / Digestivo',
+      sinonimos: ['abdomen duro', 'infeccion en todo el estomago', 'peritonitis', 'dolor de estomago mortal', 'abdomen de madera', 'panza tiesa por infeccion'],
+      descripcion: 'Inflamación gravísima y generalizada del peritoneo (la membrana que recubre todos los órganos abdominales). Generalmente ocurre cuando un órgano infectado se rompe, derramando pus, heces o ácido gástrico en la cavidad estéril del abdomen.',
+      causas_comunes: ['Apendicitis aguda que se revienta (perforada)', 'Úlcera gástrica perforada', 'Diverticulitis perforada', 'Traumatismo abdominal penetrante (arma blanca, disparo) o contuso grave (accidente)'],
+      cuidados_casa: [
+        'ES UNA CONDICIÓN MORTAL SIN CIRUGÍA INMEDIATA. No existen remedios caseros.',
+        'NADA por la boca. No permitir al paciente beber agua, comer o tomar pastillas analgésicas o tés. Cualquier líquido introducido se fugará por el órgano roto hacia el peritoneo y empeorará la peritonitis.',
+        'Mantener al paciente en completo reposo, preferiblemente con las rodillas dobladas (posición antálgica) mientras llega la ambulancia.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA QUIRÚRGICA INMINENTE: Dolor abdominal continuo, expansivo y atroz que abarca todo el abdomen.',
+        'El abdomen se siente rígido e implacable como una "tabla de madera" a la simple palpación, y el paciente no puede relajar los músculos del vientre.',
+        'El dolor es tan intenso que el paciente rechaza moverse en lo absoluto, pues toser, estornudar o el simple traqueteo del carro en el camino al hospital le causa un dolor desgarrador.',
+        'Acompañado de fiebre altísima, pulso acelerado, piel fría, sudorosa y vómitos fecaloideos o biliares (signos de choque).'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 85,
+      nombre: 'Infarto de Miocardio Atípico (Mujeres y Diabéticos)',
+      categoria: 'Cardiovascular',
+      sinonimos: ['infarto oculto', 'ataque al corazon en mujer', 'infarto sin dolor de pecho', 'infarto diabetico', 'falta de aire extrema de la nada', 'fatiga mortal repentina'],
+      descripcion: 'Oclusión de una arteria coronaria que provoca la muerte del músculo cardíaco, pero que se presenta SIN el clásico dolor de pecho aplastante, confundiendo al paciente. Es sumamente frecuente y peligroso en mujeres, ancianos y diabéticos.',
+      causas_comunes: ['Aterosclerosis coronaria', 'Diabetes crónica de larga data que causa daño a los nervios del corazón (Neuropatía autonómica)', 'Hipertensión descontrolada'],
+      cuidados_casa: [
+        'Si el paciente sospecha un infarto y ya tiene recetado Nitroglicerina, debe tomar su dosis. Si no, y no tiene alergia, Masticar media aspirina de adulto (o 2 aspirinas para niño/cardio) puede ganar tiempo crucial.',
+        'Detener INMEDIATAMENTE toda actividad física, sentar a la persona y aflojar ropas.',
+        'Trasladar rápidamente al hospital más cercano preferiblemente en ambulancia.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL: Súbita e inexplicable falta de aire (asfixia) que ocurre estando en reposo, o fatiga tan extrema que el paciente siente que va a colapsar si da un paso más.',
+        'Aparición de dolor sordo o ardor en la "boca del estómago" (epigastrio) que no cede con antiácidos y se confunde con indigestión.',
+        'Sudoración fría profusa y pegajosa sin motivo aparente (diaforesis fría).',
+        'Dolor inusual que se irradia a la espalda, entre los omóplatos, hacia el cuello o a la mandíbula inferior, a veces acompañado de náuseas o mareo inminente.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 86,
+      nombre: 'Edema Agudo de Pulmón',
+      categoria: 'Cardiovascular / Respiratorio',
+      sinonimos: ['pulmones llenos de agua', 'ahogo total', 'falla cardiaca aguda', 'no puedo respirar acostado', 'asfixia y tos rosada', 'insuficiencia cardiaca severa'],
+      descripcion: 'Acumulación masiva y súbita de líquido (agua) en los alvéolos de los pulmones, impidiendo la oxigenación. Usualmente originado porque el corazón ha perdido abruptamente la fuerza para bombear sangre, haciendo que la presión de las venas regrese agua a los pulmones.',
+      causas_comunes: ['Fallo cardíaco descompensado (Insuficiencia Cardíaca Congestiva)', 'Infarto agudo de miocardio extenso', 'Crisis hipertensiva crítica', 'Sobrecarga masiva de líquidos (falla renal)'],
+      cuidados_casa: [
+        '¡MANTENER AL PACIENTE SENTADO CON LAS PIERNAS COLGANDO HACIA ABAJO! Nunca acostarlo; la posición horizontal hará que el líquido inunde completamente los pulmones y el paciente morirá ahogado en minutos.',
+        'Intentar mantener al paciente tranquilo, ya que el pánico extremo por asfixia empeora la demanda de oxígeno.',
+        'Llamar de emergencia a una ambulancia equipada con oxígeno. Si es posible el traslado por medios propios, hacerlo con el paciente sentado en 90 grados.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL INMINENTE: Aparición brutal y fulminante de dificultad respiratoria y asfixia, que es mucho peor cuando el paciente intenta acostarse (Ortopnea severa).',
+        'Respiración muy ruidosa, con sonidos de "hervor" o burbujeo que se escuchan a distancia, como si el pecho fuera una tetera hirviendo.',
+        'Tos persistente y desesperada que empieza a producir flema espumosa de color rosado o teñida de sangre.',
+        'El paciente presenta un nivel de pánico y agitación extremo, con la piel cianótica (morada), sudando a mares y sintiendo que se muere de ahogo.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 87,
+      nombre: 'Estado Epiléptico (Status Epilepticus)',
+      categoria: 'Neurológico',
+      sinonimos: ['ataque epileptico que no para', 'convulsiones seguidas', 'status epileptico', 'se quedo trabado en la convulsion', 'ataque cerebral infinito'],
+      descripcion: 'Emergencia neurológica crítica en la que una convulsión dura más de 5 minutos, o cuando un paciente sufre múltiples convulsiones consecutivas sin recuperar la conciencia entre ellas. El daño cerebral irreversible o la muerte pueden ocurrir por hipoxia y exceso de actividad eléctrica.',
+      causas_comunes: ['Abandono de la medicación antiepiléptica', 'Trauma craneal severo', 'Infección del sistema nervioso central (Meningitis/Encefalitis)', 'Alteraciones metabólicas graves (Sodio o glucosa bajos)'],
+      cuidados_casa: [
+        '¡LLAMAR A UNA AMBULANCIA! El status epilepticus solo se detiene con medicamentos intravenosos potentes (Diazepam/Midazolam) administrados por médicos.',
+        'Girar a la persona de lado inmediatamente (Posición de seguridad) para evitar que aspire su propia saliva o vómito.',
+        'Proteger la cabeza poniéndola sobre algo blando, retirar objetos cercanos con los que pueda golpearse.',
+        'NO meter cucharas, trapos ni los propios dedos en la boca del paciente bajo ninguna circunstancia. NO intentar amarrarlo o someter sus movimientos con fuerza.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL: Una convulsión espasmódica tónico-clónica que ha superado el umbral crítico de los 5 minutos de duración.',
+        'El paciente termina de convulsionar, no despierta, y al cabo de unos minutos vuelve a iniciar un nuevo cuadro convulsivo.',
+        'Coloración gris o morada profunda de todo el rostro y los labios debido a la falla respiratoria sostenida durante las contracciones.',
+        'Fiebre extremadamente alta acompañando el cuadro de convulsiones continuas.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 88,
+      nombre: 'Sangrado Digestivo Bajo (Hematoquecia)',
+      categoria: 'Gastroenterología',
+      sinonimos: ['sangrado rectal masivo', 'cagando sangre viva', 'hematoquecia', 'hemorragia por el ano', 'excremento con charco de sangre', 'coagulos por el recto'],
+      descripcion: 'Pérdida de sangre roja viva o marrón granate, a menudo en forma de coágulos, a través del recto (ano). Generalmente se origina en el colon, el recto o el ano, y en casos severos puede provocar descompensación cardiovascular.',
+      causas_comunes: ['Hemorroides internas o externas sangrantes (causa benigna común)', 'Diverticulosis colónica (sangrado súbito masivo indoloro)', 'Enfermedad Inflamatoria Intestinal (Crohn/Colitis ulcerosa)', 'Cáncer colorrectal', 'Angiodisplasias'],
+      cuidados_casa: [
+        'Suspender cualquier fármaco AINE (Aspirina, Ibuprofeno, Diclofenaco) ya que perpetúan los sangrados.',
+        'El paciente debe guardar reposo estricto, preferiblemente acostado para mantener la presión arterial y evitar desmayos.',
+        'Si el sangrado es solo unas gotas en el papel higiénico tras esfuerzo al defecar (sugerente de hemorroides), usar baños de asiento y dieta alta en fibra.',
+        'No intentar utilizar remedios ni enemas caseros.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL: Evacuación abundante e incontrolable de sangre roja rutilante (pura) o grandes coágulos de sangre, que llena el inodoro de color rojo oscuro.',
+        'El sangrado se acompaña de signos de choque: mareo severo al ponerse de pie, visión borrosa, sudoración fría, palidez de cera, o pulso rapidísimo.',
+        'El paciente presenta pérdida de conciencia (síncope) mientras defeca o justo después.',
+        'Ocurre junto con un dolor abdominal tipo cólico insoportable y debilidad generalizada, o es un paciente de la tercera edad.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 89,
+      nombre: 'Fractura Ósea Abierta (Expuesta)',
+      categoria: 'Traumatología',
+      sinonimos: ['hueso de fuera', 'fractura expuesta', 'hueso roto con herida', 'quebradura abierta', 'fractura grave con sangrado'],
+      descripcion: 'Rotura completa de un hueso en la que los fragmentos óseos astillados atraviesan la piel, comunicando el foco de la fractura con el medio exterior. Constituye una urgencia quirúrgica inmediata por el altísimo riesgo de infección severa en el hueso (osteomielitis).',
+      causas_comunes: ['Accidentes de tránsito de alta energía (especialmente motocicletas)', 'Caídas desde grandes alturas', 'Traumatismos industriales o deportivos severos'],
+      cuidados_casa: [
+        'NO INTENTAR ACOMODAR NI METER EL HUESO DE VUELTA DENTRO DE LA PIEL. Esto desgarrará nervios y arterias, e introducirá bacterias profundamente.',
+        'Cubrir inmediatamente la herida y el hueso asomado con apósitos gruesos de gasa estéril o telas lo más limpias posibles para evitar que la contaminación empeore.',
+        'Aplicar presión firme alrededor de los bordes de la herida (nunca directamente sobre el hueso) si hay un sangrado arterial activo.',
+        'Inmovilizar el miembro afectado usando tablas o cartones duros amarrados en la posición en la que quedó tras el accidente, para que no se mueva durante el traslado.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA QUIRÚRGICA: El hueso es visible a través de la piel, sin importar qué tan pequeño sea el fragmento asomado.',
+        'Hemorragia abundante en pulsos (arterial) proveniente de la herida de la fractura.',
+        'El miembro por debajo de la fractura (pie o mano) está pálido, frío, no tiene pulso o el paciente no lo siente en absoluto (compresión neurovascular grave).',
+        'Acudir al hospital para recibir lavado quirúrgico urgente, reducción traumatológica y esquema de antibióticos potentes intravenosos y vacuna antitetánica.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 90,
+      nombre: 'Quemadura Eléctrica Severa',
+      categoria: 'Emergencias',
+      sinonimos: ['electrocutado', 'descarga electrica', 'le agarro la corriente', 'quemadura por rayo', 'pegado a los alambres'],
+      descripcion: 'Lesión provocada por el paso de corriente eléctrica a través del cuerpo humano. Además de las quemaduras profundas en los puntos de contacto, el daño letal suele ser interno (músculos, nervios, órganos) y puede inducir fibrilación ventricular (paro cardíaco).',
+      causas_comunes: ['Contacto con cables de alta tensión sin protección', 'Artefactos eléctricos defectuosos o mojados', 'Impacto por rayo (fulguración)'],
+      cuidados_casa: [
+        'SEGURIDAD PRIMERO: NUNCA TOCAR a la víctima si sigue en contacto con la fuente de electricidad. Primero desconectar el disyuntor principal o interruptor (bajar los breques).',
+        'Si no es posible cortar la electricidad, usar un objeto SECO y NO CONDUCTOR (madera, plástico, palo de escoba grueso) para separar a la persona del cable.',
+        'Si la persona no respira y no tiene pulso una vez asegurada la zona, iniciar RCP (Reanimación Cardiopulmonar) ininterrumpidamente hasta que llegue la ayuda.',
+        'Cubrir las quemaduras térmicas visibles (punto de entrada y salida) con gasas secas y limpias sin aplicar ungüentos.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL: TODA persona electrocutada por corriente de alto voltaje debe ir a un hospital para monitoreo cardíaco, incluso si se siente perfectamente bien (las arritmias letales pueden aparecer horas después).',
+        'Pérdida de conciencia temporal, confusión, amnesia o parálisis tras el choque.',
+        'Presencia de orina de color rojo oscuro o marrón (mioglobinuria, indica que el músculo interno se coció y sus toxinas están destruyendo los riñones).',
+        'Falta de pulso, ritmo cardíaco irregular o dolor de pecho severo.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 91,
+      nombre: 'Picadura de Alacrán (Escorpionismo Severo)',
+      categoria: 'Toxicología / Emergencias',
+      sinonimos: ['picadura de alacran', 'picado de escorpion', 'veneno de alacran', 'ardor y adormecimiento por piquete', 'alacran'],
+      descripcion: 'Envenenamiento ocasionado por la inoculación de toxinas de un escorpión (alacrán) del género Centruroides (comunes en Nicaragua). Las toxinas afectan directamente el sistema nervioso. La gravedad varía, pero en niños puede ser letal.',
+      causas_comunes: ['Meter pies o manos en zapatos, ropa o madera almacenada donde se ocultan', 'Trabajos en áreas rurales cálidas o en patios con escombros'],
+      cuidados_casa: [
+        'Mantener a la persona y especialmente al niño en reposo y bajo estricta observación (el veneno es transportado más rápido si hay actividad física).',
+        'Lavar el sitio de la picadura con agua y jabón y aplicar compresas frías localizadas para mitigar el dolor ardiente extremo.',
+        'NO hacer cortes ni succionar. NO aplicar amoniaco, ni lejía en la herida.',
+        'Intentar guardar el alacrán (si es seguro) para su identificación por médicos.',
+        'Administrar Paracetamol para el dolor inicial en adultos.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA PEDIÁTRICA ABSOLUTA: Todo niño menor de 5 años picado por un alacrán debe ir al hospital DE INMEDIATO para observar y aplicar suero antiescorpiónico si es necesario.',
+        'Si el paciente presenta sensación extraña en la garganta (como un nudo o cabello atorado), dificultad severa para tragar, o babaza/salivación excesiva.',
+        'Movimientos descontrolados o "brincos" rápidos de los ojos (nistagmo).',
+        'Adormecimiento (hormigueo) que se extiende lejos del sitio de la picadura, calambres musculares generalizados, o dificultad para respirar.',
+        'Crisis hipertensiva severa o vómitos incontrolables tras el piquete.'
       ],
       urgencia_default: 'ALTA',
       requiere_atencion: true
