@@ -74,7 +74,7 @@ export function getAccessibilityLabel(
   language: 'es' | 'en',
   placeholders?: Record<string, string>
 ): string {
-  let text = ACCESSIBILITY_LABELS[type][language] || ACCESSIBILITY_LABELS[type].es;
+  let text: string = ACCESSIBILITY_LABELS[type][language] || ACCESSIBILITY_LABELS[type].es;
   
   if (placeholders) {
     for (const [key, value] of Object.entries(placeholders)) {

@@ -30,6 +30,10 @@ export default function Checkout({ plan, onBack, onComplete }: CheckoutProps) {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const openLegal = () => {
+    window.dispatchEvent(new CustomEvent('changeTab', { detail: 'privacy' }));
+  };
+
   const handlePayment = (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
@@ -235,7 +239,15 @@ export default function Checkout({ plan, onBack, onComplete }: CheckoutProps) {
             </button>
 
             <p className="text-[10px] text-on-surface-variant text-center font-medium leading-relaxed opacity-60">
-              {t('checkout.terms')} <button className="text-primary hover:underline">{t('checkout.terms_link')}</button> {t('checkout.and')} <button className="text-primary hover:underline">{t('checkout.privacy_link')}</button>.
+              {t('checkout.terms')}{' '}
+              <button type="button" onClick={openLegal} className="text-primary hover:underline">
+                {t('checkout.terms_link')}
+              </button>{' '}
+              {t('checkout.and')}{' '}
+              <button type="button" onClick={openLegal} className="text-primary hover:underline">
+                {t('checkout.privacy_link')}
+              </button>
+              .
             </p>
           </div>
 

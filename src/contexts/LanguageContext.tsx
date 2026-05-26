@@ -9,9 +9,7 @@ export type Language = 'es' | 'en';
  * Translations object with full TypeScript support
  * All keys must be in TranslationKey type and exist in both languages
  */
-interface Translations {
-  [key in Language]: Record<TranslationKey, string>;
-}
+export type Translations = Record<Language, Record<TranslationKey, string>>;
 
 const translations: Translations = {
   es: {
@@ -108,8 +106,7 @@ const translations: Translations = {
     'checkout.terms_link': 'Términos de Servicio',
     'checkout.and': ' y ',
     'checkout.privacy_link': 'Política de Privacidad',
-    'checkout.social_proof': 'Únete a más de 12,000 profesionales médicos que optimizan su práctica diaria con Salud Conecta IA.',
-    'reports.download': 'Descargar PDF',
+    'checkout.social_proof': 'Únete a más de 12,000 profesionales médicos que optimizan su práctica diaria con Salud Conecta AI.',
     'profile.preview': 'Vista Previa',
     'profile.confirm': 'Confirmar',
     'profile.cancel': 'Cancelar',
@@ -528,6 +525,43 @@ const translations: Translations = {
     'maps.premium.exclusive_service': 'Servicio Exclusivo',
     'search.hero_title': 'Encuentra atención médica de calidad',
     'search.hero_subtitle': 'Busca hospitales, clínicas, farmacias y laboratorios cerca de ti',
+    'search.search_placeholder': 'Buscar hospitales, clínicas, farmacias o laboratorios...',
+    'search.location_address': 'Dirección',
+    'search.location_placeholder': 'Buscar por ubicación, ciudad, barrio...',
+    'search.cat_public': 'Instituciones MINSA',
+    'search.cat_doctors': 'Médicos',
+    'search.cat_clinics': 'Clínicas',
+    'search.cat_pharmacies': 'Farmacias',
+    'search.cat_labs': 'Laboratorios',
+    'search.results_for': 'Resultados para',
+    'search.featured_results': 'Resultados Destacados',
+    'search.view_all': 'Ver todos',
+    'search.no_results': 'No se encontraron resultados',
+    'search.page': 'Página',
+    'search.of': 'de',
+    'search.prev': 'Anterior',
+    'search.next': 'Siguiente',
+    'search.join_network': 'Únete a la Red',
+    'search.join_desc': 'Regístrate como médico, clínica o institución para aparecer en el mapa y recibir más pacientes.',
+    'search.join_doctor': 'Únete como Médico',
+    'search.join_clinic': 'Únete como Clínica',
+    'search.general_location': 'Ubicación general',
+    'search.map': 'Ver en Mapa',
+    'search.details': 'Ver Detalles',
+    'search.directions': 'Cómo Llegar',
+    'search.book_appointment': 'Agendar Cita',
+    'search.view_profile': 'Ver Perfil',
+    'search.view_slide': 'Ver Diapositiva',
+    'search.minsa_network': 'Red MINSA',
+    'search.premium_clinic': 'Clínica Premium',
+    'search.registered_medical_pro': 'Profesional Médico Registrado',
+    'search.medical_establishment': 'Establecimiento Médico',
+    'search.request_turn': 'Solicitar Turno',
+    'search.save_favorites': 'Guardar Favoritos',
+    'search.recommendations': 'Recomendaciones',
+    'search.about_us': 'Sobre Nosotros',
+    'search.available_services': 'Servicios Disponibles',
+    'search.direct_contact': 'Contacto Directo',
     'maps.premium.stat_vip': 'Centros VIP',
     'maps.premium.stat_near': 'Cercanos (<5km)',
     'maps.premium.stat_rating': 'Alta Valoración',
@@ -761,7 +795,6 @@ const translations: Translations = {
     'checkout.and': ' and ',
     'checkout.privacy_link': 'Privacy Policy',
     'checkout.social_proof': 'Join over 12,000 medical professionals who optimize their daily practice with Salud Conecta AI.',
-    'reports.download': 'Download PDF',
     'profile.preview': 'Preview',
     'profile.confirm': 'Confirm',
     'profile.cancel': 'Cancel',
@@ -1180,6 +1213,43 @@ const translations: Translations = {
     'maps.premium.exclusive_service': 'Exclusive Service',
     'search.hero_title': 'Find quality medical care',
     'search.hero_subtitle': 'Search for hospitals, clinics, pharmacies and labs near you',
+    'search.search_placeholder': 'Search for hospitals, clinics, pharmacies, or labs...',
+    'search.location_address': 'Address',
+    'search.location_placeholder': 'Search by location, city, or neighborhood...',
+    'search.cat_public': 'MINSA Institutions',
+    'search.cat_doctors': 'Doctors',
+    'search.cat_clinics': 'Clinics',
+    'search.cat_pharmacies': 'Pharmacies',
+    'search.cat_labs': 'Labs',
+    'search.results_for': 'Results for',
+    'search.featured_results': 'Featured Results',
+    'search.view_all': 'View all',
+    'search.no_results': 'No results found',
+    'search.page': 'Page',
+    'search.of': 'of',
+    'search.prev': 'Previous',
+    'search.next': 'Next',
+    'search.join_network': 'Join the Network',
+    'search.join_desc': 'Register as a doctor, clinic, or institution to appear on the map and receive more patients.',
+    'search.join_doctor': 'Join as a Doctor',
+    'search.join_clinic': 'Join as a Clinic',
+    'search.general_location': 'General location',
+    'search.map': 'View on Map',
+    'search.details': 'View Details',
+    'search.directions': 'Directions',
+    'search.book_appointment': 'Book Appointment',
+    'search.view_profile': 'View Profile',
+    'search.view_slide': 'View Slide',
+    'search.minsa_network': 'MINSA Network',
+    'search.premium_clinic': 'Premium Clinic',
+    'search.registered_medical_pro': 'Registered Medical Professional',
+    'search.medical_establishment': 'Medical Establishment',
+    'search.request_turn': 'Request Appointment',
+    'search.save_favorites': 'Save Favorites',
+    'search.recommendations': 'Recommendations',
+    'search.about_us': 'About Us',
+    'search.available_services': 'Available Services',
+    'search.direct_contact': 'Direct Contact',
     'maps.premium.stat_vip': 'VIP Centers',
     'maps.premium.stat_near': 'Nearby (<5km)',
     'maps.premium.stat_rating': 'Top Rated',
@@ -1354,7 +1424,7 @@ function translate(
 
   // Fallback: si la key no existe en el idioma actual, intenta español
   if (!text && language !== 'es') {
-    text = translations.es[key];
+    text = translations['es'][key];
     if (!text) {
       i18nLogger.logMissingKey(key, language, true);
     }
@@ -1424,7 +1494,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       lang = 'es';
     }
     setLanguageState(lang);
-    
+
     // Save to localStorage + Firestore
     try {
       await languageSyncService.saveLanguagePreference(lang);

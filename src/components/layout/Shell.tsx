@@ -83,6 +83,8 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
     { id: 'activity', label: t('nav.activity'), icon: Flame },
   ];
 
+  const showLegalLinks = !['map', 'dashboard', 'settings', 'profile', 'triage', 'search', 'premium-health', 'messages'].includes(activeTab);
+
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col font-sans">
       {/* TopAppBar */}
@@ -102,8 +104,8 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => setActiveTab('home')}
         >
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm shrink-0">
-            <Activity className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
+            <img src="/logo.png" alt="Salud Conecta IA Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-sm sm:text-lg font-bold tracking-tight text-primary truncate max-w-[110px] sm:max-w-none">Salud Conecta IA</h1>
         </div>
@@ -194,7 +196,7 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
       </div>
 
       {/* Main Content Area */}
-      <main className={`flex-grow ${activeTab === 'map' ? 'pt-16 pb-20 md:pt-16 md:pb-0' : 'pt-16 pb-20 md:pt-[132px] md:pb-0'} flex flex-col items-center w-full ${activeTab === 'map' ? 'max-w-none' : 'max-w-7xl mx-auto'}`}>
+      <main className={`flex-grow ${activeTab === 'map' ? 'pt-16 pb-20 md:pt-16 md:pb-0' : `pt-16 ${showLegalLinks ? 'pb-32' : 'pb-20'} md:pt-[132px] md:pb-0`} flex flex-col items-center w-full ${activeTab === 'map' ? 'max-w-none' : 'max-w-7xl mx-auto'}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -208,6 +210,32 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Mobile Legal Quick Links */}
+      {showLegalLinks && (
+        <div className="md:hidden fixed bottom-20 left-0 w-full z-40 bg-surface-container-low/95 backdrop-blur-lg border-t border-outline-variant/20 px-3 py-2">
+          <div className="max-w-md mx-auto grid grid-cols-3 gap-2 text-[10px] font-bold text-on-surface-variant">
+            <button
+              onClick={() => setActiveTab('privacy')}
+              className="h-9 rounded-xl bg-surface-container border border-outline-variant/20 hover:text-primary transition-colors"
+            >
+              {t('footer.legal.privacy')}
+            </button>
+            <button
+              onClick={() => setActiveTab('privacy')}
+              className="h-9 rounded-xl bg-surface-container border border-outline-variant/20 hover:text-primary transition-colors"
+            >
+              {t('footer.legal.terms')}
+            </button>
+            <button
+              onClick={() => setActiveTab('accessibility')}
+              className="h-9 rounded-xl bg-surface-container border border-outline-variant/20 hover:text-primary transition-colors"
+            >
+              {t('footer.legal.acc')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* BottomNavBar (Mobile Only) */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 bg-surface-container-high/95 backdrop-blur-lg border-t border-outline-variant/20 shadow-[0_-4px_16px_rgba(0,0,0,0.4)] rounded-t-[32px] pb-2">
@@ -233,13 +261,13 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
         ))}
       </nav>
 
-      {/* Global Footer (Desktop Only) */}
-      {!['map', 'dashboard', 'settings', 'profile', 'triage', 'search', 'premium-health', 'messages'].includes(activeTab) && (
-        <footer className="hidden md:block w-full border-t border-outline-variant/10 py-16 mt-12 bg-surface-container-lowest">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
+      {/* Global Footer */}
+      {showLegalLinks && (
+        <footer className="w-full border-t border-outline-variant/10 pt-10 pb-28 md:py-16 mt-12 bg-surface-container-lowest">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Activity className="w-5 h-5 text-primary" />
+                <img src="/logo.png" alt="Salud Conecta IA Logo" className="w-6 h-6 object-contain" />
                 <span className="text-xl font-bold text-primary">Salud Conecta IA</span>
               </div>
               <p className="text-on-surface-variant text-sm leading-relaxed max-w-sm">
@@ -258,9 +286,30 @@ export default function Shell({ children, activeTab, setActiveTab }: ShellProps)
               <div>
                 <h4 className="font-bold text-sm mb-4 uppercase tracking-widest">{t('footer.legal')}</h4>
                 <ul className="text-sm text-on-surface-variant space-y-2">
-                  <li>{t('footer.legal.privacy')}</li>
-                  <li>{t('footer.legal.terms')}</li>
-                  <li>{t('footer.legal.acc')}</li>
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('privacy')}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {t('footer.legal.privacy')}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('privacy')}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {t('footer.legal.terms')}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => setActiveTab('accessibility')}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {t('footer.legal.acc')}
+                    </button>
+                  </li>
                 </ul>
               </div>
             </div>

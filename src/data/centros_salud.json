@@ -4733,8 +4733,8 @@
     "address": "Km 45 ½ carretera Granada - Masaya, Granada, Granada",
     "phone": "",
     "location": {
-      "lat": 12.1364,
-      "lng": -86.2514
+      "lat": 11.937762090970594,
+      "lng": -85.97684740995767
     },
     "services": [
       "Consulta General"
@@ -4797,20 +4797,6 @@
     "type": "Centro",
     "sector": "GRANADA",
     "address": "De la Ferretería Hermanos Briones 5c. al lago - Final Calle Corrales, Barrio Calle Corrales, Granada, Granada",
-    "phone": "",
-    "location": {
-      "lat": 12.1364,
-      "lng": -86.2514
-    },
-    "services": [
-      "Consulta General"
-    ]
-  },
-  {
-    "name": "Hospital Departamental Amistad Japón",
-    "type": "Clínicas del Manejo Integral del Dolor",
-    "sector": "GRANADA",
-    "address": "Granada, Granada",
     "phone": "",
     "location": {
       "lat": 12.1364,

@@ -6,6 +6,21 @@ import {defineConfig, loadEnv} from 'vite';
 
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
+  const geminiApiKey = [
+    env.VITE_GEMINI_API_KEY,
+    env.GEMINI_API_KEY,
+    env.GOOGLE_API_KEY,
+    env.GEMINI_KEY,
+    env.GOOGLE_AI_KEY
+  ].find(k => k && !['MY_GEMINI_API_KEY', 'YOUR_API_KEY', 'MISSING'].includes(k)) || 'MISSING';
+  const googleMapsKey = [
+    env.VITE_GOOGLE_MAPS_PLATFORM_KEY,
+    env.GOOGLE_MAPS_PLATFORM_KEY,
+    env.GOOGLE_MAP_API_KEY,
+    env.GOOGLE_MAPS_API_KEY,
+    env.MAPS_API_KEY
+  ].find(k => k && !['MY_MAPS_API_KEY', 'YOUR_API_KEY', 'MISSING'].includes(k)) || 'MISSING';
+
   return {
     plugins: [
       react(),
@@ -14,6 +29,9 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate', // SW se actualiza automáticamente sin intervención
         includeAssets: ['icon-192.png', 'icon-512.png'], // Assets estáticos a precachear
+        devOptions: {
+          enabled: true
+        },
 
         // ── Manifest (reemplaza public/manifest.json) ─────────────────────
         manifest: {
@@ -109,14 +127,10 @@ export default defineConfig(({mode}) => {
       }),
     ],
     define: {
-      'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(
-        [env.VITE_GEMINI_API_KEY, env.GEMINI_API_KEY, env.GOOGLE_API_KEY, env.VITE_GEMINI_API_KEY, env.GEMINI_KEY, env.GOOGLE_AI_KEY]
-          .find(k => k && !['MY_GEMINI_API_KEY', 'YOUR_API_KEY', 'MISSING'].includes(k)) || 'MISSING'
-      ),
-      'import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_KEY': JSON.stringify(
-        [env.VITE_GOOGLE_MAPS_PLATFORM_KEY, env.GOOGLE_MAPS_PLATFORM_KEY, env.GOOGLE_MAP_API_KEY, env.GOOGLE_MAPS_API_KEY, env.MAPS_API_KEY]
-          .find(k => k && !['MY_MAPS_API_KEY', 'YOUR_API_KEY', 'MISSING'].includes(k)) || 'MISSING'
-      ),
+      __GEMINI_API_KEY__: JSON.stringify(geminiApiKey),
+      __GOOGLE_MAPS_PLATFORM_KEY__: JSON.stringify(googleMapsKey),
+      'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(geminiApiKey),
+      'import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_KEY': JSON.stringify(googleMapsKey),
     },
     resolve: {
       alias: {
