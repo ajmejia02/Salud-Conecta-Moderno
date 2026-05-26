@@ -4389,12 +4389,40 @@ export function buscarMultiplesMedicamentos(nombre: string) {
 export function obtenerTodosLosMedicamentos() { return MEDICAMENTOS; }
 
 /**
- * buscarSintoma — v6: fuzzy matching + sinónimos.
- * Orden de prioridad:
- * 1. Coincidencia exacta en nombre
- * 2. Coincidencia en algún sinónimo
- * 3. El texto contiene el nombre del síntoma
- * 4. El nombre del síntoma está contenido en el texto
+ * Calcula similitud Levenshtein simplificada (0-1)
+ */
+function calcularSimilitud(a: string, b: string): number {
+  const maxLen = Math.max(a.length, b.length);
+  if (maxLen === 0) return 1;
+  
+  let distancia = 0;
+  const minLen = Math.min(a.length, b.length);
+  
+  for (let i = 0; i < minLen; i++) {
+    if (a[i] !== b[i]) distancia++;
+  }
+  distancia += Math.abs(a.length - b.length);
+  
+  return 1 - (distancia / maxLen);
+}
+
+/**
+ * Extrae palabras clave principales (filtra palabras comunes)
+ */
+function extraerPalabrasClaves(texto: string): string[] {
+  const palabrasComunes = ['tengo','me','siento','me duele','soy','estoy','tengo que','el','la','de','los','las','que','el','y','o','es','está','están','muy','bastante','poco'];
+  const palabras = normalizar(texto)
+    .split(/\s+/)
+    .filter(p => p.length > 2 && !palabrasComunes.includes(p));
+  return palabras;
+}
+
+/**
+ * buscarSintoma — v7: Smart NLP matching con scoring inteligente
+ * Mejoras:
+ * - Tokenización de palabras clave
+ * - Búsqueda por similitud (Levenshtein)
+ * - Priorización de matches (exacto > parcial > palabras clave)
  */
 export function buscarSintoma(texto: string) {
   const results = buscarMultiplesSintomas(texto);
@@ -4402,21 +4430,81 @@ export function buscarSintoma(texto: string) {
 }
 
 /**
- * Busca todos los síntomas que coincidan con el término.
+ * Busca todos los síntomas con scoring inteligente
  */
 export function buscarMultiplesSintomas(texto: string) {
-  const lower = normalizar(texto);
-  if (lower.length < 3) return [];
+  const normalized = normalizar(texto);
+  if (normalized.length < 2) return [];
   
-  return SINTOMAS.filter(s => {
-    const n = normalizar(s.nombre);
-    const inName = n === lower || lower.includes(n) || n.includes(lower);
-    const inSynonyms = s.sinonimos && s.sinonimos.some(sin => {
-      const sn = normalizar(sin);
-      return sn === lower || lower.includes(sn) || sn.includes(lower);
-    });
-    return inName || inSynonyms;
-  });
+  const palabrasClaves = extraerPalabrasClaves(texto);
+  
+  // Calcular score para cada síntoma
+  const scored = SINTOMAS.map(s => {
+    const nombreNorm = normalizar(s.nombre);
+    let score = 0;
+    
+    // 1. Coincidencia exacta en nombre (máxima prioridad)
+    if (nombreNorm === normalized) {
+      score = 100;
+    }
+    // 2. El nombre completo está en el texto (o viceversa)
+    else if (normalized.includes(nombreNorm) || nombreNorm.includes(normalized)) {
+      score = 90;
+    }
+    // 3. Coincidencia en sinónimos exacta
+    else if (s.sinonimos && s.sinonimos.some(sin => normalizar(sin) === normalized)) {
+      score = 85;
+    }
+    // 4. Coincidencia en sinónimos parcial
+    else if (s.sinonimos && s.sinonimos.some(sin => {
+      const sinNorm = normalizar(sin);
+      return normalized.includes(sinNorm) || sinNorm.includes(normalized);
+    })) {
+      score = 80;
+    }
+    // 5. Coincidencia por palabras clave
+    else {
+      let palabrasCoincidentes = 0;
+      
+      // Verificar si las palabras clave coinciden con el nombre
+      palabrasClaves.forEach(palabra => {
+        if (nombreNorm.includes(palabra)) {
+          palabrasCoincidentes++;
+        }
+        // También verificar sinónimos
+        if (s.sinonimos && s.sinonimos.some(sin => normalizar(sin).includes(palabra))) {
+          palabrasCoincidentes++;
+        }
+      });
+      
+      if (palabrasCoincidentes > 0) {
+        score = 50 + (palabrasCoincidentes * 15);
+      }
+      // 6. Similitud de Levenshtein como último recurso
+      else {
+        const similitudNombre = calcularSimilitud(normalized, nombreNorm);
+        if (similitudNombre > 0.6) {
+          score = similitudNombre * 40;
+        }
+        
+        // Verificar similitud con sinónimos
+        if (s.sinonimos) {
+          const maxSimilitudSin = Math.max(...s.sinonimos.map(sin => 
+            calcularSimilitud(normalized, normalizar(sin))
+          ));
+          if (maxSimilitudSin > 0.6) {
+            score = Math.max(score, maxSimilitudSin * 35);
+          }
+        }
+      }
+    }
+    
+    return { sintoma: s, score };
+  })
+  .filter(item => item.score > 0)
+  .sort((a, b) => b.score - a.score);
+  
+  return scored.map(item => item.sintoma);
 }
 
 export function obtenerTodosLosSintomas() { return SINTOMAS; }

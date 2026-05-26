@@ -194,13 +194,15 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
         throw new Error("Gemini returned error state or is not configured.");
       }
     } catch (e) {
-      console.warn("AI Triage failed, falling back to local database:", e);
+      console.warn(`[TRIAGE] AI Triage failed, falling back to local database. Error: ${String(e).substring(0, 100)}`);
       localFallbackUsed = true;
 
-      // Usar búsqueda de síntoma local
+      // Usar búsqueda de síntoma local con nuevo algoritmo mejorado (v7 Smart NLP)
       const matchingSymptom = buscarSintoma(symptoms);
       
       if (matchingSymptom) {
+        console.log(`[TRIAGE] Local match found: "${matchingSymptom.nombre}"`);
+        
         // Encontrar medicamentos locales sugeridos para este síntoma
         const matchingMeds = buscarMultiplesMedicamentos(matchingSymptom.nombre);
         const med = matchingMeds.length > 0 ? matchingMeds[0] : null;
@@ -223,7 +225,7 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
         aiTriage = {
           urgency: matchingSymptom.urgencia_default === 'ALTA' ? 'high' : matchingSymptom.requiere_atencion ? 'emergency' : 'medium',
           recommendation: localRecommendation,
-          reasoning: `Heurística de consulta local activa (Coincidencia: ${matchingSymptom.nombre}).`,
+          reasoning: `Base de datos local (Coincidencia: ${matchingSymptom.nombre})`,
           medication: med ? {
             name: med.nombre_es,
             dosage: med.dosis_adulto || '',
@@ -233,11 +235,17 @@ export async function getEnhancedTriageWithLocation(symptoms: string, membership
           error: false
         };
       } else {
-        // Fallback genérico si no hay coincidencia exacta de síntoma en Granada
+        // Si aún no encuentra nada, intentar búsqueda más flexible
+        console.warn(`[TRIAGE] No local match found for query: "${symptoms}". Falling back to generic recommendation.`);
+        
+        const fallbackRecommendation = membership === 'free'
+          ? '**Consulta Recomendada**: Aunque no podimos identificar exactamente tu síntoma, te recomendamos acudir a una **consulta general** en tu centro de salud MINSA más cercano o farmacia local para una evaluación profesional. Los centros de salud ofrecen atención gratuita.\n\n**¿Cuáles son tus síntomas principales?** Intenta describir con más detalle (ej: "dolor", "inflamación", "fiebre", etc.).'
+          : '**Consulta Especializada**: Te recomendamos contactar con un centro de salud verificado en nuestra red para una evaluación personalizada. Como usuario Premium, tienes acceso prioritario a especialistas.';
+        
         aiTriage = {
           urgency: 'medium',
-          recommendation: 'No hemos podido identificar un síntoma específico en nuestra base de datos local de Granada. Por favor, acuda a consulta general en su centro de salud local de la Red Pública (MINSA) o farmacia más cercana para evaluación profesional.',
-          reasoning: 'Heurística de consulta local (Sin coincidencia específica).',
+          recommendation: fallbackRecommendation,
+          reasoning: 'Base de datos local (búsqueda general - describe tus síntomas con más detalle)',
           error: false
         };
       }
