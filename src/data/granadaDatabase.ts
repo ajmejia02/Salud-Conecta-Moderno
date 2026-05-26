@@ -2,17 +2,17 @@
 ═══════════════════════════════════════════════════════════════
 BASE DE DATOS DE SALUD — Salud-Conecta IA (Granada, Nicaragua)
 ═══════════════════════════════════════════════════════════════
-📌 VERSIÓN: 10.0.0
-📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-05
-📌 CAMBIOS v10.0.0:
+📌 VERSIÓN: 11.0.0
+📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-15
+📌 CAMBIOS v11.0.0:
 - Redacción clínica profesionalizada en recomendaciones de triaje y cuidados preventivos.
 - Expansión de protocolos de primer contacto para mejorar la respuesta de la IA.
-- Añadidos 6 nuevos cuadros (Trauma craneal, Cólico nefrítico, Epistaxis, Quemaduras, Sangrado ginecológico, Conjuntivitis).
+- Añadidos 6 nuevos cuadros clínicos de alta relevancia (Insomnio, Artralgia, Constipación, Urticaria, Pérdida de peso, Sudoración nocturna).
 ═══════════════════════════════════════════════════════════════
 */
 
-export const VERSION_BASE_DATOS = '10.0.0';
-export const ULTIMA_ACTUALIZACION = '2026-12-05';
+export const VERSION_BASE_DATOS = '11.0.0';
+export const ULTIMA_ACTUALIZACION = '2026-12-15';
 
 // ═══════════════════════════════════════════════════════════════
 //  🏥 HOSPITALES
@@ -3494,72 +3494,72 @@ export const SINTOMAS = [
   },
   {
     id: 4,
-    nombre: 'Cansancio',
+    nombre: 'Astenia / Fatiga',
     categoria: 'General',
     sinonimos: ['fatiga','debilidad','agotamiento','me siento cansado','sin energia','extenuado','sin fuerzas'],
-    descripcion: 'El cansancio o fatiga puede ser normal después de esfuerzo, pero si persiste requiere atención.',
-    causas_comunes: ['Falta de sueño','Estrés','Anemia','Mala alimentación','Depresión','Infecciones'],
+    descripcion: 'Sensación subjetiva de falta de energía y agotamiento que no se alivia con el descanso. Puede ser un síntoma de múltiples patologías subyacentes.',
+    causas_comunes: ['Síndrome de fatiga crónica', 'Anemia ferropénica o megaloblástica', 'Hipotiroidismo', 'Trastornos del sueño (apnea)', 'Depresión o ansiedad', 'Infecciones crónicas (ej. mononucleosis)'],
     cuidados_casa: [
-      'Duerme 7-8 horas diarias con horario regular',
-      'Mantén una alimentación balanceada',
-      'Haz ejercicio moderado (caminar 30 min)',
-      'Reduce el estrés con técnicas de relajación',
-      'Mantente bien hidratado'
+      'Priorizar la higiene del sueño: establecer un horario regular, evitar estimulantes y pantallas antes de dormir.',
+      'Asegurar una dieta nutricionalmente densa, rica en hierro, vitamina B12 y folatos.',
+      'Implementar actividad física de bajo impacto de forma gradual (ej. caminatas diarias).',
+      'Técnicas de manejo del estrés como meditación, mindfulness o yoga.',
+      'Mantener una hidratación adecuada a lo largo del día.'
     ],
     cuando_consultar: [
-      'Cansancio que no mejora con descanso',
-      'Dura más de 2 semanas sin causa aparente',
-      'Con pérdida de peso inexplicable',
-      'Con dificultad para respirar o palpitaciones',
-      'Si impide realizar actividades cotidianas'
+      'Fatiga de más de 2-4 semanas de evolución que no mejora con medidas generales.',
+      'Asociada a pérdida de peso no intencionada, fiebre persistente o sudoración nocturna.',
+      'Acompañada de disnea (falta de aire), palpitaciones o dolor torácico.',
+      'Si interfiere significativamente con las actividades de la vida diaria (laborales, sociales).',
+      'Aparición de palidez cutánea, edemas o signos neurológicos.'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
   },
   {
     id: 5,
-    nombre: 'Dolor de garganta',
+    nombre: 'Odinofagia / Faringitis (Dolor de garganta)',
     categoria: 'Respiratorio',
     sinonimos: ['garganta','dolor garganta','me duele la garganta','faringitis','amigdalitis','garganta irritada','rasquera en la garganta'],
-    descripcion: 'El dolor de garganta es común en infecciones respiratorias. Puede ser viral o bacteriano.',
-    causas_comunes: ['Resfriado común','Gripe','Faringitis estreptocócica','Alergias','Aire seco'],
+    descripcion: 'Dolor o irritación en la faringe, a menudo exacerbado por la deglución. Causa principal son infecciones virales, pero se debe descartar faringoamigdalitis bacteriana.',
+    causas_comunes: ['Faringitis viral (resfriado común, influenza)', 'Faringoamigdalitis estreptocócica (bacteriana)', 'Mononucleosis infecciosa', 'Reflujo faringolaríngeo', 'Irritantes ambientales (humo, aire seco)'],
     cuidados_casa: [
-      'Haz gárgaras con agua tibia y media cucharadita de sal',
-      'Toma líquidos tibios (té con miel y limón)',
-      'Usa humidificador si el ambiente es muy seco',
-      'Descansa la voz',
-      'Pastillas para la garganta o miel pura'
+      'Realizar gargarismos con soluciones salinas tibias (1/2 cucharadita de sal en 250 ml de agua).',
+      'Mantener una hidratación adecuada con líquidos tibios (infusiones, caldos).',
+      'Uso de analgésicos/antiinflamatorios sistémicos (Paracetamol, Ibuprofeno).',
+      'Reposo vocal relativo para disminuir la irritación mecánica.',
+      'Evitar la exposición a irritantes como el humo del tabaco.'
     ],
     cuando_consultar: [
-      'Dolor severo que dura más de 5 días',
-      'Dificultad para tragar o respirar',
-      'Fiebre alta (más de 38.5 °C)',
-      'Manchas blancas o pus en la garganta',
-      'Ganglios inflamados en el cuello'
+      'Dolor de garganta de alta intensidad que impide la deglución de saliva o líquidos.',
+      'Presencia de exudado purulento (placas de pus) en amígdalas o fiebre > 38.5°C por más de 48h.',
+      'Asociado a dificultad respiratoria (estridor) o trismo (dificultad para abrir la boca).',
+      'Adenopatías cervicales (ganglios) dolorosas y de gran tamaño.',
+      'Ausencia de mejoría tras 5-7 días de tratamiento sintomático.'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
   },
   {
     id: 6,
-    nombre: 'Tos',
+    nombre: 'Tos (Seca o Productiva)',
     categoria: 'Respiratorio',
     sinonimos: ['tosiendo','tos seca','tos con flema','tos persistente','no puedo dejar de toser','tos fuerte'],
-    descripcion: 'La tos es un reflejo para limpiar las vías respiratorias. Puede ser seca o con flema.',
-    causas_comunes: ['Resfriado','Gripe','Alergias','Asma','Reflujo','COVID-19'],
+    descripcion: 'Reflejo defensivo para despejar las vías respiratorias. Se clasifica en seca (irritativa) o productiva (con expectoración). Su cronicidad y características son claves diagnósticas.',
+    causas_comunes: ['Infecciones virales de vía aérea superior', 'Bronquitis aguda', 'Neumonía', 'Asma / EPOC', 'Reflujo gastroesofágico (ERGE)', 'Efecto adverso de fármacos (IECA)'],
     cuidados_casa: [
-      'Mantente bien hidratado',
-      'Miel pura (adultos y niños mayores de 1 año)',
-      'Evita irritantes: humo, polvo, perfumes',
-      'Usa humidificador o inhala vapor de agua tibia',
-      'Eleva la cabeza al dormir'
+      'Aumentar la ingesta de líquidos para fluidificar secreciones.',
+      'Uso de humidificadores o vaporizadores para humedecer el ambiente.',
+      'Para tos seca irritativa, se pueden usar antitusígenos de venta libre (Dextrometorfano) por periodos cortos.',
+      'Para tos productiva, se pueden usar mucolíticos (Ambroxol) para facilitar la expectoración.',
+      'Miel (en mayores de 1 año) ha demostrado ser efectiva para la tos nocturna.'
     ],
     cuando_consultar: [
-      'Tos que dura más de 3 semanas',
-      'Con sangre o esputo verde/amarillo abundante',
-      'Con dificultad para respirar o silbidos',
-      'Con fiebre alta prolongada',
-      'En niños menores de 3 meses'
+      'Tos de más de 3 semanas de evolución (tos crónica).',
+      'Hemoptisis (expectoración con sangre).',
+      'Asociada a disnea (dificultad para respirar), sibilancias o dolor torácico pleurítico.',
+      'Expectoración purulenta (amarilla/verdosa) persistente con fiebre.',
+      'Tos en "ladrido de perro" en niños (sugestivo de crup).'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
@@ -3611,96 +3611,88 @@ export const SINTOMAS = [
   },
   {
     id: 9,
-    nombre: 'Gripe',
+    nombre: 'Síndrome Gripal / Influenza',
     categoria: 'Respiratorio',
     sinonimos: ['influenza','resfriado','catarro','congestion nasal','rinitis','moqueo','nariz tapada','nariz mocosa','congestionado'],
-    descripcion: 'La gripe es una infección viral del sistema respiratorio. Suele resolverse en 5-7 días con reposo.',
-    causas_comunes: ['Virus influenza A o B','Adenovirus','Rhinovirus (resfriado común)','COVID-19'],
+    descripcion: 'Infección viral aguda del tracto respiratorio, caracterizada por inicio súbito de fiebre, mialgias, cefalea y malestar general, además de síntomas respiratorios.',
+    causas_comunes: ['Virus Influenza tipo A y B', 'Otros virus respiratorios (Parainfluenza, Adenovirus, VRS)'],
     cuidados_casa: [
-      'Reposo en cama los primeros días',
-      'Líquidos abundantes: agua, caldos, jugos naturales',
-      'Paracetamol para fiebre y dolores (ver dosis)',
-      'Lavados nasales con agua salina',
-      'Ambiente húmedo y ventilado'
+      'Reposo relativo y aislamiento para evitar la propagación.',
+      'Hidratación oral intensiva con agua, caldos y soluciones isotónicas.',
+      'Tratamiento sintomático con antipiréticos/analgésicos (Paracetamol, Ibuprofeno).',
+      'Vigilancia de signos de alarma, especialmente en poblaciones de riesgo.'
     ],
     cuando_consultar: [
-      'Fiebre mayor a 39 °C que no baja con paracetamol',
-      'Dificultad para respirar o dolor en el pecho',
-      'Síntomas que duran más de 7-10 días o empeoran',
-      'En adultos mayores de 65 años, embarazadas o con enfermedades crónicas',
-      'En niños muy pequeños con dificultad para respirar'
+      'Disnea (dificultad para respirar) o taquipnea (respiración rápida).',
+      'Dolor torácico persistente o sensación de opresión.',
+      'Confusión mental, mareo severo o letargia.',
+      'Fiebre alta (>39°C) que no responde a antipiréticos o persiste más de 3-4 días.',
+      'En grupos de alto riesgo: embarazadas, ancianos, niños pequeños, inmunocomprometidos, pacientes con comorbilidades (cardíacas, pulmonares).'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
   },
   {
     id: 10,
-    nombre: 'Alergia',
+    nombre: 'Reacción Alérgica Sistémica',
     categoria: 'Inmunológico',
     sinonimos: ['alergias','reaccion alergica','urticaria','picazon','ronchas','sarpullido','estornudos','ojos llorosos','ojos rojos'],
-    descripcion: 'Las alergias son reacciones del sistema inmune a sustancias normalmente inofensivas (alérgenos).',
-    causas_comunes: ['Polen','Polvo y ácaros','Pelo de animales','Alimentos (mariscos, maní)','Medicamentos','Picaduras de insectos'],
+    descripcion: 'Respuesta inmunitaria exagerada a un alérgeno, que puede manifestarse con síntomas cutáneos (urticaria), respiratorios (rinitis, asma) o sistémicos (anafilaxia).',
+    causas_comunes: ['Alimentos (frutos secos, mariscos)', 'Medicamentos (penicilinas, AINEs)', 'Picaduras de himenópteros (abejas, avispas)', 'Látex', 'Aeroalérgenos (polen, ácaros)'],
     cuidados_casa: [
-      'Identifica y evita el alérgeno desencadenante',
-      'Antihistamínico oral (loratadina) sin receta para síntomas leves',
-      'Compresas frías en zonas de picazón',
-      'Mantén ventanas cerradas en temporada de polen',
-      'Lávate las manos y cambia de ropa al llegar a casa'
+      'Identificación y evitación estricta del alérgeno sospechoso.',
+      'Para reacciones cutáneas leves (urticaria localizada), administrar antihistamínicos orales no sedantes (Loratadina, Cetirizina).',
+      'Aplicación de compresas frías en áreas de prurito intenso.'
     ],
     cuando_consultar: [
-      'Dificultad para respirar o hinchazón de garganta',
-      'Reacción alérgica severa (anafilaxia): mareo, dificultad para tragar',
-      'Urticaria que no mejora con antihistamínico en 24 horas',
-      'Reacción a medicamento recetado',
-      'Primera vez que te ocurre sin causa conocida'
+      'EMERGENCIA (Anafilaxia): Dificultad respiratoria, sibilancias, hinchazón de lengua o garganta, mareo severo o pérdida de conciencia.',
+      'Urticaria generalizada que se extiende rápidamente por todo el cuerpo.',
+      'Asociado a vómitos, diarrea o dolor abdominal intenso.',
+      'Si la reacción ocurre tras la administración de un nuevo medicamento.'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
   },
   {
     id: 11,
-    nombre: 'Dolor de espalda',
+    nombre: 'Lumbalgia / Dolor de Espalda',
     categoria: 'Dolor',
     sinonimos: ['dolor espalda','lumbalgia','dolor lumbar','me duele la espalda','espalda baja','dolor de cintura','rigidez espalda'],
-    descripcion: 'El dolor de espalda es muy común. La mayoría de los casos son musculares y mejoran con reposo y movimiento moderado.',
-    causas_comunes: ['Malas posturas','Esfuerzo excesivo','Sedentarismo','Sobrepeso','Estrés muscular'],
+    descripcion: 'Dolor localizado en la región lumbar, de origen musculoesquelético en la mayoría de los casos (lumbalgia mecánica). Es crucial descartar "banderas rojas" que sugieran patología grave.',
+    causas_comunes: ['Distensión muscular o esguince ligamentoso', 'Enfermedad discal degenerativa', 'Hernia de disco', 'Estenosis espinal', 'Malas posturas o sobreesfuerzo'],
     cuidados_casa: [
-      'Aplica calor en la zona dolorosa por 15-20 minutos',
-      'Evita reposo absoluto; camina suavemente',
-      'Duerme de lado con almohada entre las rodillas',
-      'Evita cargar peso hasta que mejore',
-      'Ibuprofeno o paracetamol para el dolor (ver dosis)'
+      'Evitar el reposo absoluto. Mantenerse activo dentro de los límites del dolor.',
+      'Aplicación de termoterapia (calor local) para relajar la musculatura.',
+      'Analgésicos/AINEs (Ibuprofeno, Naproxeno) por un ciclo corto (3-5 días), siempre con comida.',
+      'Ejercicios de estiramiento suave para la zona lumbar y los isquiotibiales.'
     ],
     cuando_consultar: [
-      'Dolor que irradia hacia la pierna (ciática)',
-      'Debilidad o entumecimiento en piernas',
-      'Dificultad para orinar o controlar esfínteres',
-      'Dolor que empeora de noche o en reposo',
-      'Después de un golpe o caída'
+      'Dolor irradiado por debajo de la rodilla, especialmente si se asocia a debilidad o pérdida de sensibilidad en la pierna (ciática compresiva).',
+      'Disfunción de esfínteres (incontinencia urinaria o fecal) o "anestesia en silla de montar" (EMERGENCIA: Síndrome de cauda equina).',
+      'Dolor que no mejora con reposo o empeora por la noche.',
+      'Asociado a fiebre, pérdida de peso inexplicable o antecedentes de cáncer.',
+      'Tras un traumatismo significativo (caída, accidente).'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
   },
   {
     id: 12,
-    nombre: 'Mareo',
+    nombre: 'Mareo / Vértigo',
     categoria: 'Neurológico',
     sinonimos: ['vertigo','me siento mareado','sensacion de giro','inestabilidad','perdida de equilibrio','cabeza que da vueltas'],
-    descripcion: 'El mareo puede ser una sensación de inestabilidad o de que todo gira. Puede tener causas benignas o más serias.',
-    causas_comunes: ['Deshidratación','Bajada de presión arterial al pararse','Laberintitis','Anemia','Problemas del oído interno'],
+    descripcion: 'Término inespecífico que puede describir presíncope (sensación de desmayo), desequilibrio, o vértigo (ilusión de movimiento rotatorio). La caracterización del síntoma es fundamental.',
+    causas_comunes: ['Vértigo posicional paroxístico benigno (VPPB)', 'Hipotensión ortostática', 'Laberintitis / Neuronitis vestibular', 'Enfermedad de Ménière', 'Causas centrales (ACV, migraña vestibular)'],
     cuidados_casa: [
-      'Siéntate o acuéstate lentamente para evitar caídas',
-      'Toma agua o suero oral si sospechas deshidratación',
-      'Levántate lentamente de la cama o silla',
-      'Evita movimientos bruscos de cabeza',
-      'Descansa en un lugar fresco y tranquilo'
+      'Durante un episodio agudo, acostarse en una superficie firme y evitar movimientos bruscos de la cabeza.',
+      'Mantener una buena hidratación y evitar cambios posturales rápidos (levantarse lentamente).',
+      'Evitar la conducción de vehículos o el manejo de maquinaria pesada.'
     ],
     cuando_consultar: [
-      'Mareo súbito muy severo sin causa aparente',
-      'Con dolor de cabeza intenso, visión doble o dificultad para hablar',
-      'Con pérdida del conocimiento o casi-desmayo',
-      'Si dura más de 48 horas',
-      'En personas mayores o con hipertensión'
+      'Vértigo de inicio súbito y severo, especialmente si se acompaña de cefalea intensa, visión doble, dificultad para hablar o debilidad en una extremidad (signos de ACV).',
+      'Asociado a dolor torácico, palpitaciones o pérdida de conciencia (síncope).',
+      'Si se acompaña de hipoacusia (pérdida de audición) o acúfenos (zumbidos) de inicio súbito.',
+      'Si el mareo es persistente y limita las actividades diarias.'
     ],
     urgencia_default: 'MEDIA',
     requiere_atencion: false
@@ -4107,6 +4099,138 @@ export const SINTOMAS = [
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
+  },
+  {
+    id: 31,
+    nombre: 'Insomnio',
+    categoria: 'Salud Mental / Neurológico',
+    sinonimos: ['no puedo dormir', 'dificultad para dormir', 'despertarse en la noche', 'sueño no reparador', 'problemas de sueño'],
+    descripcion: 'Dificultad persistente para iniciar el sueño, mantenerlo, o la sensación de que el sueño no es reparador, resultando en un deterioro del funcionamiento diurno.',
+    causas_comunes: ['Mala higiene del sueño', 'Estrés, ansiedad o depresión', 'Dolor crónico', 'Consumo de estimulantes (cafeína, nicotina)', 'Trastornos médicos (apnea del sueño, síndrome de piernas inquietas)'],
+    cuidados_casa: [
+      'Establecer una rutina de sueño regular, acostándose y levantándose a la misma hora todos los días, incluso fines de semana.',
+      'Optimizar el ambiente del dormitorio: oscuro, silencioso y fresco.',
+      'Evitar cafeína, alcohol y comidas pesadas al menos 4-6 horas antes de acostarse.',
+      'Limitar el uso de pantallas (teléfonos, tabletas, TV) al menos una hora antes de dormir.',
+      'Realizar actividades relajantes antes de dormir, como leer un libro, meditar o tomar un baño tibio.'
+    ],
+    cuando_consultar: [
+      'El insomnio dura más de 3-4 semanas y afecta significativamente su calidad de vida, trabajo o seguridad.',
+      'Se acompaña de síntomas de depresión o ansiedad severa.',
+      'Su pareja reporta que usted ronca fuertemente, deja de respirar o se mueve mucho durante la noche (sospecha de apnea del sueño).',
+      'Si depende de alcohol o medicamentos no recetados para poder dormir.'
+    ],
+    urgencia_default: 'BAJA',
+    requiere_atencion: false
+  },
+  {
+    id: 32,
+    nombre: 'Dolor Articular / Artralgia',
+    categoria: 'Musculoesquelético / Reumatología',
+    sinonimos: ['dolor de articulaciones', 'me duelen las coyunturas', 'artritis', 'dolor en rodillas', 'dolor en manos', 'artralgia'],
+    descripcion: 'Dolor localizado en una o más articulaciones. Puede ser inflamatorio (con hinchazón, calor y enrojecimiento) o no inflamatorio. Su patrón es clave para el diagnóstico.',
+    causas_comunes: ['Osteoartritis (desgaste)', 'Artritis reumatoide (autoinmune)', 'Gota (depósito de cristales)', 'Lesiones traumáticas (esguinces)', 'Infecciones virales (Chikungunya, Dengue)'],
+    cuidados_casa: [
+      'Reposo relativo de la articulación afectada durante las fases agudas.',
+      'Aplicación de frío (crioterapia) en las primeras 48h de una lesión aguda para reducir la inflamación.',
+      'Aplicación de calor (termoterapia) para dolores crónicos musculares o rigidez.',
+      'Uso de analgésicos/AINEs de venta libre (Paracetamol, Ibuprofeno) por ciclos cortos.'
+    ],
+    cuando_consultar: [
+      'Dolor articular asociado a hinchazón, enrojecimiento y calor intenso en la articulación (signos de artritis séptica o gota).',
+      'Dolor que se acompaña de fiebre, malestar general o erupción cutánea.',
+      'Incapacidad para mover la articulación o soportar peso sobre ella.',
+      'Rigidez matutina que dura más de 30 minutos (sugestivo de artritis inflamatoria).',
+      'Dolor que afecta múltiples articulaciones de forma simétrica (ej. ambas manos).'
+    ],
+    urgencia_default: 'MEDIA',
+    requiere_atencion: false
+  },
+  {
+    id: 33,
+    nombre: 'Estreñimiento / Constipación',
+    categoria: 'Digestivo',
+    sinonimos: ['no puedo evacuar', 'estreñido', 'constipacion', 'dificultad para defecar', 'heces duras', 'no voy al baño'],
+    descripcion: 'Disminución en la frecuencia de las deposiciones (típicamente < 3 por semana) o dificultad para evacuar, con heces duras y esfuerzo excesivo.',
+    causas_comunes: ['Baja ingesta de fibra y líquidos', 'Sedentarismo', 'Efecto secundario de medicamentos (opioides, antidepresivos)', 'Hipotiroidismo', 'Síndrome de Intestino Irritable (SII-C)'],
+    cuidados_casa: [
+      'Aumentar gradualmente la ingesta de fibra dietética (frutas, verduras, legumbres, cereales integrales) hasta 25-30 gramos/día.',
+      'Asegurar una ingesta hídrica adecuada (al menos 2 litros de agua al día).',
+      'Realizar actividad física regular para estimular la motilidad intestinal.',
+      'Establecer un hábito defecatorio, intentando ir al baño a la misma hora cada día.'
+    ],
+    cuando_consultar: [
+      'Estreñimiento de inicio reciente y persistente, especialmente en mayores de 50 años.',
+      'Asociado a sangrado rectal, heces negras (melena) o pérdida de peso inexplicable.',
+      'Acompañado de dolor abdominal severo y distensión.',
+      'Si no hay mejoría tras 2-3 semanas de cambios en la dieta y estilo de vida.',
+      'Alternancia de estreñimiento con episodios de diarrea.'
+    ],
+    urgencia_default: 'BAJA',
+    requiere_atencion: false
+  },
+  {
+    id: 34,
+    nombre: 'Urticaria / Ronchas',
+    categoria: 'Dermatología / Alergias',
+    sinonimos: ['ronchas', 'habones', 'picazon intensa', 'brote en la piel', 'alergia cutanea'],
+    descripcion: 'Aparición de habones (ronchas) eritematosos, edematosos y pruriginosos en la piel. Las lesiones son evanescentes, es decir, aparecen y desaparecen en menos de 24 horas.',
+    causas_comunes: ['Reacción alérgica a alimentos o medicamentos', 'Infecciones virales', 'Estrés', 'Urticaria física (por frío, presión, sol)', 'Urticaria crónica idiopática'],
+    cuidados_casa: [
+      'Administración de antihistamínicos orales no sedantes (Loratadina, Cetirizina, Fexofenadina).',
+      'Aplicación de compresas frías o loción de calamina para aliviar el prurito.',
+      'Evitar rascarse para no provocar lesiones secundarias.',
+      'Evitar factores desencadenantes conocidos (calor, alcohol, AINEs).'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Si la urticaria se acompaña de angioedema (hinchazón de labios, párpados, lengua) o dificultad para respirar (anafilaxia).',
+      'Si las lesiones individuales persisten en el mismo lugar por más de 24 horas (sospecha de vasculitis urticarial).',
+      'Si se asocia a fiebre, dolor articular o malestar general.',
+      'Si la urticaria es recurrente o dura más de 6 semanas (urticaria crónica).'
+    ],
+    urgencia_default: 'MEDIA',
+    requiere_atencion: false
+  },
+  {
+    id: 35,
+    nombre: 'Pérdida de Peso Inexplicable',
+    categoria: 'General / Endocrinología / Oncología',
+    sinonimos: ['adelgazar sin querer', 'perder peso sin dieta', 'bajar de peso rapido', 'estoy muy flaco'],
+    descripcion: 'Pérdida de peso no intencionada, clínicamente significativa (generalmente >5% del peso corporal en 6-12 meses), que no puede ser explicada por cambios en la dieta o actividad física.',
+    causas_comunes: ['Neoplasias (cáncer)', 'Hipertiroidismo', 'Diabetes mellitus no controlada', 'Enfermedades malabsortivas (celiaquía)', 'Infecciones crónicas (VIH, tuberculosis)', 'Depresión severa'],
+    cuidados_casa: [
+      'Llevar un registro detallado de la ingesta de alimentos y del peso corporal semanalmente.',
+      'Asegurar una ingesta calórica y proteica adecuada.',
+      'No iniciar suplementos sin una evaluación médica previa.'
+    ],
+    cuando_consultar: [
+      'TODA pérdida de peso inexplicable y significativa requiere una evaluación médica completa para descartar patologías graves.',
+      'Si se acompaña de otros síntomas de alarma como fatiga extrema, sudoración nocturna, fiebre, cambios en el hábito intestinal o sangrados.',
+      'Si hay presencia de masas o ganglios palpables.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 36,
+    nombre: 'Sudoración Nocturna (Diaforesis)',
+    categoria: 'General / Infeccioso / Oncología',
+    sinonimos: ['sudar de noche', 'diaforesis nocturna', 'pijama mojada', 'sudores frios de noche'],
+    descripcion: 'Episodios recurrentes de sudoración excesiva durante el sueño, tan intensos que pueden empapar la ropa de cama y requerir un cambio. Es un síntoma constitucional importante.',
+    causas_comunes: ['Linfoma u otras neoplasias', 'Tuberculosis', 'Infección por VIH', 'Menopausia', 'Hipertiroidismo', 'Efecto secundario de medicamentos (antidepresivos)'],
+    cuidados_casa: [
+      'Mantener el dormitorio fresco y bien ventilado.',
+      'Usar ropa de cama y pijamas de materiales transpirables como el algodón.',
+      'Evitar el consumo de alcohol, cafeína y comidas picantes antes de acostarse.'
+    ],
+    cuando_consultar: [
+      'TODA sudoración nocturna persistente y sin causa obvia (como un ambiente caluroso) debe ser evaluada por un médico.',
+      'Si se acompaña de fiebre, pérdida de peso inexplicable o fatiga persistente (Síntomas B).',
+      'Si hay presencia de ganglios linfáticos inflamados (adenopatías).',
+      'Si es de inicio reciente y no está relacionada con la menopausia.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
   }
 ];
 
