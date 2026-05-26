@@ -353,50 +353,6 @@ export default function TriageChecker() {
 
       <div className="max-w-[1300px] mx-auto w-full flex-1 flex flex-col p-4 md:p-6 lg:p-8 relative">
         
-        {/* Header Block */}
-        <div className="bg-surface-container/80 backdrop-blur-md border border-outline-variant/30 rounded-[24px] p-4 mb-6 flex items-center justify-between shadow-sm shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-              <Activity className="w-5 h-5 animate-pulse" />
-            </div>
-            <div>
-              <span className="font-display font-black text-on-surface flex items-center gap-1.5">
-                {t('triage.title')}
-                {/* ===== FASE 5: Offline Badge ===== */}
-                {!offlineState.isOnline && (
-                  <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 border border-amber-500/30 text-amber-600 rounded-lg">
-                    <WifiOff className="w-3 h-3" />
-                    OFFLINE
-                  </span>
-                )}
-                {offlineState.isRateLimited && (
-                  <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 text-[10px] font-bold bg-error/20 border border-error/30 text-error rounded-lg animate-pulse">
-                    <Zap className="w-3 h-3" />
-                    RATE LIMITED
-                  </span>
-                )}
-                {offlineState.pendingSync > 0 && (
-                  <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 text-[10px] font-bold bg-secondary/20 border border-secondary/30 text-secondary rounded-lg">
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                    SYNCING ({offlineState.pendingSync})
-                  </span>
-                )}
-              </span>
-              <p className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">
-                {t('triage.subtitle')} ({membership.toUpperCase()})
-              </p>
-            </div>
-          </div>
-          {triageResult && (
-            <button 
-              onClick={handleReset}
-              className="w-8 h-8 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
-              title={t('triage.reset_btn')}
-            >
-              <RotateCcw className="w-4 h-4"/>
-            </button>
-          )}
-        </div>
 
         {/* Core Layout Grid */}
         <div className="flex-1 flex flex-col lg:flex-row gap-6 relative overflow-hidden min-h-0">
