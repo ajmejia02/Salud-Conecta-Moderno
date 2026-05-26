@@ -38,7 +38,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { auth } from '../../lib/firebase';
-import { onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
+import { onAuthStateChanged, User as FirebaseUser, signOut, updateProfile } from 'firebase/auth';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { BiometricModal } from './BiometricModal';
 import DocumentScanner from '../history/DocumentScanner';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -323,11 +324,17 @@ export function Profile() {
           console.log('[Profile] Patient created in FHIR Store');
         }
 
+          // Actualizamos el perfil oficial de Firebase Auth
+          await updateProfile(user, {
+            displayName: profile.name,
+            photoURL: finalPhotoURL
+          });
+
         // Update local user object
         const updatedUserObj = {
           ...user,
           displayName: profile.name,
-          photoURL: profile.photoURL
+            photoURL: finalPhotoURL
         };
         localStorage.setItem('user', JSON.stringify(updatedUserObj));
         window.dispatchEvent(new Event('storage'));
