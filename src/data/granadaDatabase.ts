@@ -5066,7 +5066,6 @@ export const SINTOMAS = [
       requiere_atencion: true
     }
   ];
-];
 
 // ═══════════════════════════════════════════════════════════════
 //  🚑 EMERGENCIAS
