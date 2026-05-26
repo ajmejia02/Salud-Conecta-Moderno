@@ -223,20 +223,91 @@ export function Profile() {
     }
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile({ ...profile, photoURL: reader.result as string });
-        setIsPreviewMode(true);
-        setToastMessage(t('profile.photo_uploaded'));
+    if (!file || !user) return;
+
+    // Mostrar preview inmediatamente
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Data = reader.result as string;
+      setProfile({ ...profile, photoURL: base64Data });
+      setIsPreviewMode(true);
+      setToastMessage(t('profile.uploading_photo'));
+      setToastType('success');
+      setShowToast(true);
+
+      try {
+        // Subir a Firebase Storage inmediatamente
+        const storage = getStorage();
+        const timestamp = Date.now();
+        const storageRef = ref(storage, `profiles/${user.uid}/avatar_${timestamp}.jpg`);
+        
+        // Subir el archivo original (no base64)
+        await uploadString(storageRef, base64Data, 'data_url');
+        
+        // Obtener URL descargable
+        const downloadURL = await getDownloadURL(storageRef);
+
+        // Actualizar perfil con URL permanente
+        const updatedProfile = { ...profile, photoURL: downloadURL };
+        setProfile(updatedProfile);
+
+        // Guardar en localStorage inmediatamente
+        const profileData = {
+          ...updatedProfile,
+          name: profile.name,
+          phone: profile.phone,
+          email: profile.email,
+          address: profile.address,
+          bloodType: profile.bloodType,
+          allergies: profile.allergies,
+          dob: profile.dob
+        };
+        localStorage.setItem('userProfile', JSON.stringify(profileData));
+
+        // Actualizar Firebase Auth
+        try {
+          await updateProfile(user, {
+            displayName: profile.name,
+            photoURL: downloadURL
+          });
+        } catch (authError) {
+          console.warn('[Profile] Advertencia al actualizar Firebase Auth:', authError);
+        }
+
+        // Actualizar objeto usuario en localStorage
+        const updatedUserObj = {
+          ...user,
+          displayName: profile.name,
+          photoURL: downloadURL
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUserObj));
+        window.dispatchEvent(new Event('storage'));
+
+        setToastMessage(t('profile.photo_saved_permanently'));
         setToastType('success');
         setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
-      };
-      reader.readAsDataURL(file);
-    }
+        setTimeout(() => {
+          setShowToast(false);
+          setIsPreviewMode(false);
+        }, 2000);
+
+      } catch (uploadError) {
+        console.error('[Profile] Error al subir foto a Storage:', uploadError);
+        setToastMessage('Error al guardar la foto. Intenta de nuevo.');
+        setToastType('error');
+        setShowToast(true);
+        // Revertir a foto anterior si falla
+        const savedProfile = localStorage.getItem('userProfile');
+        if (savedProfile) {
+          const parsed = JSON.parse(savedProfile);
+          setProfile({ ...profile, photoURL: parsed.photoURL || user?.photoURL || DEFAULT_PHOTO });
+        }
+        setIsPreviewMode(false);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const [emergencyContacts, setEmergencyContacts] = useState([
@@ -295,11 +366,12 @@ export function Profile() {
     try {
       let finalPhotoURL = profile.photoURL;
 
-      // Si la foto está en base64 (recién seleccionada localmente), la subimos a Firebase Storage
+      // Si la foto está en base64 (caso inesperado, ya debería estar subida), subirla
       if (user && finalPhotoURL.startsWith('data:')) {
         try {
           const storage = getStorage();
-          const storageRef = ref(storage, `profiles/${user.uid}/avatar.jpg`);
+          const timestamp = Date.now();
+          const storageRef = ref(storage, `profiles/${user.uid}/avatar_${timestamp}.jpg`);
           await uploadString(storageRef, finalPhotoURL, 'data_url');
           finalPhotoURL = await getDownloadURL(storageRef);
         } catch (uploadError) {
@@ -318,61 +390,58 @@ export function Profile() {
         photoURL: finalPhotoURL
       };
 
-      // 1. Local Storage fallback
+      // 1. Guardar en localStorage
       localStorage.setItem('userProfile', JSON.stringify(profileData));
-      // Actualizar estado de React INMEDIATAMENTE para anclar la foto a la UI
       setProfile(profileData);
 
       if (user) {
-        // 2. Sync with FHIR Store
-        const names = profile.name.split(' ');
-        const fhirData = {
-          firstName: names[0] || 'Unknown',
-          lastName: names.slice(1).join(' ') || 'Unknown',
-          birthDate: profile.dob || '1990-01-01',
-          gender: 'unknown' as const,
-          identifier: user.uid, // Use Firebase UID to link
-          phone: profile.phone,
-          email: profile.email,
-          address: profile.address,
-        };
-
-        const existing = await healthcareApi.searchByIdentifier(user.uid);
-        if (existing) {
-          await healthcareApi.updatePatient(existing.id, fhirData);
-          console.log('[Profile] Patient updated in FHIR Store');
-        } else {
-          await healthcareApi.createPatient(fhirData);
-          console.log('[Profile] Patient created in FHIR Store');
+        // 2. Actualizar Firebase Auth con la foto
+        try {
+          await updateProfile(user, {
+            displayName: profile.name,
+            photoURL: finalPhotoURL
+          });
+        } catch (authError) {
+          console.warn('[Profile] Advertencia al actualizar Firebase Auth:', authError);
         }
 
-          // Actualizamos el perfil oficial de Firebase Auth.
-          // Evitamos enviar base64 gigante a Auth porque produce un error de Payload Too Large.
-          try {
-            if (!finalPhotoURL.startsWith('data:')) {
-              await updateProfile(user, {
-                displayName: profile.name,
-                photoURL: finalPhotoURL
-              });
-            } else {
-              await updateProfile(user, { displayName: profile.name });
-            }
-          } catch (authError) {
-            console.warn('[Profile] Advertencia al actualizar Firebase Auth:', authError);
-          }
+        // 3. Sincronizar con FHIR Store
+        try {
+          const names = profile.name.split(' ');
+          const fhirData = {
+            firstName: names[0] || 'Unknown',
+            lastName: names.slice(1).join(' ') || 'Unknown',
+            birthDate: profile.dob || '1990-01-01',
+            gender: 'unknown' as const,
+            identifier: user.uid,
+            phone: profile.phone,
+            email: profile.email,
+            address: profile.address,
+          };
 
-        // Update local user object
+          const existing = await healthcareApi.searchByIdentifier(user.uid);
+          if (existing) {
+            await healthcareApi.updatePatient(existing.id, fhirData);
+            console.log('[Profile] Patient updated in FHIR Store');
+          } else {
+            await healthcareApi.createPatient(fhirData);
+            console.log('[Profile] Patient created in FHIR Store');
+          }
+        } catch (fhirError) {
+          console.error('[Profile] Error al sincronizar con FHIR:', fhirError);
+        }
+
+        // Actualizar objeto usuario en localStorage
         const updatedUserObj = {
           ...user,
           displayName: profile.name,
-            photoURL: finalPhotoURL
+          photoURL: finalPhotoURL
         };
         localStorage.setItem('user', JSON.stringify(updatedUserObj));
         window.dispatchEvent(new Event('storage'));
       }
 
-      // ✅ COMPROBACIÓN AUTOMÁTICA DE RETO:
-      // Al guardar el perfil exitosamente, se completa el reto sin intervención del usuario.
+      // ✅ Completar reto al guardar perfil exitosamente
       const challengeResult = PointsService.completeChallenge('profile-update');
       if (challengeResult && challengeResult.success) {
         toastManager.success('¡Reto automático completado: Perfil actualizado!');
@@ -469,7 +538,15 @@ export function Profile() {
               className="mt-6 flex items-center gap-2"
             >
               <button
-                onClick={handleSave}
+                onClick={async () => {
+                  // La foto ya está subida a Firebase Storage
+                  // Solo necesitamos confirmar y cerrar el preview
+                  setIsPreviewMode(false);
+                  setToastMessage(t('profile.photo_confirmed'));
+                  setToastType('success');
+                  setShowToast(true);
+                  setTimeout(() => setShowToast(false), 2000);
+                }}
                 disabled={isSaving}
                 className="bg-primary-container text-on-primary-container px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg hover:bg-primary transition-all active:scale-95 disabled:opacity-50"
               >
@@ -477,9 +554,20 @@ export function Profile() {
                 {t('profile.confirm')}
               </button>
               <button
-                onClick={() => {
+                onClick={async () => {
+                  // Revertir a la foto anterior
+                  const savedProfile = localStorage.getItem('userProfile');
+                  if (savedProfile) {
+                    const parsed = JSON.parse(savedProfile);
+                    setProfile({ ...profile, photoURL: parsed.photoURL || user?.photoURL || DEFAULT_PHOTO });
+                  } else {
+                    setProfile({ ...profile, photoURL: user?.photoURL || DEFAULT_PHOTO });
+                  }
                   setIsPreviewMode(false);
-                  setProfile({ ...profile, photoURL: user?.photoURL || DEFAULT_PHOTO });
+                  setToastMessage(t('profile.photo_cancelled'));
+                  setToastType('success');
+                  setShowToast(true);
+                  setTimeout(() => setShowToast(false), 2000);
                 }}
                 className="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-error-container hover:text-on-error-container transition-all"
               >
