@@ -43,6 +43,8 @@ import { BiometricModal } from './BiometricModal';
 import DocumentScanner from '../history/DocumentScanner';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { healthcareApi } from '../../services/healthcareApi';
+import { PointsService } from '../../lib/pointsService';
+import { toastManager } from '../../lib/toastService';
 
 const DEFAULT_PHOTO = "https://lh3.googleusercontent.com/aida-public/AB6AXuCNjxM_kx1krlJpGAVOh-nfFDhGn7s-29GpIE4wJWRsqYWpCfOS2KwA0mDjXP283OFfd0LtGx5JPWVrYMEB1cg1irom_1Hm34eluol-cmYe4YG_wnOcjQSvXjDOPm-gtH24rSMm6i0J8uh2fP2_ixZm9Bq0yqMp4aTljcnyLHm8NYc7BeN6mABRDrlnCT35AHv-EBa3m15B2F8AG3IKN-eRA6aH-P_gNEBQ7te36sc60HjVj0KVBPIT4WPJljYhbiXnLMmBo9Tw9A";
 
@@ -329,6 +331,13 @@ export function Profile() {
         };
         localStorage.setItem('user', JSON.stringify(updatedUserObj));
         window.dispatchEvent(new Event('storage'));
+      }
+
+      // ✅ COMPROBACIÓN AUTOMÁTICA DE RETO:
+      // Al guardar el perfil exitosamente, se completa el reto sin intervención del usuario.
+      const challengeResult = PointsService.completeChallenge('profile-update');
+      if (challengeResult && challengeResult.success) {
+        toastManager.success('¡Reto automático completado: Perfil actualizado!');
       }
 
       setIsPreviewMode(false);
