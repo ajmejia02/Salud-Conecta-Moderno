@@ -69,7 +69,6 @@ export default function PointsConfig() {
 
   const goBack = () => {
     window.dispatchEvent(new CustomEvent('changeTab', { detail: 'settings' }));
-    window.dispatchEvent(new CustomEvent('goBack'));
   };
 
   const handleSave = () => {

@@ -81,7 +81,7 @@ export default function PremiumBenefits({ onDowngrade }: PremiumBenefitsProps = 
       <section className="flex flex-col gap-4 relative">
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => window.dispatchEvent(new CustomEvent('goBack'))}
+            onClick={() => window.dispatchEvent(new CustomEvent('changeTab', { detail: 'home' }))}
             className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
           >
             <ArrowLeft className="w-6 h-6" />
