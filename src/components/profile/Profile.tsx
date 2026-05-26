@@ -1153,12 +1153,6 @@ export function Profile() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <BiometricModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={handleValidationSuccess}
-      />
     </div>
   );
 }
