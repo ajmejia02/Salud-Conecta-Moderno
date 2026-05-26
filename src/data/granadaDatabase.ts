@@ -2,17 +2,17 @@
 ═══════════════════════════════════════════════════════════════
 BASE DE DATOS DE SALUD — Salud-Conecta IA (Granada, Nicaragua)
 ═══════════════════════════════════════════════════════════════
-📌 VERSIÓN: 9.0.0
-📌 ÚLTIMA ACTUALIZACIÓN: 2026-11-10
-📌 CAMBIOS v9.0.0:
-- Expansión ultra-masiva de conocimientos médicos.
-- Añadidos 15 nuevos fármacos de especialidad (Neurología, Urología, Cardiología, Dermatología).
-- Añadidas 8 emergencias y síntomas neurológicos/cardiovasculares críticos (ACV, Síncope, Anafilaxia).
+📌 VERSIÓN: 10.0.0
+📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-05
+📌 CAMBIOS v10.0.0:
+- Redacción clínica profesionalizada en recomendaciones de triaje y cuidados preventivos.
+- Expansión de protocolos de primer contacto para mejorar la respuesta de la IA.
+- Añadidos 6 nuevos cuadros (Trauma craneal, Cólico nefrítico, Epistaxis, Quemaduras, Sangrado ginecológico, Conjuntivitis).
 ═══════════════════════════════════════════════════════════════
 */
 
-export const VERSION_BASE_DATOS = '9.0.0';
-export const ULTIMA_ACTUALIZACION = '2026-11-10';
+export const VERSION_BASE_DATOS = '10.0.0';
+export const ULTIMA_ACTUALIZACION = '2026-12-05';
 
 // ═══════════════════════════════════════════════════════════════
 //  🏥 HOSPITALES
@@ -3425,71 +3425,69 @@ export const MEDICAMENTOS = [
 export const SINTOMAS = [
   {
     id: 1,
-    nombre: 'Dolor de cabeza',
+    nombre: 'Cefalea (Dolor de cabeza)',
     categoria: 'Dolor',
     sinonimos: ['cefalea','migrana','jaqueca','dolor cabeza','cabeza me duele','me duele la cabeza','dolor en la cabeza'],
-    descripcion: 'El dolor de cabeza es una de las molestias más comunes. Puede ser tensional, migraña o por otras causas.',
-    causas_comunes: ['Estrés','Deshidratación','Falta de sueño','Tensión muscular','Cambios hormonales','Presión arterial alta'],
+    descripcion: 'Cefalea primaria (tensional, migrañosa) o secundaria. Requiere evaluación para descartar signos de alarma neurológica (banderas rojas).',
+    causas_comunes: ['Cefalea tensional','Migraña','Crisis hipertensiva','Deshidratación sistémica','Trastornos del sueño','Alteraciones refractivas (visión)'],
     cuidados_casa: [
-      'Descansa en un lugar oscuro y silencioso',
-      'Aplica compresas frías en la frente',
-      'Mantente hidratado (agua, suero oral)',
-      'Masajea suavemente sienes y cuello',
-      'Evita pantallas y luces brillantes'
+      'Reposo en decúbito en un ambiente con baja estimulación lumínica y acústica (aislamiento sensorial por fotofobia/fonofobia).',
+      'Aplicación de termoterapia fría localizada (crioterapia) en región frontal o bitemporal.',
+      'Asegurar un aporte hídrico adecuado mediante ingesta de soluciones isotónicas.',
+      'Evitar la exposición a pantallas y dispositivos electrónicos (reducción de estrés ocular).',
+      'Administración de analgésicos de primera línea (Paracetamol/AINEs) respetando la posología máxima diaria.'
     ],
     cuando_consultar: [
-      'Dolor súbito y muy severo ("el peor de tu vida")',
-      'Después de un golpe en la cabeza',
-      'Con fiebre alta, rigidez de cuello o confusión',
-      'Si dura más de 3 días seguidos',
-      'Si te despierta en la noche'
+      'EMERGENCIA: Cefalea súbita en estallido o "en trueno" (el peor dolor de su vida).',
+      'Asociada a signos meníngeos: rigidez de nuca, fiebre alta no explicada, o confusión mental.',
+      'Presencia de focalidad neurológica (debilidad en un miembro, asimetría facial, dificultad del habla).',
+      'Cefalea de reciente comienzo en pacientes mayores de 50 años o con antecedentes oncológicos.',
+      'Empeoramiento progresivo o refractario a la analgesia habitual tras 72 horas.'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
   },
   {
     id: 2,
-    nombre: 'Fiebre',
+    nombre: 'Síndrome Febril (Fiebre)',
     categoria: 'Temperatura',
     sinonimos: ['temperatura','calentura','fiebre alta','febrilis','me siento caliente','tengo fiebre','febril'],
-    descripcion: 'La fiebre es una respuesta natural del cuerpo a infecciones. Se considera fiebre a partir de 38 °C (100.4 °F).',
-    causas_comunes: ['Infecciones virales','Infecciones bacterianas','Gripe','COVID-19','Infecciones urinarias'],
+    descripcion: 'Respuesta termorreguladora sistémica mediada por pirógenos, generalmente secundaria a procesos infecciosos o inflamatorios. Temperatura > 38.0 °C.',
+    causas_comunes: ['Procesos infecciosos virales (VRS, Influenza, COVID-19)','Infecciones bacterianas (faringoamigdalitis, ITU)','Gastroenteritis aguda','Reacciones post-vacunales'],
     cuidados_casa: [
-      'Mantente hidratado (agua, suero, caldos)',
-      'Descansa adecuadamente',
-      'Usa ropa ligera',
-      'Aplica compresas tibias en frente y axilas',
-      'Puedes tomar paracetamol (ver dosis)'
+      'Vigilancia estricta de la curva térmica mediante termometría objetiva.',
+      'Mantener un estado óptimo de hidratación oral para compensar las pérdidas insensibles.',
+      'Aplicación de medios físicos (compresas con agua tibia en zonas de grandes vasos: cuello, axilas, ingles).',
+      'Uso de antipiréticos pautados (Paracetamol/Ibuprofeno) si hay disconfort significativo, evitando la automedicación excesiva.',
+      'Utilizar prendas de vestir ligeras y mantener un ambiente ventilado.'
     ],
     cuando_consultar: [
-      'Fiebre mayor a 39.5 °C (103 °F)',
-      'Fiebre que dura más de 3 días',
-      'Con dificultad para respirar o erupción en la piel',
-      'En bebés menores de 3 meses (cualquier temperatura)'
+      'Temperatura sostenida > 39.5 °C resistente al tratamiento antipirético.',
+      'Fiebre de evolución superior a 72 horas sin foco infeccioso claro.',
+      'Aparición de exantemas (manchas en piel) purpúricos o petequiales que no desaparecen a la vitropresión.',
+      'En lactantes menores de 3 meses de edad (requiere evaluación pediátrica inmediata).'
     ],
     urgencia_default: 'MEDIA',
     requiere_atencion: false
   },
   {
     id: 3,
-    nombre: 'Náuseas',
+    nombre: 'Náuseas y Emesis (Vómitos)',
     categoria: 'Digestivo',
     sinonimos: ['nausea','asco','ganas de vomitar','me dan ganas de vomitar','mareo estomacal','malestar estomago'],
-    descripcion: 'Las náuseas son la sensación de querer vomitar. Pueden tener múltiples causas.',
-    causas_comunes: ['Gastroenteritis','Mareo por movimiento','Embarazo','Ansiedad','Alimentos en mal estado'],
+    descripcion: 'Sensación inminente de expulsión del contenido gástrico, a menudo acompañada de síntomas autonómicos (diaforesis, palidez). Riesgo principal: deshidratación.',
+    causas_comunes: ['Gastroenteritis aguda infecciosa','Intoxicación alimentaria','Cinetosis (mareo por movimiento)','Gestación (hiperemesis temprana)','Efecto adverso farmacológico'],
     cuidados_casa: [
-      'Toma líquidos en pequeños sorbos frecuentes',
-      'Evita alimentos grasos o picantes',
-      'Come galletas saladas o pan tostado',
-      'Descansa sentado o recostado',
-      'Prueba té de jengibre o menta'
+      'Reposo gástrico inicial seguido de tolerancia oral fraccionada (líquidos en volúmenes pequeños cada 15-20 minutos).',
+      'Dieta blanda y astringente al recuperar la tolerancia, evitando lípidos y agentes irritantes.',
+      'Hidratación con Sales de Rehidratación Oral (SRO) para reposición electrolítica.',
+      'Posición en sedestación o decúbito lateral para prevenir broncoaspiración si ocurre el vómito.'
     ],
     cuando_consultar: [
-      'Vómitos que duran más de 24 horas',
-      'No puedes retener líquidos',
-      'Vómito con sangre o de color café',
-      'Dolor abdominal severo acompañante',
-      'Signos de deshidratación (boca seca, poca orina)'
+      'Incapacidad para tolerar la vía oral por más de 12-24 horas.',
+      'Hematemesis (vómito con sangre fresca) o vómitos con aspecto de "posos de café".',
+      'Signos clínicos de deshidratación severa: oliguria, sequedad de mucosas, letargia o taquicardia.',
+      'Asociado a dolor abdominal agudo intenso, rigidez abdominal o fiebre alta.'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
@@ -3568,47 +3566,45 @@ export const SINTOMAS = [
   },
   {
     id: 7,
-    nombre: 'Dolor abdominal',
+    nombre: 'Dolor Abdominal (Abdomen Agudo)',
     categoria: 'Digestivo',
     sinonimos: ['dolor de barriga','dolor de estomago','dolor estomacal','dolor abdomen','colicos','me duele el estomago','me duele la barriga'],
-    descripcion: 'El dolor abdominal puede tener muchas causas, desde leves hasta graves.',
-    causas_comunes: ['Gases','Indigestión','Gastroenteritis','Estreñimiento','Menstruación'],
+    descripcion: 'Cuadro clínico caracterizado por dolor en la región abdominal, de inicio súbito o insidioso. Puede corresponder a patología médica o requerir intervención quirúrgica de urgencia.',
+    causas_comunes: ['Gastroenteritis aguda','Dispepsia o enfermedad acidopéptica','Meteorismo (acumulación de gases)','Apendicitis aguda','Cólico biliar o colecistitis','Dismenorrea'],
     cuidados_casa: [
-      'Aplica calor suave en el abdomen (no si hay fiebre)',
-      'Toma líquidos claros y descansa',
-      'Evita alimentos grasos o irritantes',
-      'Come alimentos suaves: arroz, plátano cocido, caldo'
+      'Reposo físico e ingesta fraccionada de líquidos claros isotónicos.',
+      'Evitar la administración de analgésicos potentes o antiespasmódicos no recetados que puedan enmascarar un cuadro quirúrgico (apendicitis).',
+      'Dieta de fácil digestión, exenta de irritantes gástricos, lácteos y grasas saturadas.',
+      'Aplicación de termoterapia local moderada, EXCEPTO si se sospecha proceso infeccioso/inflamatorio agudo con fiebre.'
     ],
     cuando_consultar: [
-      'Dolor severo y súbito que no cede',
-      'Dolor en la parte inferior derecha (posible apendicitis)',
-      'Con vómitos prolongados o sangre en heces',
-      'Abdomen duro o muy inflamado',
-      'No puedes evacuar ni expulsar gases por más de 24h'
+      'EMERGENCIA: Dolor abdominal severo, súbito, con abdomen en "tabla" o intolerancia al tacto (signo de rebote positivo).',
+      'Migración del dolor hacia la fosa ilíaca derecha (posible cuadro apendicular).',
+      'Asociado a vómitos fecaloideos o biliares persistentes, hematemesis o melena.',
+      'Incapacidad absoluta para la expulsión de heces y flatos por más de 24 horas (íleo u obstrucción intestinal).'
     ],
     urgencia_default: 'MEDIA',
     requiere_atencion: false
   },
   {
     id: 8,
-    nombre: 'Diarrea',
+    nombre: 'Gastroenteritis / Cuadro Diarreico Agudo',
     categoria: 'Digestivo',
     sinonimos: ['evacuaciones liquidas','heces liquidas','soltura','vientre suelto','deposiciones frecuentes','colitis'],
-    descripcion: 'La diarrea son evacuaciones líquidas frecuentes. El principal riesgo es la deshidratación.',
-    causas_comunes: ['Infecciones virales','Alimentos en mal estado','Intolerancias','Medicamentos','Estrés','Parásitos'],
+    descripcion: 'Aumento en la frecuencia y disminución en la consistencia de las deposiciones. La complicación más crítica a monitorizar es la deshidratación y los desequilibrios hidroelectrolíticos.',
+    causas_comunes: ['Infección viral entérica (Rotavirus, Norovirus)','Toxiinfección alimentaria bacteriana','Parasitosis intestinal (Amebiasis, Giardiasis)','Efecto adverso a antibioticoterapia'],
     cuidados_casa: [
-      'Toma suero oral o agua con sal y azúcar frecuentemente',
-      'Come alimentos suaves: arroz, plátano, pan tostado',
-      'Evita lácteos, cafeína, jugos y grasas',
-      'Lávate las manos frecuentemente con jabón',
-      'Descansa'
+      'Terapia de rehidratación oral (TRO) temprana y continua usando Sales de Rehidratación Oral (SRO) tras cada deposición líquida.',
+      'Implementar dieta astringente (arroz, compota de manzana, pan tostado) una vez restaurada la tolerancia oral.',
+      'Restricción temporal de lactosa, bebidas azucaradas hiperosmolares, cafeína y grasas.',
+      'Higiene de manos estricta para evitar cadenas de transmisión feco-oral.',
+      'NO utilizar fármacos inhibidores de la motilidad (Loperamida) sin indicación médica, especialmente si hay fiebre o disentería.'
     ],
     cuando_consultar: [
-      'Diarrea que dura más de 2 días en adultos',
-      'Signos de deshidratación: boca seca, poca orina, mareo',
-      'Sangre o moco en las heces',
-      'Fiebre mayor a 38.5 °C',
-      'En niños menores de 2 años con más de 6 evacuaciones al día'
+      'Persistencia del cuadro por más de 48 horas sin tendencia a la mejoría.',
+      'Presencia de disentería (heces con sangre macroscópica o moco purulento).',
+      'Aparición de signos clínicos de deshidratación grave (oliguria, enoftalmos, pliegue cutáneo positivo, alteración del sensorio).',
+      'Pacientes pediátricos, geriátricos o inmunocomprometidos con alta tasa de pérdidas hídricas.'
     ],
     urgencia_default: 'BAJA',
     requiere_atencion: false
@@ -3973,6 +3969,143 @@ export const SINTOMAS = [
       'En niños menores de 6 meses con llanto incontrolable.'
     ],
     urgencia_default: 'MEDIA',
+    requiere_atencion: false
+  },
+  // ════════════════════════════════════════════════════════
+  //  SÍNTOMAS ADICIONALES Y ESPECIALIDADES (NUEVOS v10.0)
+  // ════════════════════════════════════════════════════════
+  {
+    id: 25,
+    nombre: 'Traumatismo Craneoencefálico (Golpe en la cabeza)',
+    categoria: 'Neurológico',
+    sinonimos: ['golpe en la cabeza','caida de cabeza','chichon','trauma craneal','tec','herida en el cuero cabelludo'],
+    descripcion: 'Impacto directo sobre el cráneo. Varía desde un traumatismo leve (contusión simple) hasta lesiones intracraneales severas con riesgo vital.',
+    causas_comunes: ['Caídas accidentales','Accidentes de tránsito','Golpes contusos en deportes','Agresiones físicas'],
+    cuidados_casa: [
+      'Reposo absoluto con la cabeza ligeramente elevada a 30 grados.',
+      'Aplicación de crioterapia (hielo) local envuelto en un paño sobre el área del impacto por 15-20 minutos para reducir el edema subcutáneo.',
+      'Observación neurológica estrecha por un familiar durante las primeras 24-48 horas, despertando al paciente cada 3 horas para verificar respuesta.',
+      'Administración exclusiva de Paracetamol para el dolor. EVITAR AINEs (Ibuprofeno/Aspirina) por riesgo de sangrado.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Pérdida del estado de conciencia, sin importar su duración.',
+      'EMERGENCIA: Vómitos recurrentes o en "proyectil" sin náuseas previas.',
+      'Presencia de anisocoria (pupilas de distinto tamaño), visión doble o alteraciones del habla.',
+      'Amnesia del evento, confusión severa, agresividad inusual o somnolencia profunda.',
+      'Salida de líquido claro o sangre por los oídos o la nariz (rinorrea/otorrea).'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 26,
+    nombre: 'Cólico Nefrítico (Dolor agudo en espalda/flanco)',
+    categoria: 'Urología',
+    sinonimos: ['dolor de rinon','colico renal','piedra en el rinon','calculo renal','dolor en el flanco','dolor lumbar intenso'],
+    descripcion: 'Dolor paroxístico, de intensidad severa e intermitente, usualmente localizado en la región lumbar o fosa renal, con irradiación hacia el abdomen anterior o genitales.',
+    causas_comunes: ['Litiasis renal (Cálculos/Piedras en el riñón)','Infección severa del tracto urinario superior (Pielonefritis)','Obstrucción ureteral aguda'],
+    cuidados_casa: [
+      'Reposo físico en posición antiálgica (la que genere menor disconfort, usualmente posición fetal).',
+      'Aplicación de termoterapia (calor local) en la región lumbar afectada para ayudar a relajar la musculatura ureteral.',
+      'Aumento prudente de la ingesta hídrica (solo si el paciente no presenta náuseas ni vómitos activos).',
+      'Uso de analgésicos/antiespasmódicos pautados si ya cuenta con diagnóstico médico previo.'
+    ],
+    cuando_consultar: [
+      'Dolor incapacitante refractario a la analgesia ambulatoria.',
+      'Presencia de hematuria macroscópica (orina de color francamente rojo o sanguinolento).',
+      'Asociado a síndrome febril alto y escalofríos (sugestivo de pionefrosis o sepsis urinaria, requiere ATB IV).',
+      'Anuria (ausencia total de emisión de orina) prolongada.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 27,
+    nombre: 'Hemorragia Nasal (Epistaxis)',
+    categoria: 'Otorrinolaringología',
+    sinonimos: ['sangrado de nariz','epistaxis','sangre por la nariz','hemorragia nasal'],
+    descripcion: 'Pérdida de sangre proveniente de las fosas nasales, usualmente secundaria a la ruptura del plexo vascular de Kiesselbach (zona anterior).',
+    causas_comunes: ['Traumatismo digital (rascado)','Resequedad de la mucosa nasal','Crisis hipertensivas','Rinitis alérgica severa','Uso de anticoagulantes'],
+    cuidados_casa: [
+      'Mantener la calma. Sentarse con la cabeza INCLINADA HACIA ADELANTE (no hacia atrás, para evitar tragar sangre y vomitar).',
+      'Ejercer compresión digital firme y continua en la porción blanda (cartilaginosa) de la nariz por 10 a 15 minutos exactos sin soltar.',
+      'Aplicar compresas frías en el dorso nasal o nuca para inducir vasoconstricción.',
+      'Una vez cedido el sangrado, evitar sonarse la nariz, realizar esfuerzos físicos o consumir bebidas muy calientes por 24 horas.'
+    ],
+    cuando_consultar: [
+      'Sangrado activo profuso que no cede tras 20-30 minutos de compresión digital correcta.',
+      'Epistaxis en pacientes sometidos a terapia anticoagulante (Warfarina, Rivaroxaban).',
+      'Sangrado masivo con coágulos que fluye predominantemente hacia la garganta (epistaxis posterior).',
+      'Acompañado de palidez extrema, sudoración, mareos severos o palpitaciones (compromiso hemodinámico).'
+    ],
+    urgencia_default: 'MEDIA',
+    requiere_atencion: false
+  },
+  {
+    id: 28,
+    nombre: 'Quemadura Térmica Localizada',
+    categoria: 'Dermatología',
+    sinonimos: ['quemada','quemadura con agua hirviendo','quemadura de sol fuerte','ardor por fuego','ampolla por quemadura'],
+    descripcion: 'Lesión de los tejidos tegumentarios inducida por transferencia aguda de energía térmica (fuego, líquidos hirvientes, objetos calientes o fricción).',
+    causas_comunes: ['Accidentes domésticos con líquidos hirviendo (escaldadura)','Contacto con superficies calientes (planchas, escapes)','Fuego directo','Exposición solar extrema'],
+    cuidados_casa: [
+      'ENFRIAMIENTO INMEDIATO: Irrigar la zona con abundante agua corriente a temperatura ambiente durante 15 a 20 minutos ininterrumpidos.',
+      'Retirar ropa, joyas o anillos cercanos al área antes de que inicie el edema (hinchazón), salvo que la ropa esté adherida a la piel.',
+      'Cubrir la lesión con un apósito estéril, gasa o paño limpio y seco sin apretar.',
+      'NO aplicar remedios caseros (pasta dental, aceites, mostaza, café) ya que favorecen la infección y profundizan el daño celular.',
+      'NO romper ni puncionar las ampollas (flictenas) formadas.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Quemaduras que comprometan la vía aérea (rostro, cuello), genitales o articulaciones mayores.',
+      'Si la quemadura es circunferencial (rodea completamente un brazo, pierna o el torso).',
+      'Quemaduras de tercer grado (piel de aspecto blanco coriáceo, acartonado o carbonizado, usualmente indoloras).',
+      'Si la extensión afecta un área mayor a la palma de la mano del paciente (especialmente en niños y ancianos).'
+    ],
+    urgencia_default: 'MEDIA',
+    requiere_atencion: true
+  },
+  {
+    id: 29,
+    nombre: 'Sangrado Transvaginal Anormal',
+    categoria: 'Ginecología',
+    sinonimos: ['hemorragia vaginal','sangrado ginecologico','regla muy abundante','sangrado en embarazo','sangre fuera del periodo'],
+    descripcion: 'Cualquier pérdida hemática a través de la vagina que difiera del patrón menstrual fisiológico habitual, o que ocurra durante cualquier etapa de la gestación.',
+    causas_comunes: ['Alteraciones hormonales (SOP, perimenopausia)','Miomatosis uterina','Amenaza de aborto / Complicaciones obstétricas','Efecto adverso a anticonceptivos'],
+    cuidados_casa: [
+      'Reposo pélvico absoluto (abstención de relaciones sexuales).',
+      'Reposo físico relativo en decúbito para monitorización del flujo.',
+      'Utilizar exclusivamente toallas sanitarias externas (NO tampones ni copas menstruales) para permitir la cuantificación objetiva del sangrado.',
+      'Monitoreo clínico del paciente buscando signos de hipotensión (mareo al ponerse en pie, palidez).'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Cualquier sangrado transvaginal en una paciente gestante o con sospecha de embarazo.',
+      'Sangrado activo y profuso que satura completamente más de una toalla sanitaria o apósito por hora, durante 2 horas consecutivas.',
+      'Expulsión de coágulos de gran tamaño (mayores a 3-4 centímetros).',
+      'Acompañado de dolor pélvico lancinante, fiebre, mal olor o lipotimia (desmayo).'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 30,
+    nombre: 'Conjuntivitis Aguda / Ojo Rojo',
+    categoria: 'Oftalmología',
+    sinonimos: ['ojo rojo','infeccion en el ojo','conjuntivitis','secrecion ocular','lagañas','ojo pegado','picazon en el ojo'],
+    descripcion: 'Proceso inflamatorio o infeccioso de la conjuntiva bulbar y tarsal. Se presenta con hiperemia (enrojecimiento), sensación de cuerpo extraño y secreción.',
+    causas_comunes: ['Conjuntivitis bacteriana (secreción purulenta espesa)','Conjuntivitis viral (secreción acuosa, usualmente bilateral)','Conjuntivitis alérgica (prurito intenso)','Exposición a irritantes químicos o polvo'],
+    cuidados_casa: [
+      'Lavado ocular frecuente con solución salina estéril o lágrimas artificiales libres de preservantes.',
+      'Aplicación de compresas frías limpias sobre los párpados cerrados para mitigar la inflamación y el edema.',
+      'Higiene estricta: lavado de manos continuo y uso de toallas de papel desechables para evitar el contagio al otro ojo o a terceros.',
+      'NO frotar el globo ocular ni automedicarse con colirios que contengan corticosteroides (puede agravar severamente úlceras virales).'
+    ],
+    cuando_consultar: [
+      'Asociado a dolor ocular severo y profundo (no solo sensación de arenilla superficial).',
+      'Pérdida súbita o disminución de la agudeza visual (visión borrosa que no mejora con el parpadeo).',
+      'Fotofobia intensa (intolerancia extrema a la luz).',
+      'Presencia de asimetría pupilar (una pupila más dilatada que la otra) o antecedente de traumatismo/impacto en el ojo.'
+    ],
+    urgencia_default: 'BAJA',
     requiere_atencion: false
   }
 ];
