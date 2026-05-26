@@ -105,6 +105,12 @@ export function Profile() {
             photoURL: u.photoURL || prev.photoURL
           }));
         }
+        else {
+          const parsed = JSON.parse(savedProfile);
+          if (parsed.photoURL) {
+            setProfile(prev => ({ ...prev, photoURL: parsed.photoURL }));
+          }
+        }
         
         // Try to load data from FHIR Store
         try {
@@ -314,6 +320,8 @@ export function Profile() {
 
       // 1. Local Storage fallback
       localStorage.setItem('userProfile', JSON.stringify(profileData));
+      // Actualizar estado de React INMEDIATAMENTE para anclar la foto a la UI
+      setProfile(profileData);
 
       if (user) {
         // 2. Sync with FHIR Store
@@ -338,11 +346,20 @@ export function Profile() {
           console.log('[Profile] Patient created in FHIR Store');
         }
 
-          // Actualizamos el perfil oficial de Firebase Auth
-          await updateProfile(user, {
-            displayName: profile.name,
-            photoURL: finalPhotoURL
-          });
+          // Actualizamos el perfil oficial de Firebase Auth.
+          // Evitamos enviar base64 gigante a Auth porque produce un error de Payload Too Large.
+          try {
+            if (!finalPhotoURL.startsWith('data:')) {
+              await updateProfile(user, {
+                displayName: profile.name,
+                photoURL: finalPhotoURL
+              });
+            } else {
+              await updateProfile(user, { displayName: profile.name });
+            }
+          } catch (authError) {
+            console.warn('[Profile] Advertencia al actualizar Firebase Auth:', authError);
+          }
 
         // Update local user object
         const updatedUserObj = {
