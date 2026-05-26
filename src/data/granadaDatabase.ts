@@ -2,17 +2,17 @@
 ═══════════════════════════════════════════════════════════════
 BASE DE DATOS DE SALUD — Salud-Conecta IA (Granada, Nicaragua)
 ═══════════════════════════════════════════════════════════════
-📌 VERSIÓN: 7.4.0
-📌 ÚLTIMA ACTUALIZACIÓN: 2026-04-15
-📌 CAMBIOS v7.4.0:
-- Nuevos centros: 3 clínicas, 2 laboratorios, 4 farmacias
-- Nueva categoría: LABORATORIOS integrada en el mapa
-- Mejoras en la visualización de información completa (v7.2+)
+📌 VERSIÓN: 8.0.0
+📌 ÚLTIMA ACTUALIZACIÓN: 2026-10-25
+📌 CAMBIOS v8.0.0:
+- Expansión masiva de conocimientos médicos (Fármacos modernos y Síntomas críticos).
+- Nuevos grupos farmacológicos: Anticoagulantes NOAC, GLP-1, SGLT2, ISRS modernos.
+- Nuevos cuadros sintomáticos detallados para potenciar el triaje IA.
 ═══════════════════════════════════════════════════════════════
 */
 
-export const VERSION_BASE_DATOS = '7.4.0';
-export const ULTIMA_ACTUALIZACION = '2026-04-16';
+export const VERSION_BASE_DATOS = '8.0.0';
+export const ULTIMA_ACTUALIZACION = '2026-10-25';
 
 // ═══════════════════════════════════════════════════════════════
 //  🏥 HOSPITALES
@@ -2965,6 +2965,188 @@ export const MEDICAMENTOS = [
     precio_aproximado: '20-50 C$ (tabletas)',
     embarazo: 'Categoría C — Uso permitido para malaria en embarazo'
   },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 42 — DIABETES Y METABOLISMO AVANZADO
+  // ════════════════════════════════════════════════════════
+  {
+    id: 301,
+    nombre_es: 'Metformina',
+    nombre_en: 'Metformin',
+    nombres_comerciales: ['Glucophage','Dianben','Metformina MK','Glafornil'],
+    sinonimos: ['glucophage','dianben','para la azucar','diabetes tipo 2','resistencia a la insulina','glafornil'],
+    categoria: 'Hipoglucemiante oral (Biguanida)',
+    uso_principal: 'Tratamiento de primera línea para Diabetes Tipo 2, resistencia a la insulina, Síndrome de Ovario Poliquístico (SOP).',
+    dosis_adulto: '500-1000 mg 1 o 2 veces al día junto con las comidas (MÁX 2000-2550 mg/día).',
+    dosis_nino: 'Aprobado en >10 años (bajo estricta supervisión endocrinológica).',
+    contraindicaciones: 'Insuficiencia renal grave (TFG < 30), acidosis metabólica, alcoholismo, insuficiencia cardíaca aguda.',
+    efectos_secundarios: 'Diarrea, náuseas, dolor abdominal (suele mejorar tomándola con comida y tras unas semanas). Riesgo raro de acidosis láctica.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '30-180 C$ (según presentación y liberación prolongada XR)',
+    embarazo: 'Categoría B — Generalmente segura, aunque la insulina es el estándar en embarazo.'
+  },
+  {
+    id: 302,
+    nombre_es: 'Dapagliflozina',
+    nombre_en: 'Dapagliflozin',
+    nombres_comerciales: ['Forxiga','Dapavel','Dapagliflozina MK'],
+    sinonimos: ['forxiga','para la diabetes y corazon','inhibidor sglt2','para proteger el riñon'],
+    categoria: 'Hipoglucemiante (Inhibidor SGLT2)',
+    uso_principal: 'Diabetes Tipo 2, Insuficiencia cardíaca crónica, Enfermedad renal crónica. Actúa eliminando azúcar por la orina.',
+    dosis_adulto: '10 mg una vez al día.',
+    dosis_nino: 'No recomendado en menores de 18 años.',
+    contraindicaciones: 'Diabetes tipo 1 (riesgo de cetoacidosis), diálisis. Infecciones urinarias recurrentes graves.',
+    efectos_secundarios: 'Infecciones urinarias o por hongos (candidiasis), deshidratación, orina frecuente.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '900-1500 C$ (28 tabletas)',
+    embarazo: 'Categoría C — Evitar en 2do y 3er trimestre.'
+  },
+  {
+    id: 303,
+    nombre_es: 'Semaglutida',
+    nombre_en: 'Semaglutide',
+    nombres_comerciales: ['Ozempic','Rybelsus','Wegovy'],
+    sinonimos: ['ozempic','rybelsus','wegovy','inyeccion para bajar de peso','inyeccion diabetes semanal','glp-1'],
+    categoria: 'Agonista del receptor GLP-1',
+    uso_principal: 'Diabetes Tipo 2, control de peso (obesidad clínica) y reducción de riesgo cardiovascular.',
+    dosis_adulto: 'Subcutánea: 0.25 mg a 1 mg semanal (iniciar gradual). Oral (Rybelsus): 3 mg a 14 mg diarios en ayunas.',
+    dosis_nino: 'Wegovy aprobado en adolescentes específicos; Ozempic solo adultos.',
+    contraindicaciones: 'Antecedentes familiares de carcinoma medular de tiroides, neoplasia endocrina múltiple.',
+    efectos_secundarios: 'Náuseas severas al inicio, vómitos, diarrea, dolor abdominal, pérdida de apetito rápida.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '6,000-12,000 C$ (pluma mensual o caja)',
+    embarazo: 'Categoría C — Suspender al menos 2 meses antes de planear embarazo.'
+  },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 43 — CARDIOVASCULAR MODERNO (LÍPIDOS / ANTICOAGULANTES)
+  // ════════════════════════════════════════════════════════
+  {
+    id: 304,
+    nombre_es: 'Rosuvastatina',
+    nombre_en: 'Rosuvastatin',
+    nombres_comerciales: ['Crestor','Rovartal','Rosuvastatina MK'],
+    sinonimos: ['crestor','estatina potente','para el colesterol alto','bajar colesterol malo'],
+    categoria: 'Hipolipemiante (Estatina de alta intensidad)',
+    uso_principal: 'Reducción agresiva de colesterol LDL, triglicéridos y prevención de eventos cardiovasculares.',
+    dosis_adulto: '10-40 mg una vez al día (se puede tomar a cualquier hora, a diferencia de otras estatinas).',
+    dosis_nino: 'Uso pediátrico muy restringido (hipercolesterolemia familiar).',
+    contraindicaciones: 'Enfermedad hepática activa, embarazo, lactancia.',
+    efectos_secundarios: 'Dolor muscular (mialgia), fatiga, elevación de enzimas hepáticas.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '250-700 C$ (30 tabletas)',
+    embarazo: 'Categoría X — CONTRAINDICADO.'
+  },
+  {
+    id: 305,
+    nombre_es: 'Rivaroxaban',
+    nombre_en: 'Rivaroxaban',
+    nombres_comerciales: ['Xarelto','Rivaroxaban MK'],
+    sinonimos: ['xarelto','anticoagulante nuevo','para trombosis','noac','para la sangre espesa'],
+    categoria: 'Anticoagulante oral directo (DOAC)',
+    uso_principal: 'Prevención de ACV en fibrilación auricular, tratamiento de trombosis venosa profunda y embolia pulmonar.',
+    dosis_adulto: '15-20 mg una vez al día CON la comida (imprescindible para absorción).',
+    dosis_nino: 'Solo bajo protocolo especializado.',
+    contraindicaciones: 'Sangrado activo grave, insuficiencia hepática con coagulopatía, insuficiencia renal muy grave.',
+    efectos_secundarios: 'Sangrado prolongado, moretones fáciles. No requiere controles de sangre (INR) como la warfarina.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '1,800-2,500 C$ (28 tabletas)',
+    embarazo: 'Categoría C — Evitar por riesgo de hemorragia y toxicidad fetal.'
+  },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 44 — NEUROLOGÍA Y PSIQUIATRÍA DE PRIMERA LÍNEA
+  // ════════════════════════════════════════════════════════
+  {
+    id: 306,
+    nombre_es: 'Escitalopram',
+    nombre_en: 'Escitalopram',
+    nombres_comerciales: ['Lexapro','Dexapron','Meridian','Escitalopram MK'],
+    sinonimos: ['lexapro','dexapron','para la ansiedad','para la depresion','isrs moderno'],
+    categoria: 'Antidepresivo / Ansiolítico (ISRS)',
+    uso_principal: 'Trastorno depresivo mayor, trastorno de ansiedad generalizada, trastorno de pánico.',
+    dosis_adulto: '10-20 mg una vez al día. Iniciar con dosis de 5 mg en ansiedad para evitar agitación inicial.',
+    dosis_nino: 'Aprobado >12 años bajo supervisión psiquiátrica estricta.',
+    contraindicaciones: 'Uso concurrente de IMAO, prolongación del intervalo QT (corazón).',
+    efectos_secundarios: 'Náuseas temporales, somnolencia o insomnio, disfunción sexual (retraso en eyaculación/anorgasmia). Efecto máximo tarda 4 semanas.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '180-600 C$ (30 tabletas)',
+    embarazo: 'Categoría C — Consultar psiquiatra y obstetra.'
+  },
+  {
+    id: 307,
+    nombre_es: 'Pregabalina',
+    nombre_en: 'Pregabalin',
+    nombres_comerciales: ['Lyrica','Martesia','Pregabalina MK'],
+    sinonimos: ['lyrica','martesia','para el nervio ciatico','dolor de nervios','neuropatia diabetica','fibromialgia'],
+    categoria: 'Anticonvulsivante / Analgésico neuropático / Ansiolítico',
+    uso_principal: 'Dolor neuropático periférico y central, fibromialgia, trastorno de ansiedad generalizada.',
+    dosis_adulto: '75-300 mg dos veces al día. Dosis máxima 600 mg/día. (Se debe iniciar gradualmente).',
+    dosis_nino: 'No recomendado en <18 años para indicaciones comunes.',
+    contraindicaciones: 'Alergia. Ajustar dosis en falla renal.',
+    efectos_secundarios: 'Mareos, somnolencia, aumento de peso, edema periférico (hinchazón de pies).',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '250-900 C$ (según concentración)',
+    embarazo: 'Categoría C — Evitar a menos que sea estrictamente necesario.'
+  },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 45 — GASTROENTEROLOGÍA MODERNA Y RESPIRATORIO
+  // ════════════════════════════════════════════════════════
+  {
+    id: 308,
+    nombre_es: 'Esomeprazol',
+    nombre_en: 'Esomeprazole',
+    nombres_comerciales: ['Nexium','Esomeprazol MK','Racper'],
+    sinonimos: ['nexium','para la gastritis fuerte','reflujo severo','ibp de ultima generacion'],
+    categoria: 'Inhibidor de Bomba de Protones (IBP)',
+    uso_principal: 'Reflujo gastroesofágico (ERGE), esofagitis erosiva, erradicación de Helicobacter pylori (en combo).',
+    dosis_adulto: '20-40 mg al día, 30 minutos antes de la primera comida.',
+    dosis_nino: 'Niños mayores de 1 año bajo supervisión.',
+    contraindicaciones: 'Alergia. No administrar simultáneamente con atazanavir o nelfinavir.',
+    efectos_secundarios: 'Dolor de cabeza, diarrea. Uso crónico (>1 año) asociado a mala absorción de calcio, magnesio y B12.',
+    disponible_nicaragua: true,
+    requiere_receta: false,
+    precio_aproximado: '400-800 C$ (caja 14-28 tabletas)',
+    embarazo: 'Categoría C — Consultar médico.'
+  },
+  {
+    id: 309,
+    nombre_es: 'Montelukast',
+    nombre_en: 'Montelukast',
+    nombres_comerciales: ['Singulair','Montelukast MK','Inmuno-Bronc'],
+    sinonimos: ['singulair','para el asma alergica','prevencion de asma','antialergico respiratorio'],
+    categoria: 'Antagonista de receptores de leucotrienos',
+    uso_principal: 'Profilaxis y tratamiento crónico del asma, rinitis alérgica estacional y perenne.',
+    dosis_adulto: '10 mg una vez al día por la noche.',
+    dosis_nino: '6 meses a 5 años: 4 mg. 6 a 14 años: 5 mg (tabletas masticables o granulado).',
+    contraindicaciones: 'Ataques agudos de asma (no es de rescate).',
+    efectos_secundarios: 'Dolor de cabeza. ADVERTENCIA: Puede causar cambios de humor o alteraciones psiquiátricas (ansiedad, pesadillas).',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '400-900 C$ (caja de 30)',
+    embarazo: 'Categoría B — Generalmente seguro bajo indicación.'
+  },
+  {
+    id: 310,
+    nombre_es: 'Fosfomicina',
+    nombre_en: 'Fosfomycin',
+    nombres_comerciales: ['Monurol','Fosfocina'],
+    sinonimos: ['monurol','sobre para la orina','infeccion urinaria dosis unica','para mal de orin rapido'],
+    categoria: 'Antibiótico urinario',
+    uso_principal: 'Infección del tracto urinario no complicada (cistitis aguda) en mujeres.',
+    dosis_adulto: '3 gramos (1 sobre) en dosis ÚNICA, disuelto en agua, tomado preferiblemente antes de acostarse tras vaciar la vejiga.',
+    dosis_nino: 'No recomendado en <12 años rutinariamente.',
+    contraindicaciones: 'Insuficiencia renal grave.',
+    efectos_secundarios: 'Diarrea, dolor de cabeza, náuseas (suelen ser leves y autolimitados).',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '300-500 C$ (1 sobre)',
+    embarazo: 'Categoría B — Seguro y comúnmente usado en embarazo.'
+  }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -3255,6 +3437,117 @@ export const SINTOMAS = [
       'En personas mayores o con hipertensión'
     ],
     urgencia_default: 'MEDIA',
+    requiere_atencion: false
+  },
+  {
+    id: 13,
+    nombre: 'Dolor de pecho',
+    categoria: 'Cardiovascular',
+    sinonimos: ['dolor en el pecho','presion en el pecho','pecho apretado','angina','infarto','me duele el corazon','punzadas en el pecho'],
+    descripcion: 'El dolor de pecho puede ir desde problemas musculares o reflujo hasta emergencias graves como un infarto cardíaco.',
+    causas_comunes: ['Ataque cardíaco (infarto)','Angina de pecho','Reflujo gastroesofágico','Costocondritis (dolor muscular/costal)','Ataque de pánico o ansiedad'],
+    cuidados_casa: [
+      'Si es un dolor muscular (empeora al tocar o moverse), reposo y analgésicos suaves.',
+      'Si está relacionado con acidez (quemazón que sube tras comer), antiácidos o posición erguida.',
+      'Mantener la calma y aflojar ropa ajustada.',
+      'NUNCA ignorar un dolor de pecho opresivo.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Dolor que se siente como presión intensa, pesadez o que el pecho está siendo aplastado.',
+      'EMERGENCIA: El dolor se irradia al brazo izquierdo, mandíbula, cuello o espalda.',
+      'EMERGENCIA: Acompañado de dificultad para respirar, sudoración fría, mareo o náuseas.',
+      'El dolor dura más de unos minutos o empeora con la actividad física.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 14,
+    nombre: 'Dificultad para respirar',
+    categoria: 'Respiratorio',
+    sinonimos: ['falta de aire','disnea','no puedo respirar','me ahogo','respiracion rapida','pecho apretado para respirar'],
+    descripcion: 'Sentir que no entra suficiente aire a los pulmones. Puede ser crónico o presentarse de forma aguda.',
+    causas_comunes: ['Asma o EPOC exacerbado','Infecciones respiratorias graves (Neumonía, COVID-19)','Problemas cardíacos','Ataque de pánico','Reacción alérgica grave (anafilaxia)'],
+    cuidados_casa: [
+      'Si tiene asma o EPOC diagnosticado, usar su inhalador de rescate (ej. Salbutamol).',
+      'Sentarse en posición erguida e intentar respirar lentamente (respiración con labios fruncidos).',
+      'Si es ansiedad, buscar un lugar tranquilo y concentrarse en exhalar lento.',
+      'Aflojar prendas alrededor del cuello y pecho.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Comienzo súbito de asfixia severa.',
+      'EMERGENCIA: Labios, rostro o uñas se tornan azulados o grises (cianosis).',
+      'EMERGENCIA: Acompañado de dolor opresivo en el pecho o hinchazón de cara/garganta.',
+      'Si requiere usar músculos del cuello y pecho intensamente para respirar.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 15,
+    nombre: 'Ansiedad o Ataque de Pánico',
+    categoria: 'Salud Mental',
+    sinonimos: ['panico','nervios','mucha ansiedad','desesperacion','siento que me voy a morir','taquicardia por nervios'],
+    descripcion: 'Episodios de miedo o temor intenso que desencadenan reacciones físicas severas cuando no hay peligro real.',
+    causas_comunes: ['Estrés crónico o trauma','Trastorno de ansiedad generalizada','Trastorno de pánico','Consumo excesivo de cafeína o estimulantes'],
+    cuidados_casa: [
+      'Técnicas de respiración (ej. regla 4-7-8: inhalar 4s, sostener 7s, exhalar 8s).',
+      'Enfoque sensorial (técnica 5-4-3-2-1 para conectar con el entorno).',
+      'Evitar estimulantes, cafeína y alcohol.',
+      'Beber agua a sorbos pequeños y descansar en un lugar seguro.'
+    ],
+    cuando_consultar: [
+      'Es la primera vez que ocurre (los síntomas son idénticos a los de un infarto y deben descartarse problemas físicos).',
+      'Los ataques son frecuentes y afectan su vida laboral o personal.',
+      'Siente miedo constante a tener un nuevo ataque de pánico.',
+      'Se acompaña de pensamientos de hacerse daño a sí mismo.'
+    ],
+    urgencia_default: 'MEDIA',
+    requiere_atencion: false
+  },
+  {
+    id: 16,
+    nombre: 'Ardor al orinar',
+    categoria: 'Urinario',
+    sinonimos: ['mal de orin','disuria','ardor al hacer pipi','dolor al orinar','infeccion urinaria','ganas de orinar a cada rato'],
+    descripcion: 'Dolor, ardor o molestia generalizada al momento de orinar. Suele indicar inflamación o infección del tracto urinario.',
+    causas_comunes: ['Infección del tracto urinario (ITU / Cistitis)','Infecciones de transmisión sexual (ITS)','Cálculos renales (piedras)','Irritación por productos de higiene íntima'],
+    cuidados_casa: [
+      'Beber abundante agua pura para ayudar a limpiar las vías urinarias.',
+      'Evitar temporalmente café, alcohol, cítricos y alimentos muy picantes.',
+      'Si se receta, analgésicos urinarios (Fenazopiridina) pueden aliviar el ardor temporalmente.',
+      'No aguantar las ganas de orinar.'
+    ],
+    cuando_consultar: [
+      'Fiebre, escalofríos, náuseas o vómitos (podría indicar infección renal).',
+      'Dolor intenso en la espalda baja o un costado.',
+      'Sangre visible en la orina.',
+      'Si los síntomas no mejoran en 24 horas o es un hombre/embarazada (requiere cultivo).'
+    ],
+    urgencia_default: 'MEDIA',
+    requiere_atencion: false
+  },
+  {
+    id: 17,
+    nombre: 'Sarpullido o Erupción',
+    categoria: 'Dermatología',
+    sinonimos: ['ronchas','rash','erupcion cutanea','manchas rojas','brote en la piel','alergia en la piel'],
+    descripcion: 'Cambios en el color, textura o apariencia de la piel, a menudo asociados a picazón, inflamación o descamación.',
+    causas_comunes: ['Reacciones alérgicas (medicamentos, alimentos, plantas)','Infecciones virales (ej. varicela, sarampión) o fúngicas','Dermatitis por contacto','Calor o sudor (sudamina)'],
+    cuidados_casa: [
+      'Evitar rascarse para no causar infección bacteriana secundaria.',
+      'Lavar la zona con agua fresca y jabón neutro, sin frotar bruscamente.',
+      'Aplicar compresas frías, calamina o cremas hidratantes sin perfume.',
+      'Para picazón fuerte, puede usar un antihistamínico oral de venta libre (Loratadina o Cetirizina).'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Sarpullido acompañado de dificultad para respirar, hinchazón de rostro o lengua (anafilaxia).',
+      'El sarpullido cubre todo el cuerpo de manera súbita.',
+      'Presencia de fiebre alta, dolor articular o malestar general extremo.',
+      'Las ronchas se convierten en ampollas grandes o supuran pus.',
+      'Se ve rojo oscuro/púrpura y NO desaparece al presionarlo con un vaso de vidrio.'
+    ],
+    urgencia_default: 'BAJA',
     requiere_atencion: false
   }
 ];
