@@ -9,6 +9,7 @@ import {
   Scale,
   ShieldCheck,
   UserCheck,
+  ArrowLeft,
 } from 'lucide-react';
 
 const sections = [
@@ -119,19 +120,29 @@ export default function PrivacyTerms() {
       <div className="max-w-5xl mx-auto flex flex-col gap-8">
         <section className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-6 md:p-8 shadow-xl">
           <div className="flex flex-col lg:flex-row lg:items-start gap-8">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 text-primary text-xs font-black uppercase tracking-widest mb-4">
-                <LockKeyhole className="w-4 h-4" />
-                Documento legal
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => window.dispatchEvent(new CustomEvent('goBack'))}
+                  className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
+                >
+                  <ArrowLeft className="w-6 h-6" />
+                </button>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-3 text-primary text-xs font-black uppercase tracking-widest mb-1">
+                    <LockKeyhole className="w-4 h-4" />
+                    Documento legal
+                  </div>
+                  <h1 className="text-3xl md:text-5xl font-display font-black text-on-surface tracking-tight">
+                    Privacidad y Términos de Uso
+                  </h1>
+                </div>
               </div>
-              <h1 className="text-3xl md:text-5xl font-display font-black text-on-surface tracking-tight">
-                Privacidad y Términos de Uso
-              </h1>
-              <p className="mt-4 text-on-surface-variant leading-relaxed max-w-3xl">
+              <p className="mt-2 text-on-surface-variant leading-relaxed max-w-3xl md:pl-16">
                 Este documento describe cómo Salud Conecta IA recopila, usa, protege y comparte información personal,
                 especialmente datos sensibles de salud, y establece las condiciones básicas para utilizar la plataforma.
               </p>
-              <p className="mt-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+              <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest md:pl-16">
                 Última actualización: 23 de mayo de 2026
               </p>
             </div>

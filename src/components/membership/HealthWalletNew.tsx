@@ -12,6 +12,7 @@ import {
   Flame,
   CheckCircle2,
   Search,
+  ArrowLeft,
   Settings as SettingsIcon
 } from 'lucide-react';
 import { PointsService } from '../../lib/pointsService';
@@ -178,14 +179,22 @@ export default function HealthWallet() {
     <>
       <div className="w-full flex-grow flex flex-col gap-10 pb-12 px-4 md:px-0">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-8">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-5xl font-display font-black text-primary tracking-tight">
-              Puntos de Salud
-            </h1>
-            <p className="text-on-surface-variant font-medium text-lg max-w-2xl">
-              Recompensas por uso frecuente y hábitos saludables. Mantén tus metas al día y canjea
-              beneficios exclusivos.
-            </p>
+          <div className="flex items-start gap-4">
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('goBack'))}
+              className="mt-2 w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <div className="flex flex-col gap-2">
+              <h1 className="text-5xl font-display font-black text-primary tracking-tight">
+                Puntos de Salud
+              </h1>
+              <p className="text-on-surface-variant font-medium text-lg max-w-2xl">
+                Recompensas por uso frecuente y hábitos saludables. Mantén tus metas al día y canjea
+                beneficios exclusivos.
+              </p>
+            </div>
           </div>
           <button
             onClick={navigationToConfig}

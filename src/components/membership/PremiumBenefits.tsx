@@ -76,13 +76,23 @@ export default function PremiumBenefits({ onDowngrade }: PremiumBenefitsProps = 
   return (
     <div className="w-full flex-grow flex flex-col gap-12 py-8 px-4 md:px-0">
       {/* Header Section */}
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-secondary fill-secondary/20" />
-          <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Estado de Cuenta</span>
+      <section className="flex flex-col gap-4 relative">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('goBack'))}
+            className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-1">
+              <CheckCircle2 className="w-5 h-5 text-secondary fill-secondary/20" />
+              <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Estado de Cuenta</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-black text-on-surface">Beneficios Premium</h1>
+          </div>
         </div>
-        <h1 className="text-4xl md:text-5xl font-display font-black text-on-surface">Beneficios Premium</h1>
-        <p className="text-lg text-on-surface-variant max-w-2xl font-medium">
+        <p className="text-lg text-on-surface-variant max-w-2xl font-medium md:pl-16">
           Gestiona tus servicios exclusivos y saca el máximo provecho de tu suscripción a Salud Conecta IA.
         </p>
       </section>

@@ -11,6 +11,7 @@ import {
   Copy, 
   MapPin, 
   ArrowRight,
+  ArrowLeft,
   Store,
   Clock,
   ExternalLink
@@ -45,19 +46,29 @@ export default function PharmacyDiscounts() {
   return (
     <div className="w-full flex-grow flex flex-col gap-12 py-8 px-4 md:px-0">
       {/* Header Section */}
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <motion.span 
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest rounded-full border border-primary/20"
+      <section className="flex flex-col gap-4 relative">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('goBack'))}
+            className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
           >
-            <Star className="w-3 h-3 fill-primary" />
-            {t('pharmacy.badge')}
-          </motion.span>
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest rounded-full border border-primary/20"
+              >
+                <Star className="w-3 h-3 fill-primary" />
+                {t('pharmacy.badge')}
+              </motion.span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-black text-on-surface">{t('pharmacy.title')}</h1>
+          </div>
         </div>
-        <h1 className="text-4xl md:text-5xl font-display font-black text-on-surface">{t('pharmacy.title')}</h1>
-        <p className="text-lg text-on-surface-variant max-w-3xl font-medium">
+        <p className="text-lg text-on-surface-variant max-w-3xl font-medium md:pl-16">
           {t('pharmacy.subtitle')}
         </p>
       </section>

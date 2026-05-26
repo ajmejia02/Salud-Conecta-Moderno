@@ -12,6 +12,7 @@ import {
   Droplets,
   Search,
   Bell,
+  ArrowLeft,
   User,
   LayoutDashboard,
   Wallet,
@@ -199,9 +200,17 @@ export default function ActivityLogs() {
     <div className="flex-1 flex flex-col gap-8 pb-32">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h2 className="text-4xl font-display font-black text-on-surface tracking-tight">{t('activity.title')}</h2>
-          <p className="text-lg text-on-surface-variant mt-1 font-medium opacity-70">{t('activity.subtitle')}</p>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('goBack'))}
+            className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <div>
+            <h2 className="text-4xl font-display font-black text-on-surface tracking-tight">{t('activity.title')}</h2>
+            <p className="text-lg text-on-surface-variant mt-1 font-medium opacity-70">{t('activity.subtitle')}</p>
+          </div>
         </div>
         <div className="flex items-center gap-1 bg-surface-container-low border border-outline-variant/30 rounded-2xl p-1 shadow-sm">
           <button 

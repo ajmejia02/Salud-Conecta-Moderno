@@ -9,6 +9,7 @@ import {
   MessageSquare, 
   Users, 
   Globe, 
+  ArrowLeft,
   CheckCircle
 } from 'lucide-react';
 import PremiumBenefits from './PremiumBenefits';
@@ -112,6 +113,12 @@ export default function Membership() {
     <div className="w-full flex-grow flex flex-col gap-16 py-12 px-4 md:px-0">
       {/* Hero Section */}
       <section className="text-center flex flex-col gap-6 items-center relative overflow-hidden py-12">
+        <button 
+          onClick={() => window.dispatchEvent(new CustomEvent('goBack'))}
+          className="absolute top-0 left-4 md:left-0 w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm z-10"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-container/10 via-background to-background opacity-50 pointer-events-none" />
         <motion.h1 
           initial={{ opacity: 0, y: 20 }}
@@ -222,4 +229,3 @@ export default function Membership() {
     </div>
   );
 }
-
