@@ -207,10 +207,7 @@ export default function ActivityLogs() {
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <div>
-            <h2 className="text-4xl font-display font-black text-on-surface tracking-tight">{t('activity.title')}</h2>
-            <p className="text-lg text-on-surface-variant mt-1 font-medium opacity-70">{t('activity.subtitle')}</p>
-          </div>
+          <h1 className="text-3xl md:text-4xl font-display font-black text-on-surface tracking-tight">{t('activity.title')}</h1>
         </div>
         <div className="flex items-center gap-1 bg-surface-container-low border border-outline-variant/30 rounded-2xl p-1 shadow-sm">
           <button 
@@ -235,6 +232,7 @@ export default function ActivityLogs() {
           </button>
         </div>
       </div>
+      <p className="text-lg text-on-surface-variant font-medium opacity-70 -mt-4">{t('activity.subtitle')}</p>
 
       {/* Accumulated Stats Panel (Bento Grid) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

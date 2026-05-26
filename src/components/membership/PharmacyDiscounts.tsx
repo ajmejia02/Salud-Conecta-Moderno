@@ -54,23 +54,23 @@ export default function PharmacyDiscounts() {
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <motion.span 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest rounded-full border border-primary/20"
-              >
-                <Star className="w-3 h-3 fill-primary" />
-                {t('pharmacy.badge')}
-              </motion.span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-display font-black text-on-surface">{t('pharmacy.title')}</h1>
-          </div>
+          <h1 className="text-3xl md:text-4xl font-display font-black text-on-surface">{t('pharmacy.title')}</h1>
         </div>
-        <p className="text-lg text-on-surface-variant max-w-3xl font-medium md:pl-16">
-          {t('pharmacy.subtitle')}
-        </p>
+        <div className="flex flex-col gap-2 md:pl-16">
+          <div className="flex items-center gap-2 w-fit">
+            <motion.span 
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest rounded-full border border-primary/20"
+            >
+              <Star className="w-3 h-3 fill-primary" />
+              {t('pharmacy.badge')}
+            </motion.span>
+          </div>
+          <p className="text-lg text-on-surface-variant max-w-3xl font-medium">
+            {t('pharmacy.subtitle')}
+          </p>
+        </div>
       </section>
 
       {/* Medication Search */}

@@ -29,14 +29,16 @@ export default function PremiumBenefits({ onDowngrade }: PremiumBenefitsProps = 
   if (currentView === 'pharmacy') {
     return (
       <div className="w-full">
-        <div className="max-w-7xl mx-auto px-6 pt-12">
-          <button 
-            onClick={() => setCurrentView('benefits')}
-            className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-xs font-black uppercase tracking-widest mb-4 w-fit"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver a Beneficios
-          </button>
+        <div className="max-w-7xl mx-auto px-4 md:px-0 pt-8 pb-4">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setCurrentView('benefits')}
+              className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-2xl font-display font-black text-on-surface tracking-tight">Volver</h1>
+          </div>
         </div>
         <PharmacyDiscounts />
       </div>

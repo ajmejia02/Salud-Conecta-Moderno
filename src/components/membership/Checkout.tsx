@@ -58,16 +58,17 @@ export default function Checkout({ plan, onBack, onComplete }: CheckoutProps) {
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 flex flex-col lg:flex-row gap-12 items-start justify-center">
         {/* Left Column: Form */}
         <section className="w-full lg:w-7/12 flex flex-col gap-8">
-          <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-4">
             <button 
               onClick={onBack}
-              className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-xs font-black uppercase tracking-widest mb-4 w-fit"
+              className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
             >
-              <ArrowLeft className="w-4 h-4" />
-              {t('checkout.back')}
+              <ArrowLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-4xl font-display font-black text-on-surface tracking-tight">{t('checkout.title')}</h1>
-            <p className="text-on-surface-variant font-medium">{t('checkout.subtitle')}</p>
+            <div className="flex flex-col gap-1">
+              <h1 className="text-3xl md:text-4xl font-display font-black text-on-surface tracking-tight">{t('checkout.title')}</h1>
+              <p className="text-on-surface-variant font-medium">{t('checkout.subtitle')}</p>
+            </div>
           </div>
 
           {/* Method Selector */}
