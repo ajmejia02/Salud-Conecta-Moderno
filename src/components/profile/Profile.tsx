@@ -38,7 +38,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { auth } from '../../lib/firebase';
-import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import { onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
 import { BiometricModal } from './BiometricModal';
 import DocumentScanner from '../history/DocumentScanner';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -353,11 +353,15 @@ export function Profile() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('user');
-    auth.signOut();
-    window.location.reload(); // Recarga para resetear el estado de App.tsx
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('user');
+      await signOut(auth); // Usamos la sintaxis moderna correcta
+      // ¡Ya no necesitamos recargar la página! App.tsx lo detectará al instante
+    } catch (error) {
+      console.error('[Profile] Error al cerrar sesión:', error);
+    }
   };
 
   return (
