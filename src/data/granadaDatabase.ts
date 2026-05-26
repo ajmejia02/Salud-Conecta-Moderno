@@ -2,17 +2,17 @@
 ═══════════════════════════════════════════════════════════════
 BASE DE DATOS DE SALUD — Salud-Conecta IA (Granada, Nicaragua)
 ═══════════════════════════════════════════════════════════════
-📌 VERSIÓN: 12.0.0
-📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-20
-📌 CAMBIOS v12.0.0:
-- Actualización masiva de la base de datos de síntomas y enfermedades (19 nuevos cuadros clínicos).
-- Inclusión de enfermedades endémicas (Dengue/Zika/Chikungunya), psiquiatría, urología, ginecología, dermatología y reumatología.
-- Expansión masiva del motor de razonamiento de triaje para la IA.
+📌 VERSIÓN: 13.0.0
+📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-25
+📌 CAMBIOS v13.0.0:
+- Actualización Ultra Masiva: Adición de 17 nuevos escenarios clínicos de altísima complejidad.
+- Soporte clínico para endocrinología de urgencias (Cetoacidosis, Hipoglucemia), oftalmología crítica (Glaucoma), urología de urgencia y cuadros de choque (Sepsis, Anafilaxia).
+- Base de datos de síntomas aumentada exponencialmente en profundidad diagnóstica.
 ═══════════════════════════════════════════════════════════════
 */
 
-export const VERSION_BASE_DATOS = '12.0.0';
-export const ULTIMA_ACTUALIZACION = '2026-12-20';
+export const VERSION_BASE_DATOS = '13.0.0';
+export const ULTIMA_ACTUALIZACION = '2026-12-25';
 
 // ═══════════════════════════════════════════════════════════════
 //  🏥 HOSPITALES
@@ -4694,9 +4694,378 @@ export const SINTOMAS = [
       ],
       urgencia_default: 'BAJA',
       requiere_atencion: false
+    },
+    {
+      id: 56,
+      nombre: 'Cólico Biliar / Colecistitis (Dolor de Vesícula)',
+      categoria: 'Digestivo',
+      sinonimos: ['dolor de vesicula', 'piedras en la vesicula', 'colico biliar', 'dolor bajo la costilla derecha', 'barro biliar', 'dolor de costado derecho'],
+      descripcion: 'Dolor agudo en el cuadrante superior derecho del abdomen o epigastrio, que frecuentemente se irradia a la espalda o escápula derecha, típicamente posprandial (después de comer grasas).',
+      causas_comunes: ['Colelitiasis (piedras en la vesícula)', 'Colecistitis aguda (inflamación de la vesícula)', 'Lodo biliar'],
+      cuidados_casa: [
+        'Suspensión absoluta de la ingesta de grasas, lácteos enteros y frituras.',
+        'Dieta estricta de líquidos claros y carbohidratos simples (arroz, manzana, pan tostado).',
+        'Uso de antiespasmódicos de venta libre si el paciente ya tiene un diagnóstico previo y conocido.',
+        'Evitar analgésicos fuertes que puedan enmascarar el dolor de un cuadro quirúrgico en evolución.'
+      ],
+      cuando_consultar: [
+        'Dolor continuo que dura más de 4-6 horas y no cede con antiespasmódicos o posiciones de reposo.',
+        'Acompañado de fiebre alta y escalofríos (indica infección grave, colangitis o colecistitis aguda).',
+        'Presencia de ictericia (coloración amarillenta progresiva en los ojos o la piel).',
+        'Vómitos incoercibles (que no se pueden detener) o incapacidad para beber agua.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 57,
+      nombre: 'Hipoglucemia (Nivel de Azúcar Muy Bajo)',
+      categoria: 'Endocrinología',
+      sinonimos: ['bajon de azucar', 'hipoglucemia', 'desmayo por diabetes', 'azucar baja', 'sudadera por azucar', 'temblor por hambre', 'debilidad por falta de comida'],
+      descripcion: 'Nivel anormalmente bajo de glucosa en sangre (generalmente < 70 mg/dL), lo que priva al cerebro de su principal fuente de energía. Presenta síntomas autonómicos y neuroglucopénicos rápidos.',
+      causas_comunes: ['Exceso de insulina o medicamentos antidiabéticos (como Glibenclamida)', 'Saltarse comidas o ayuno prolongado', 'Ejercicio extenuante sin aporte calórico previo', 'Consumo de alcohol en exceso sin ingerir alimentos'],
+      cuidados_casa: [
+        'Aplicar la regla de los 15: ingerir 15 gramos de carbohidratos de absorción rápida (1/2 vaso de jugo o refresco no dietético, 3 cucharaditas de azúcar o miel, o caramelos masticables).',
+        'Esperar 15 minutos exactos y, si es posible, medir la glucosa. Si sigue baja o los síntomas no ceden, repetir la dosis de 15 gramos.',
+        'Una vez que los síntomas mejoren, consumir un snack con carbohidratos complejos y proteínas (ej. galletas con queso o medio sándwich) para evitar una recaída a las pocas horas.',
+        'NO dar alimentos sólidos ni líquidos si la persona está inconsciente o muy confundida (riesgo mortal de asfixia o broncoaspiración).'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA: Pérdida del conocimiento o aparición de convulsiones (requiere glucagón intramuscular urgente o glucosa intravenosa hospitalaria).',
+        'Incapacidad del paciente para tragar de forma segura.',
+        'Los síntomas no mejoran después de haber aplicado la "regla de los 15" en tres ocasiones consecutivas.',
+        'Confusión mental severa o comportamiento agresivo inusual que no se resuelve tras ingerir azúcar.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 58,
+      nombre: 'Neumonía Adquirida en la Comunidad',
+      categoria: 'Respiratorio / Infeccioso',
+      sinonimos: ['pulmonia', 'neumonia', 'infeccion en los pulmones', 'dolor al respirar hondo', 'flema con sangre', 'tos con fiebre alta persistente'],
+      descripcion: 'Infección aguda del parénquima pulmonar (alvéolos), que produce ocupación por líquido o pus, limitando severamente el intercambio de oxígeno. Se manifiesta con tos profunda, fiebre alta y disnea.',
+      causas_comunes: ['Infección bacteriana (Streptococcus pneumoniae, Mycoplasma)', 'Infección viral aguda (Influenza, SARS-CoV-2, VSR)', 'Aspiración de contenido gástrico (frecuente en pacientes de la tercera edad)'],
+      cuidados_casa: [
+        'Evitar cualquier esfuerzo físico; mantener reposo absoluto en cama en posición semisentada (a 45 grados) para facilitar la expansión torácica y la respiración.',
+        'Hidratación agresiva oral para ayudar a fluidificar las secreciones pulmonares y facilitar la expectoración del pus/moco.',
+        'Uso de antipiréticos (Paracetamol) para el control de la fiebre.',
+        'NO utilizar antitusígenos (supresores de la tos como el Dextrometorfano) bajo ningún concepto, ya que el pulmón requiere expulsar las secreciones infectadas mediante la tos.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA: Dificultad extrema para respirar, respiración muy rápida (>30 por minuto) o cianosis (coloración gris/azulada en labios o uñas).',
+        'EMERGENCIA: Aparición de confusión, desorientación o somnolencia profunda (signo de falta de oxígeno cerebral, muy peligroso en mayores de 65 años).',
+        'Dolor torácico tipo "punzada" intenso, que agrava como un cuchillo cada vez que se intenta tomar aire profundo (dolor pleurítico).',
+        'Tos persistente con expectoración herrumbrosa (color óxido), verdosa oscura o manchada de sangre fresca.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 59,
+      nombre: 'Pielonefritis Aguda (Infección Renal)',
+      categoria: 'Urología / Infeccioso',
+      sinonimos: ['infeccion en los riñones', 'dolor de riñon con fiebre', 'pielonefritis', 'infeccion de orina grave', 'mal de orin con calentura', 'escalofrios y dolor de espalda'],
+      descripcion: 'Infección bacteriana profunda y potencialmente peligrosa del tracto urinario superior (riñones y pelvis renal), generalmente ascendente desde una cistitis no resuelta.',
+      causas_comunes: ['Cistitis (infección de vejiga) no tratada', 'Bacterias entéricas (E. coli es responsable de >80% de los casos)', 'Obstrucción del flujo de orina (por cálculos o agrandamiento de próstata)'],
+      cuidados_casa: [
+        'Esta patología NO se puede manejar únicamente con cuidados caseros; requiere de inicio inmediato de antibióticos sistémicos.',
+        'Mantener una ingesta hídrica máxima (mínimo 2.5 a 3 litros de agua diarios) para forzar la diuresis.',
+        'Controlar la temperatura con Paracetamol, pero EVITAR los AINEs (Ibuprofeno, Diclofenaco) ya que pueden empeorar la función de los riñones ya inflamados e infectados.',
+        'Aplicar compresas calientes secas en la zona lumbar baja para ayudar a relajar la musculatura y mitigar el dolor irradiado.'
+      ],
+      cuando_consultar: [
+        'Vómitos persistentes que impiden que el paciente retenga líquidos o las pastillas de los antibióticos recetados.',
+        'Fiebre en picos alta (sobre 39°C) con escalofríos intensos e incontrolables (tiritona, que puede indicar paso de bacterias a la sangre).',
+        'Caída de la presión arterial, mareo severo al ponerse de pie, o palidez extrema (signos de choque séptico).',
+        'Orina claramente teñida de sangre roja (hematuria macroscópica masiva).'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 60,
+      nombre: 'Glaucoma Agudo de Ángulo Cerrado',
+      categoria: 'Oftalmología',
+      sinonimos: ['dolor insoportable en el ojo', 'glaucoma agudo', 'ojo rojo como tomate', 'veo halos alrededor de las luces', 'pupila dilatada y ojo duro', 'presion en el ojo estalla'],
+      descripcion: 'Aumento súbito, extremadamente severo del nivel de la presión intraocular debido a un bloqueo total del drenaje de fluidos en el ojo. Es una de las verdaderas urgencias oftalmológicas que puede causar ceguera irreversible en horas.',
+      causas_comunes: ['Bloqueo anatómico brusco del ángulo iridocorneal', 'Uso de fármacos midriáticos (que dilatan la pupila) en personas predispuestas', 'Reacción cruzada con antidepresivos o antihistamínicos sistémicos'],
+      cuidados_casa: [
+        'NO EXISTEN cuidados en casa efectivos ni seguros para esta condición. Es una emergencia hospitalaria absoluta.',
+        'Mantener al paciente en completo reposo, sin frotarse el ojo bajo ninguna circunstancia.',
+        'Evitar ambientes oscuros o cerrar los ojos apretadamente; mantenerse en una habitación muy bien iluminada (la luz ayuda a contraer la pupila, lo que puede abrir milimétricamente la vía de drenaje).',
+        'No administrar gotas caseras, ni colirios genéricos.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA ABSOLUTA: Dolor ocular profundo y dolor de cabeza frontal/cefálico tan atroz que provoca náuseas intensas y vómitos repetidos.',
+        'Visión borrosa repentina y percepción de "halos con colores del arcoíris" alrededor de fuentes de luz.',
+        'El globo ocular afectado está excesivamente rojo y al tocarlo suavemente a través del párpado cerrado se palpa extremadamente duro, como una canica (comparado con el otro ojo sano).',
+        'Pupila semi-dilatada que no se contrae ni responde cuando se le enfoca una luz directa.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 61,
+      nombre: 'Torsión Testicular',
+      categoria: 'Urología',
+      sinonimos: ['dolor repentino en los testiculos', 'hinchazon de testiculo', 'torsion testicular', 'se me torcio el testiculo', 'testiculo subido', 'dolor insoportable en los huevos'],
+      descripcion: 'Rotación del testículo y estrangulación de su cordón espermático, lo que interrumpe abruptamente el flujo de sangre arterial. Isquemia que causa dolor atroz y resulta en la muerte (necrosis) del testículo si no se interviene quirúrgicamente en menos de 6 horas.',
+      causas_comunes: ['Anomalía congénita (deformidad en badajo de campana) que permite la rotación libre del testículo', 'Traumatismo genital previo reciente', 'Esfuerzo o actividad física intensa súbita', 'Mayor incidencia durante el pico de crecimiento en la pubertad'],
+      cuidados_casa: [
+        'EL TIEMPO ES TEJIDO. No se deben aplicar remedios caseros, hielo o cremas para intentar aliviar un dolor que sugiera esta condición.',
+        'Suspender inmediatamente cualquier ingesta de alimentos y líquidos (ya que el paciente probablemente requerirá cirugía general con anestesia en las próximas horas).',
+        'Evitar manipular o intentar "desenroscar" manualmente el testículo por personal no entrenado, lo cual puede agravar la lesión isquémica.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA ABSOLUTA: Dolor escrotal y testicular súbito, extremadamente agudo e incapacitante, que a menudo despierta al paciente de madrugada.',
+        'El testículo afectado se retrae (se ve más alto en el escroto que el sano), está sumamente duro y puede adoptar una posición transversal anómala.',
+        'Presencia de náuseas, vómitos, taquicardia o palidez causados por la intensidad visceral del dolor.',
+        'Falta de alivio del dolor al elevar suavemente el escroto (signo de Prehn negativo), lo cual es crítico para diferenciar de otras patologías menos urgentes.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 62,
+      nombre: 'Crisis de Asma / Broncoespasmo Severo',
+      categoria: 'Respiratorio',
+      sinonimos: ['ataque de asma', 'pecho cerrado', 'silbido en el pecho intenso', 'asfixia asmatica', 'crisis asmatica', 'broncoespasmo agudo'],
+      descripcion: 'Episodio de empeoramiento agudo y rápidamente progresivo de la inflamación pulmonar y constricción del músculo liso de las vías respiratorias. Reduce drásticamente el flujo de aire, causando fatiga de músculos respiratorios.',
+      causas_comunes: ['Exposición masiva a aeroalérgenos (ácaros, caspa de animales, polen, hongos)', 'Infecciones virales respiratorias (desencadenante #1 en niños)', 'Exposición a aire muy frío o ejercicio físico extremo', 'Abandono del tratamiento preventivo con corticoides inhalados diarios'],
+      cuidados_casa: [
+        'Mantener la calma total (la ansiedad exacerba el espasmo); colocar al paciente sentado derecho, levemente inclinado hacia adelante para maximizar la mecánica ventilatoria.',
+        'Utilizar el inhalador de RESCATE (ej. Salbutamol / Albuterol) utilizando una cámara espaciadora: 2 a 4 pulsaciones consecutivas, repitiendo cada 20 minutos durante la primera hora.',
+        'Aflojar inmediatamente prendas apretadas en cuello, cintura y tórax.',
+        'Evacuar o alejar al paciente de cualquier desencadenante ambiental sospechoso (humo, olores químicos fuertes, animales).'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA: Si no hay una mejoría evidente tras completar el primer protocolo de rescate de 1 hora con el inhalador.',
+        'El paciente es incapaz de completar una sola frase sin tener que detenerse para recuperar el aliento (habla entrecortada o por sílabas).',
+        'Uso evidente de musculatura accesoria: la piel se hunde profundamente entre las costillas y en el hueco del cuello (tiraje severo) con cada respiración.',
+        'Cambios en la coloración (cianosis peri-bucal o distal) o estado mental (somnolencia, agitación o silencio auscultatorio, es decir, ya ni siquiera se oyen silbidos porque el aire no pasa).'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 63,
+      nombre: 'Celulitis Infecciosa / Erisipela',
+      categoria: 'Dermatología / Infeccioso',
+      sinonimos: ['infeccion en la pierna', 'pierna roja y caliente', 'celulitis bacteriana', 'erisipela', 'piel roja inflamada', 'pierna hinchada con fiebre', 'cuero rojo infectado'],
+      descripcion: 'Infección bacteriana grave, aguda y expansiva de las capas dérmicas profundas de la piel y tejido celular subcutáneo. Cursa clásicamente con una extensa placa roja (eritematosa), brillante, caliente, muy hinchada y dolorosa.',
+      causas_comunes: ['Infección por cepas patógenas de Streptococcus pyogenes o Staphylococcus aureus', 'Ruptura de la barrera cutánea (picaduras de insectos rasgadas, cortes, heridas quirúrgicas, úlceras o incluso hongos interdigitales en los pies)', 'Pacientes con linfedema, insuficiencia venosa crónica o diabetes mal controlada'],
+      cuidados_casa: [
+        'Esta infección exige invariablemente tratamiento antibiótico médico, el manejo casero es solo complementario.',
+        'Elevación rigurosa de la extremidad afectada por encima del nivel anatómico del corazón para ayudar al drenaje veno-linfático, lo cual reduce significativamente el edema y el dolor opresivo.',
+        'Controlar la fiebre con antipiréticos (Paracetamol) y analgésicos sistémicos.',
+        'NO aplicar cremas caseras, hielo directo o calor directo a la placa infectada. Mantener la piel limpia y seca.'
+      ],
+      cuando_consultar: [
+        'Requiere evaluación médica temprana (en las primeras 12 a 24 horas del inicio) para iniciar antibióticos orales antes de que la infección invada el torrente sanguíneo.',
+        'La placa eritematosa (zona roja) avanza rápidamente de tamaño (se aconseja delinear los bordes con un bolígrafo para medir la progresión en horas).',
+        'Presencia de fiebre altísima con escalofríos, mareos severos al pararse, o latidos muy acelerados (signos de sepsis).',
+        'La aparición de ampollas llenas de sangre, dolor extremadamente desproporcionado, o piel que se torna color negro/violáceo (Sospecha crítica de Fascitis Necrotizante, una emergencia quirúrgica a vida o muerte).'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 64,
+      nombre: 'Tromboembolismo Pulmonar (TEP)',
+      categoria: 'Respiratorio / Cardiovascular',
+      sinonimos: ['coagulo en el pulmon', 'trombo en el pulmon', 'tep', 'falta de aire subita', 'dolor al respirar hondo repentino', 'infarto pulmonar'],
+      descripcion: 'Obstrucción repentina e impactante de las arterias pulmonares, usualmente debido a un coágulo grande de sangre (trombo) que se ha desprendido y viajado desde las venas profundas de las piernas hasta los pulmones. Resulta en isquemia letal y sobrecarga inmediata del corazón.',
+      causas_comunes: ['Trombosis Venosa Profunda (TVP) activa o previa en piernas', 'Inmovilización extrema prolongada (vuelos intercontinentales sin pararse, postración hospitalaria, yesos ortopédicos)', 'Tratamientos hormonales (anticonceptivos combinados) o embarazo', 'Pacientes con cáncer activo o cirugías mayores recientes'],
+      cuidados_casa: [
+        'ESTA ES UNA EMERGENCIA EXTREMADAMENTE GRAVE. No hay ningún tratamiento o cuidado que se deba intentar en casa.',
+        'Mantener a la persona en reposo absoluto, sentada o recostada.',
+        'NO PERMITIRLE CAMINAR, NI HACER EL MÁS MÍNIMO ESFUERZO. El esfuerzo físico dispara la demanda de oxígeno en un cuerpo que no lo puede suplir, llevando a paro cardíaco inmediato.',
+        'Llamar al servicio de emergencias (ambulancia) de inmediato.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL (Llamar 128 o acudir a Hospital inmediatamente).',
+        'Aparición fulminante y sorpresiva de asfixia (disnea grave) sin motivo aparente, incluso estando en reposo.',
+        'Dolor de pecho de características pleuríticas, es decir, una punzada muy intensa que empeora con el menor intento de tos o de tomar aire.',
+        'Tos nueva asociada a expectoración repentina de sangre roja fresca (hemoptisis).',
+        'Síncope (desmayo brusco) asociado a palpitaciones o si una de las pantorrillas del paciente está repentinamente gruesa, enrojecida y muy dolorosa.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 65,
+      nombre: 'Cetoacidosis Diabética (Complicación Crítica)',
+      categoria: 'Endocrinología',
+      sinonimos: ['azucar por las nubes', 'coma diabetico', 'cetoacidosis', 'cad', 'respiracion rapida por diabetes', 'aliento a manzana podrida', 'intoxicacion por azucar altisima'],
+      descripcion: 'Descompensación metabólica severa, potencialmente letal, secundaria al déficit de insulina circulante (muy común en Diabetes Tipo 1). Ante la falta de insulina celular, el cuerpo metaboliza masivamente ácidos grasos, liberando compuestos tóxicos y muy ácidos (cuerpos cetónicos) en el torrente sanguíneo.',
+      causas_comunes: ['Falta de aplicación u olvido prolongado de las dosis de insulina pautadas', 'Infección aguda subyacente que dispara los requerimientos de insulina (neumonía, infección urinaria, sepsis)', 'Debut no diagnosticado de Diabetes Tipo 1 (frecuente en jóvenes)', 'Uso de fármacos hiperglucemiantes potentes (corticoides a dosis altas)'],
+      cuidados_casa: [
+        'ESTADO PRE-COMA. Requiere manejo de Cuidados Intensivos (reanimación hídrica IV masiva, insulina continua, electrolitos como potasio).',
+        'Si el paciente está 100% consciente, alerta y sin vómitos, puede ingerir abundante agua pura mientras es transportado de urgencia, para diluir la hiperglucemia.',
+        'Monitorizar inmediatamente la glucemia capilar si se tiene glucómetro, y el nivel de cetonas urinarias si disponen de reactivos en casa.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL: Vómitos intratables y dolor abdominal difuso (confundido muchas veces con apendicitis) en cualquier paciente diabético conocido.',
+        'Alteración franca del patrón respiratorio: Respiraciones muy rápidas, profundas, ansiosas y trabajosas (Respiración de Kussmaul).',
+        'Presencia de aliento muy peculiar, con olor dulce parecido a la fruta fermentada, manzana podrida o acetona/quitaesmalte.',
+        'Signos de deshidratación celular extrema (lengua seca y áspera como lija, piel acartonada, ojos profundamente hundidos).',
+        'Cualquier grado de alteración del estado de conciencia, desde confusión y letargo, hasta somnolencia profunda y coma diabético.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 66,
+      nombre: 'Úlcera Péptica Complicada (Sangrado o Perforación)',
+      categoria: 'Digestivo',
+      sinonimos: ['ulcera reventada', 'sangrado del estomago', 'hoyo en el estomago', 'dolor de estomago punzante mortal', 'vomito negro como petroleo', 'melena severa'],
+      descripcion: 'Erosión grave, aguda y profunda en la mucosa del estómago o duodeno. Ha penetrado ya sea vasos sanguíneos arteriales grandes (causando hemorragia digestiva masiva) o ha erosionado toda la pared del órgano (causando perforación y peritonitis química fatal).',
+      causas_comunes: ['Uso indiscriminado y crónico de analgésicos tipo AINEs (Ibuprofeno, Diclofenaco, Naproxeno) y Aspirina', 'Infección gástrica erosiva crónica por Helicobacter pylori no erradicada', 'Consumo masivo de alcohol combinado con tabaco', 'Tumores gástricos sangrantes'],
+      cuidados_casa: [
+        'Reposo gástrico absoluto: NADA POR LA BOCA, ni siquiera un sorbo de agua, jugos, ni pastillas de ningún tipo, hasta ser evaluado en un quirófano.',
+        'Suspender permanentemente y de manera inmediata el consumo de cualquier AINE o Aspirina.',
+        'Evitar el uso de "remedios caseros" como leche, bicarbonato, limón o antiácidos. Si existe una perforación gástrica, introducir fluidos al peritoneo causará un choque séptico casi irrecuperable.',
+        'Trasladar en posición reclinada.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA ABSOLUTA: Dolor abdominal superior o medio de inicio súbito, inaguantable, descrito a menudo como "una puñalada que atraviesa hacia la espalda".',
+        'Abdomen extremadamente rígido "en tabla de madera", donde el paciente no tolera el más leve roce ni movimiento (Signos de irritación peritoneal).',
+        'Vómitos muy abundantes de sangre fresca o con un aspecto negro/marrón granuloso (vómito en borra de café/posos de café).',
+        'Heces sumamente pegajosas, de color negro brillante y con un olor fétido intenso característico (Melena), especialmente si se acompañan de desmayo (síncope) o sudor frío.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 67,
+      nombre: 'Neuralgia del Trigémino',
+      categoria: 'Neurológico',
+      sinonimos: ['dolor electrico en la cara', 'tic doloroso', 'calambre en la cara', 'choque electrico en la mandibula', 'neuralgia facial', 'dolor lancinante de ojo o cachete'],
+      descripcion: 'Trastorno neuropático crónico severo del quinto par craneal (nervio trigémino). Produce cuadros paroxísticos de dolor facial insoportable, repentino y fulgurante, descrito usualmente como el equivalente a un choque de alto voltaje directo en la piel del rostro.',
+      causas_comunes: ['Compresión vascular del nervio (un vaso sanguíneo latiendo y presionando el nervio craneal en la base del cerebro)', 'Esclerosis Múltiple (daño de mielina)', 'Degeneración nerviosa secundaria a la edad o trauma orofacial previo'],
+      cuidados_casa: [
+        'Identificar y evitar religiosamente las zonas o acciones "gatillo" (comer o masticar alimentos duros, cepillarse los dientes vigorosamente, afeitarse o exponer el rostro al viento muy frío y directo).',
+        'Comprender que los analgésicos comunes de venta libre (Aspirina, Ibuprofeno, Acetaminofén) son completamente ineficaces y su abuso buscando alivio solo causará daño renal o gástrico.',
+        'Consumir líquidos tibios y alimentos suaves si la masticación es el gatillo principal.',
+        'Aplicar protección de la zona sensitiva.'
+      ],
+      cuando_consultar: [
+        'El dolor alcanza un umbral tan severo que imposibilita al paciente para beber líquidos, ingerir alimentos, hablar o realizar su higiene básica, poniendo en riesgo agudo su nutrición e hidratación.',
+        'Pérdida de la eficacia (taquifilaxia) a los fármacos neuromoduladores de rescate recetados (ej. Carbamazepina, Gabapentina o Pregabalina).',
+        'Aparición nueva de entumecimiento permanente en la cara, caída del párpado o debilidad muscular facial (signos de que puede existir un tumor u otra lesión comprimiendo permanentemente el nervio).'
+      ],
+      urgencia_default: 'MEDIA',
+      requiere_atencion: false
+    },
+    {
+      id: 68,
+      nombre: 'Sepsis / Infección Generalizada',
+      categoria: 'Infeccioso / General',
+      sinonimos: ['septicemia', 'infeccion en la sangre', 'sepsis', 'infeccion general', 'presion muy baja por infeccion', 'fiebre incontrolable con confusion', 'choque septico'],
+      descripcion: 'Síndrome letal resultante de una respuesta inmunitaria extrema y desregulada a una infección, donde el cuerpo termina dañando sus propios tejidos y órganos. Evoluciona rápidamente a un colapso circulatorio (choque séptico) y fallo multiorgánico.',
+      causas_comunes: ['Neumonías bacterianas comunitarias no tratadas o ignoradas', 'Infecciones urinarias severas en pacientes mayores o sondados', 'Procesos infecciosos intraabdominales agudos (Apendicitis perforada, Peritonitis)', 'Infecciones invasivas en heridas quirúrgicas extensas o catéteres intravenosos'],
+      cuidados_casa: [
+        'CONDICIÓN 100% INTRATABLE EN EL HOGAR. Todo intento de manejar la sepsis con remedios caseros aumenta exponencialmente el riesgo de muerte en cuestión de horas.',
+        'El único cuidado válido es el reconocimiento hipertemprano de la triada de peligro (Alteración mental + Respiración rápida + Hipotensión) y el traslado inmediato a urgencias.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA VITAL ABSOLUTA: Un paciente (especialmente niños pequeños o ancianos) con una infección conocida que súbitamente desarrolla comportamiento confuso, somnolencia extrema, letargo profundo o delirio incomprensible.',
+        'La respiración se vuelve sumamente rápida (frecuencia respiratoria superior a 22 respiraciones por minuto) y superficial.',
+        'Piel con signos de muy mala perfusión: fría, sudorosa, extremadamente pálida, o con la aparición de un patrón azulado/rojizo en red (moteado lívido de la piel).',
+        'Caída profunda de la orina (paciente que no logra orinar nada en más de 12 a 18 horas).',
+        'Tiritona severa, incontrolable, con fiebres muy altas o, paradójicamente y aún más grave, temperaturas corporales excesivamente bajas (Hipotermia < 36°C en un cuadro infeccioso).'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 69,
+      nombre: 'Retención Aguda de Orina (Globo Vesical)',
+      categoria: 'Urología',
+      sinonimos: ['no puedo mear', 'globo vesical', 'vejiga reventada', 'retencion de orina severa', 'dolor en el bajo vientre por orina retenida', 'atasco urinario'],
+      descripcion: 'Es la imposibilidad súbita, abrupta y extremadamente dolorosa de vaciar la vejiga, provocando un estiramiento forzado de las paredes vesicales y riesgo de reflujo urinario hacia los riñones.',
+      causas_comunes: ['Agrandamiento de la próstata (Hiperplasia Prostática Benigna) en el varón adulto mayor', 'Consumo inadvertido de fármacos de venta libre (Antihistamínicos para alergia, Antigripales con pseudoefedrina, o fármacos antiespasmódicos potentes)', 'Obstrucción mecánica por coágulos post-cirugía urológica o cálculos uretrales', 'Compresión o daño neurológico de la columna lumbar (síndrome de cauda equina)'],
+      cuidados_casa: [
+        'BAJO NINGÚN CONCEPTO intente forzar al paciente a beber más líquidos para "estimular" la orina, esto aumentará exponencialmente la distensión y el dolor insoportable de la vejiga.',
+        'Intente relajar la zona aplicando compresas moderadamente calientes o baños de asiento tibios sobre la pelvis inferior.',
+        'Abandone y prohíba todo uso de pastillas antigripales o medicamentos para alergias que provocan retención urinaria.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA UROLÓGICA: Cuando el paciente reporta dolor infraumbilical agudo asociado a más de 6-8 horas de incapacidad absoluta para orinar a pesar de tener un deseo (urgencia) desesperado.',
+        'Si se logra palpar visual y físicamente un bulto redondeado, duro y tenso (tamaño de un melón) justo por debajo del ombligo (Globo vesical agudo).',
+        'Asociación del cuadro con sudoración fría excesiva, picos de presión arterial alta, y agitación incontrolable por el propio dolor expansivo.',
+        'Debe ser ingresado por emergencias de manera inmediata para la descompresión instrumental (cateterismo o paso de Sonda Foley) por personal médico.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 70,
+      nombre: 'Meningitis / Encefalitis Aguda',
+      categoria: 'Neurológico / Infeccioso',
+      sinonimos: ['meningitis', 'infeccion en el cerebro', 'fiebre altisima con cuello duro', 'inflamacion del cerebro y medula', 'dolor de cabeza que ciega con fiebre', 'fiebre y fotofobia extrema'],
+      descripcion: 'Enfermedad infecciosa invasiva y de desarrollo rapidísimo que inflama las cubiertas protectoras del cerebro y médula espinal (Meninges) o el parénquima cerebral mismo (Encefalitis). Es una causa clásica de daño neurológico mortal si el diagnóstico se demora horas.',
+      causas_comunes: ['Bacterias muy agresivas (Streptococcus pneumoniae, Neisseria meningitidis o Meningococo)', 'Virus neurotropos (Virus del Herpes Simple, Enterovirus)', 'Hongos invasivos (especialmente en pacientes con inmunodepresión o VIH no controlado)'],
+      cuidados_casa: [
+        'ENFERMEDAD QUE AMENAZA LA VIDA EN HORAS. El tiempo de retraso en la casa para dar tratamientos de fiebre aumentará directamente las probabilidades de muerte o discapacidad permanente.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA ABSOLUTA DE SALUD PÚBLICA: Cuadro febril de aparición brutal, acompañado de un dolor de cabeza opresivo y explosivo, distinto a cualquier migraña conocida.',
+        'Signo de Rigidez de Nuca evidente: El paciente presenta dolor y espasmo que imposibilitan física y completamente flexionar el cuello (es decir, tratar de pegar el mentón/barbilla contra su propio tórax).',
+        'Aparición rápida de brotes en la piel como pequeñas manchas purpúricas o rojo oscuro (Petequias o Púrpura) que, al presionarlas con un cristal transparente o dedo, NO palidecen ni desaparecen (sugiere Meningococo masivo en sangre).',
+        'Intolerancia visual dramática e invalidante frente a cualquier fuente de luz (Fotofobia severa) acompañada de confusión mental y somnolencia.',
+        'Bebés pequeños y lactantes: Mollera (fontanela anterior) muy abultada y dura, llanto chillón, agudo e incesante, o aparición de fiebre inexplicable con total rechazo a la succión.'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 71,
+      nombre: 'Choque Anafiláctico (Anafilaxia Sistémica)',
+      categoria: 'Inmunología / Alergia',
+      sinonimos: ['alergia mortal y fulminante', 'choque alergico', 'anafilaxia', 'garganta cerrada de golpe por alergia', 'asfixia aguda por alergia', 'hinchazon de cara y cuello subita'],
+      descripcion: 'Es el grado más severo, peligroso y multisistémico de una reacción alérgica, desatada en segundos o escasos minutos posteriores a la exposición. Genera vasodilatación masiva (caída de la presión arterial letal) y edema laríngeo que cierra la vía aérea impidiendo respirar.',
+      causas_comunes: ['Toxinas por picaduras/mordeduras (abejas, avispas, hormigas de fuego)', 'Alérgenos alimentarios altamente reactivos (cacahuates, frutos secos, mariscos, huevo, lácteos en algunos individuos)', 'Fármacos administrados IV o VO (Alergia conocida a Penicilinas, contrastes de yodo para rayos X, AINEs)'],
+      cuidados_casa: [
+        'Si el paciente cuenta con prescripción y porta su autoinyector de adrenalina (Epinefrina, EpiPen, Jext), DEBE ADMINISTRARSE INMEDIATAMENTE en la porción lateral y anterior (cara externa) del muslo sin demora. No existe ninguna contraindicación absoluta para usar adrenalina si se sospecha anafilaxia.',
+        'Colocar rápidamente al paciente recostado sobre su espalda (decúbito supino) y elevar ambas piernas en alto, esto forzará mecánicamente que el flujo de sangre retorne al corazón y el cerebro para prevenir un paro (Posición de Trendelenburg modificado).',
+        'Si el paciente está vomitando profusamente, tiene un colapso respiratorio evidente o está desmayado, colocarlo acostado firmemente sobre su lado izquierdo (posición de seguridad) para evitar la muerte por broncoaspiración del vómito.',
+        'NUNCA ASUMA QUE LOS ANTIHISTAMÍNICOS (como la Loratadina, Dexclorfeniramina) o corticoides orales van a ser suficientes para frenar la anafilaxia. Tardan más de 40 minutos en actuar, tiempo que puede resultar en paro cardiorrespiratorio.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA EXTREMA Y PRIORITARIA (Notificar de inmediato al 128 o trasladar a emergencias).',
+        'Inicio agudo de dificultad asfixiante para ingresar aire, silbidos ásperos en el pecho o sensación real de estrangulamiento de la vía aérea.',
+        'Percepción angustiante de la presencia de un "nudo o bulto gigante en la garganta" con imposibilidad completa de tragar la propia saliva, y voz apagada o ronca (edema glótico).',
+        'Hinchazón deformante, veloz e impresionante de los labios, la totalidad del rostro, la lengua y los párpados.',
+        'Síncope instantáneo, caída redonda, palidez blanca/grisácea de todo el cuerpo, pulso rapidísimo e imperceptible (indicativos del inicio del colapso vascular periférico).'
+      ],
+      urgencia_default: 'EMERGENCIA',
+      requiere_atencion: true
+    },
+    {
+      id: 72,
+      nombre: 'Obstrucción Intestinal Completa / Íleo Paralítico',
+      categoria: 'Digestivo',
+      sinonimos: ['tripas trabadas y cruzadas', 'obstruccion intestinal severa', 'no echo gases ni defeco nada', 'intestino cerrado', 'vomito negro con olor a caca fecal', 'ileo', 'abdomen inflado como tambor a tension'],
+      descripcion: 'Interrupción o bloqueo crítico que impide que el contenido digestivo, los líquidos y los gases avancen de manera normal a través del tubo intestinal. Puede deberse a un impedimento anatómico (mecánico) o un fallo en los nervios del intestino (parálisis o íleo), induciendo dilatación extrema y peligro de necrosis o perforación intestinal de las vísceras.',
+      causas_comunes: ['Múltiples adherencias, cicatrices internas o "bridas" formadas tras cirugías abdominales mayores antiguas (cesáreas pasadas, apendicectomías)', 'Atrapamiento e isquemia dentro de un saco de hernia externa estrangulada (ej. hernia umbilical o inguinal que no se reduce)', 'Crecimientos o neoplasias malignas que taponan la luz del colon (Cáncer colorrectal de progresión tardía)', 'Oclusión crónica y masiva por heces resecas (Fecaloma masivo en el recto de pacientes seniles)'],
+      cuidados_casa: [
+        'SUSPENSIÓN INCONDICIONAL Y ESTRICTA de la vía oral: Está formal y críticamente contraindicado forzar o alentar al paciente a consumir ningún tipo de sólido ni líquido, ya que todo se regurgitará e incrementará el riesgo gravísimo de broncoaspiración (ingresar fluido gástrico a los pulmones al vomitar).',
+        'PROHIBICIÓN TOTAL DE AUTOMEDICACIÓN LAXANTE (Ciruelas, Sen, Bisacodilo) o ENEMAS DE LIMPIEZA EXTREMOS caseros sin antes contar con luz verde médica. Si hay una obstrucción completa rígida, el purgante causará un aumento brutal de presión dentro del segmento obstruido y reventará la pared del colon, provocando peritonitis generalizada fatal.',
+        'Tampoco administrar analgésicos narcóticos o narcóticos opioides, puesto que frenan aún más el movimiento normal peristáltico del intestino.'
+      ],
+      cuando_consultar: [
+        'URGENCIA MÉDICA Y POTENCIALMENTE QUIRÚRGICA INMINENTE.',
+        'Cese abrupto y total del paso de deposiciones y, característicamente, la imposibilidad de expulsar gases intestinales (flatos) durante un periodo continuo de 24 a 48 horas o más.',
+        'Instauración de dolor abdominal intermitente sumamente intenso, "tipo retorcijón" o calambre severo, que con el paso de las horas comienza a hacerse constante y progresivamente insoportable.',
+        'El abdomen presenta una distensión grosera; a la simple inspección visual, la pared del abdomen luce altamente tensa y "redondeada como un globo o tambor", a veces permitiendo la visualización de los propios bucles del intestino peleando debajo de la piel por vencer la obstrucción.',
+        'Aparición de vómitos recurrentes y biliosos que en las etapas más avanzadas y críticas asumen un franco color pardo-marrón muy fétido con características fecales (Vómito Fecaloideo), indicativo indiscutible de obstrucción baja avanzada.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
     }
   ];
-];
 
 // ═══════════════════════════════════════════════════════════════
 //  🚑 EMERGENCIAS
