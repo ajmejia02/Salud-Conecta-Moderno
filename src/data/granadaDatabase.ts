@@ -2,17 +2,17 @@
 ═══════════════════════════════════════════════════════════════
 BASE DE DATOS DE SALUD — Salud-Conecta IA (Granada, Nicaragua)
 ═══════════════════════════════════════════════════════════════
-📌 VERSIÓN: 8.0.0
-📌 ÚLTIMA ACTUALIZACIÓN: 2026-10-25
-📌 CAMBIOS v8.0.0:
-- Expansión masiva de conocimientos médicos (Fármacos modernos y Síntomas críticos).
-- Nuevos grupos farmacológicos: Anticoagulantes NOAC, GLP-1, SGLT2, ISRS modernos.
-- Nuevos cuadros sintomáticos detallados para potenciar el triaje IA.
+📌 VERSIÓN: 9.0.0
+📌 ÚLTIMA ACTUALIZACIÓN: 2026-11-10
+📌 CAMBIOS v9.0.0:
+- Expansión ultra-masiva de conocimientos médicos.
+- Añadidos 15 nuevos fármacos de especialidad (Neurología, Urología, Cardiología, Dermatología).
+- Añadidas 8 emergencias y síntomas neurológicos/cardiovasculares críticos (ACV, Síncope, Anafilaxia).
 ═══════════════════════════════════════════════════════════════
 */
 
-export const VERSION_BASE_DATOS = '8.0.0';
-export const ULTIMA_ACTUALIZACION = '2026-10-25';
+export const VERSION_BASE_DATOS = '9.0.0';
+export const ULTIMA_ACTUALIZACION = '2026-11-10';
 
 // ═══════════════════════════════════════════════════════════════
 //  🏥 HOSPITALES
@@ -3146,6 +3146,276 @@ export const MEDICAMENTOS = [
     requiere_receta: true,
     precio_aproximado: '300-500 C$ (1 sobre)',
     embarazo: 'Categoría B — Seguro y comúnmente usado en embarazo.'
+  },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 46 — PSIQUIATRÍA Y NEUROLOGÍA AVANZADA
+  // ════════════════════════════════════════════════════════
+  {
+    id: 401,
+    nombre_es: 'Sertralina',
+    nombre_en: 'Sertraline',
+    nombres_comerciales: ['Zoloft','Altruline','Sertralina MK','Serolux'],
+    sinonimos: ['zoloft','altruline','para la depresion','para la ansiedad','isrs','serolux'],
+    categoria: 'Antidepresivo (ISRS)',
+    uso_principal: 'Depresión mayor, trastorno de pánico, ansiedad social, trastorno obsesivo-compulsivo (TOC).',
+    dosis_adulto: '50-100 mg una vez al día (preferiblemente en la mañana).',
+    dosis_nino: 'Aprobado en TOC pediátrico (>6 años) bajo estricta supervisión.',
+    contraindicaciones: 'Uso concurrente de IMAO o pimozida. Trastorno bipolar no tratado (riesgo de manía).',
+    efectos_secundarios: 'Insomnio o somnolencia, náuseas, disfunción sexual, temblor leve.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '200-500 C$ (30 tabletas)',
+    embarazo: 'Categoría C — Considerar riesgo/beneficio con psiquiatra.'
+  },
+  {
+    id: 402,
+    nombre_es: 'Duloxetina',
+    nombre_en: 'Duloxetine',
+    nombres_comerciales: ['Cymbalta','Duxetin','Duloxetina MK'],
+    sinonimos: ['cymbalta','duxetin','antidepresivo dolor','para fibromialgia','para neuropatia y depresion'],
+    categoria: 'Antidepresivo dual (IRSN) / Analgésico',
+    uso_principal: 'Depresión mayor, dolor neuropático diabético, fibromialgia, dolor musculoesquelético crónico.',
+    dosis_adulto: '30-60 mg una vez al día.',
+    dosis_nino: 'Solo bajo supervisión psiquiátrica.',
+    contraindicaciones: 'Glaucoma de ángulo cerrado no controlado, enfermedad hepática severa.',
+    efectos_secundarios: 'Náuseas severas al inicio, sudoración excesiva, boca seca, estreñimiento.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '450-800 C$ (28 cápsulas)',
+    embarazo: 'Categoría C — Consultar médico.'
+  },
+  {
+    id: 403,
+    nombre_es: 'Quetiapina',
+    nombre_en: 'Quetiapine',
+    nombres_comerciales: ['Seroquel','Quetiazic','Quetiapina MK','Norsic'],
+    sinonimos: ['seroquel','quetiazic','para dormir fuerte','antipsicotico','para esquizofrenia','para bipolaridad','norsic'],
+    categoria: 'Antipsicótico atípico',
+    uso_principal: 'Esquizofrenia, trastorno bipolar. En dosis bajas (25-50mg) se usa off-label para insomnio severo o ansiedad resistente.',
+    dosis_adulto: 'Insomnio: 25-50 mg noche. Psiquiatría: 300-800 mg diarios.',
+    dosis_nino: 'No recomendado rutinariamente.',
+    contraindicaciones: 'Demencia con psicosis en ancianos (riesgo CV elevado).',
+    efectos_secundarios: 'Somnolencia severa, aumento de peso, riesgo de diabetes tipo 2 con uso crónico, mareos al pararse.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '300-900 C$ (según concentración)',
+    embarazo: 'Categoría C — Solo si es estrictamente necesario.'
+  },
+  {
+    id: 404,
+    nombre_es: 'Zolpidem',
+    nombre_en: 'Zolpidem',
+    nombres_comerciales: ['Stilnox','Somno','Zolpidem MK','Nocte'],
+    sinonimos: ['stilnox','somno','pastilla para dormir','insomnio fuerte','inductor del sueno','nocte'],
+    categoria: 'Hipnótico no benzodiazepínico',
+    uso_principal: 'Tratamiento a corto plazo del insomnio (dificultad para iniciar el sueño).',
+    dosis_adulto: '5-10 mg justo antes de acostarse. No exceder 4 semanas.',
+    dosis_nino: 'CONTRAINDICADO.',
+    contraindicaciones: 'Apnea del sueño, miastenia gravis, insuficiencia hepática grave. NUNCA mezclar con alcohol.',
+    efectos_secundarios: 'Amnesia anterógrada, sonambulismo (comer o caminar dormido sin recordarlo), mareo matutino.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '250-600 C$ (30 tabletas)',
+    embarazo: 'Categoría C — Evitar por depresión respiratoria neonatal.'
+  },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 47 — CARDIOLOGÍA AVANZADA
+  // ════════════════════════════════════════════════════════
+  {
+    id: 405,
+    nombre_es: 'Apixabán',
+    nombre_en: 'Apixaban',
+    nombres_comerciales: ['Eliquis'],
+    sinonimos: ['eliquis','anticoagulante seguro','para arritmia','para trombosis','sangre liquida'],
+    categoria: 'Anticoagulante oral directo (DOAC)',
+    uso_principal: 'Prevención de embolia y ACV en fibrilación auricular. Tratamiento de Trombosis Venosa Profunda (TVP) y Tromboembolismo Pulmonar (TEP).',
+    dosis_adulto: '2.5 a 5 mg dos veces al día.',
+    dosis_nino: 'No recomendado.',
+    contraindicaciones: 'Sangrado activo, insuficiencia hepática severa, uso de válvulas cardíacas mecánicas.',
+    efectos_secundarios: 'Sangrado (pero con menor riesgo gastrointestinal que Rivaroxaban), anemia.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '2,000-3,500 C$ (60 tabletas)',
+    embarazo: 'Categoría C — Evitar.'
+  },
+  {
+    id: 406,
+    nombre_es: 'Valsartán',
+    nombre_en: 'Valsartan',
+    nombres_comerciales: ['Diovan','Valsartan MK','Valaplex'],
+    sinonimos: ['diovan','valaplex','para la presion','antihipertensivo moderno','ara2'],
+    categoria: 'Antihipertensivo (ARA II)',
+    uso_principal: 'Hipertensión arterial, insuficiencia cardíaca, post-infarto de miocardio.',
+    dosis_adulto: '80-160 mg una vez al día o dividido en dos dosis.',
+    dosis_nino: 'Aprobado en >6 años bajo supervisión.',
+    contraindicaciones: 'Embarazo, falla hepática grave, uso combinado con Aliskireno en diabéticos.',
+    efectos_secundarios: 'Mareo, hiperpotasemia, hipotensión. Excelente tolerancia gástrica.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '200-500 C$ (30 tabletas)',
+    embarazo: 'Categoría D — CONTRAINDICADO.'
+  },
+  {
+    id: 407,
+    nombre_es: 'Bisoprolol',
+    nombre_en: 'Bisoprolol',
+    nombres_comerciales: ['Concor','Ziac','Bisoprolol MK','Corbis'],
+    sinonimos: ['concor','corbis','para la taquicardia','para el corazon','betabloqueador cardioselectivo'],
+    categoria: 'Antihipertensivo / Betabloqueador Cardioselectivo',
+    uso_principal: 'Insuficiencia cardíaca crónica estable, hipertensión, cardiopatía isquémica.',
+    dosis_adulto: '2.5 - 10 mg una vez al día por la mañana.',
+    dosis_nino: 'No recomendado.',
+    contraindicaciones: 'Bradicardia severa, asma grave (aunque es más seguro que el propranolol), bloqueo AV.',
+    efectos_secundarios: 'Fatiga, extremidades frías, bradicardia, cansancio al hacer ejercicio.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '300-600 C$ (30 tabletas)',
+    embarazo: 'Categoría C — Usar con precaución extrema.'
+  },
+  {
+    id: 408,
+    nombre_es: 'Espironolactona',
+    nombre_en: 'Spironolactone',
+    nombres_comerciales: ['Aldactone','Espironolactona MK'],
+    sinonimos: ['aldactone','diuretico ahorrador de potasio','para la cirrosis','liquido en el abdomen','para el corazon'],
+    categoria: 'Diurético ahorrador de potasio',
+    uso_principal: 'Insuficiencia cardíaca severa, ascitis por cirrosis hepática, hiperaldosteronismo, acné hormonal (off-label).',
+    dosis_adulto: '25-100 mg al día.',
+    dosis_nino: 'Solo bajo estricta supervisión.',
+    contraindicaciones: 'Insuficiencia renal aguda, hiperpotasemia (potasio alto en sangre).',
+    efectos_secundarios: 'Crecimiento de pechos en hombres (ginecomastia), irregularidad menstrual, potasio elevado.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '150-300 C$ (30 tabletas)',
+    embarazo: 'Categoría C — Evitar por potencial de feminización de fetos masculinos.'
+  },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 48 — UROLOGÍA Y DIGESTIVO AVANZADO
+  // ════════════════════════════════════════════════════════
+  {
+    id: 409,
+    nombre_es: 'Tamsulosina',
+    nombre_en: 'Tamsulosin',
+    nombres_comerciales: ['Flomax','Secotex','Tamsulosina MK','Aclosan'],
+    sinonimos: ['flomax','secotex','para la prostata','dificultad para orinar hombres','crecimiento de prostata','aclosan'],
+    categoria: 'Bloqueador Alfa-1 (Urológico)',
+    uso_principal: 'Hiperplasia prostática benigna (HPB), facilita la expulsión de cálculos renales (off-label).',
+    dosis_adulto: '0.4 mg una vez al día, 30 minutos después de la misma comida.',
+    dosis_nino: 'CONTRAINDICADO.',
+    contraindicaciones: 'Antecedentes de hipotensión ortostática, falla hepática grave.',
+    efectos_secundarios: 'Mareo al pararse rápidamente, eyaculación retrógrada (semen va hacia vejiga), rinitis.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '400-800 C$ (30 cápsulas)',
+    embarazo: 'Categoría B — Pero solo se usa en hombres.'
+  },
+  {
+    id: 410,
+    nombre_es: 'Trimebutina',
+    nombre_en: 'Trimebutine',
+    nombres_comerciales: ['Debridat','Colipan','Trimebutina MK','Libertrim'],
+    sinonimos: ['debridat','colipan','libertrim','para el colon irritable','colon inflamado','espamos estomacales','dolor de colon'],
+    categoria: 'Antiespasmódico / Regulador de la motilidad',
+    uso_principal: 'Síndrome de Intestino Irritable (SII), cólicos abdominales, dolor por colitis.',
+    dosis_adulto: '200 mg tres veces al día, 15 min antes de las comidas.',
+    dosis_nino: 'Suspensión pediátrica según peso bajo indicación médica.',
+    contraindicaciones: 'Alergia al componente.',
+    efectos_secundarios: 'Boca seca, ligera somnolencia o dolor de cabeza (muy raros y leves).',
+    disponible_nicaragua: true,
+    requiere_receta: false,
+    precio_aproximado: '180-350 C$ (30 tabletas)',
+    embarazo: 'Categoría C — Evitar en primer trimestre.'
+  },
+  {
+    id: 411,
+    nombre_es: 'Domperidona',
+    nombre_en: 'Domperidone',
+    nombres_comerciales: ['Motilium','Domperidona MK','Domperix'],
+    sinonimos: ['motilium','domperix','para los vomitos','digestion lenta','reflujo ninos','gases y pesadez'],
+    categoria: 'Antiemético / Procinético',
+    uso_principal: 'Alivio de náuseas y vómitos, pesadez estomacal, dispepsia.',
+    dosis_adulto: '10 mg tres veces al día antes de comer. MÁX 30 mg/día por 1 semana.',
+    dosis_nino: '0.25 mg/kg por dosis (solo casos estrictos, alto riesgo cardíaco).',
+    contraindicaciones: 'Hemorragia gastrointestinal, tumores pituitarios, arritmias cardíacas o uso con fluconazol/macrólidos.',
+    efectos_secundarios: 'Aumento de prolactina (secreción de leche), riesgo de arritmias cardíacas en dosis altas.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '150-300 C$ (30 tabletas)',
+    embarazo: 'Categoría C — No recomendada.'
+  },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 49 — DERMATOLOGÍA Y ALERGIAS NUEVA GENERACIÓN
+  // ════════════════════════════════════════════════════════
+  {
+    id: 412,
+    nombre_es: 'Levocetirizina',
+    nombre_en: 'Levocetirizine',
+    nombres_comerciales: ['Xyzal','Degaler','Levocetirizina MK'],
+    sinonimos: ['xyzal','degaler','para la alergia fuerte','picazon severa','antihistaminico moderno','rinitis cronica'],
+    categoria: 'Antihistamínico (3ra generación)',
+    uso_principal: 'Rinitis alérgica severa, urticaria crónica idiopática.',
+    dosis_adulto: '5 mg una vez al día en la noche.',
+    dosis_nino: 'Gotas/Jarabe para >6 meses (dosis exacta por pediatra).',
+    contraindicaciones: 'Enfermedad renal terminal (diálisis).',
+    efectos_secundarios: 'Ligera somnolencia (menor que cetirizina), boca seca, fatiga.',
+    disponible_nicaragua: true,
+    requiere_receta: false,
+    precio_aproximado: '200-450 C$ (caja 10-30 tabletas)',
+    embarazo: 'Categoría B — Seguro bajo supervisión.'
+  },
+  {
+    id: 413,
+    nombre_es: 'Isotretinoína',
+    nombre_en: 'Isotretinoin',
+    nombres_comerciales: ['Roaccutan','Tretiheal','Isotretinoina MK','Acnemin'],
+    sinonimos: ['roaccutan','tretiheal','pastilla para acne severo','cura del acne','acnemin'],
+    categoria: 'Retinoide oral',
+    uso_principal: 'Acné noduloquístico severo, acné resistente a antibióticos y cremas.',
+    dosis_adulto: '0.5 - 1 mg/kg/día por 4 a 6 meses (Cálculo estricto por dermatólogo).',
+    dosis_nino: 'No recomendado antes de la pubertad.',
+    contraindicaciones: 'EMBARAZO ABSOLUTAMENTE PROHIBIDO (Produce malformaciones gravísimas), falla hepática.',
+    efectos_secundarios: 'Resequedad extrema de labios, piel y ojos. Dolor articular, elevación de colesterol/triglicéridos.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '1,200-2,500 C$ (30 cápsulas)',
+    embarazo: 'Categoría X — TOTALMENTE PROHIBIDO. Exige anticoncepción doble.'
+  },
+  // ════════════════════════════════════════════════════════
+  //  GRUPO 50 — ANTIBIÓTICOS AVANZADOS Y DIABETES MODERNAS
+  // ════════════════════════════════════════════════════════
+  {
+    id: 414,
+    nombre_es: 'Cefuroxima',
+    nombre_en: 'Cefuroxime',
+    nombres_comerciales: ['Zinnat','Cefur','Cefuroxima MK','Xorimax'],
+    sinonimos: ['zinnat','cefur','xorimax','antibiotico 2da generacion','para infeccion fuerte','neumonia','sinusitis fuerte'],
+    categoria: 'Antibiótico Cefalosporina (2da generación)',
+    uso_principal: 'Infecciones respiratorias bajas (neumonía), otitis media, enfermedad de Lyme, infecciones de piel graves.',
+    dosis_adulto: '250-500 mg cada 12 horas por 7-10 días.',
+    dosis_nino: '15 mg/kg dos veces al día.',
+    contraindicaciones: 'Alergia severa a penicilinas o cefalosporinas.',
+    efectos_secundarios: 'Diarrea (común), náuseas, sobreinfección por hongos vaginales.',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '300-800 C$ (según caja y marca)',
+    embarazo: 'Categoría B — Seguro en caso necesario.'
+  },
+  {
+    id: 415,
+    nombre_es: 'Vildagliptina',
+    nombre_en: 'Vildagliptin',
+    nombres_comerciales: ['Galvus','Galvus Met','Vildagliptina MK'],
+    sinonimos: ['galvus','inhibidor dpp4','para la diabetes moderna','azucar en sangre','galvus met'],
+    categoria: 'Hipoglucemiante (Inhibidor de DPP-4)',
+    uso_principal: 'Diabetes Tipo 2, muy útil para evitar hipoglucemias y porque no produce aumento de peso.',
+    dosis_adulto: '50 mg una o dos veces al día (frecuentemente combinada con metformina).',
+    dosis_nino: 'No recomendado.',
+    contraindicaciones: 'Insuficiencia hepática, insuficiencia cardíaca descompensada.',
+    efectos_secundarios: 'Mareos, dolor de cabeza. Muy rara vez pancreatitis (dolor abdominal severo).',
+    disponible_nicaragua: true,
+    requiere_receta: true,
+    precio_aproximado: '800-1,500 C$ (28 tabletas)',
+    embarazo: 'Categoría C — Evitar.'
   }
 ];
 
@@ -3548,6 +3818,161 @@ export const SINTOMAS = [
       'Se ve rojo oscuro/púrpura y NO desaparece al presionarlo con un vaso de vidrio.'
     ],
     urgencia_default: 'BAJA',
+    requiere_atencion: false
+  },
+  // ════════════════════════════════════════════════════════
+  //  SÍNTOMAS CRÍTICOS Y NEUROLÓGICOS (NUEVOS v9.0)
+  // ════════════════════════════════════════════════════════
+  {
+    id: 18,
+    nombre: 'Debilidad en un lado del cuerpo / Rostro caído (ACV)',
+    categoria: 'Neurológico',
+    sinonimos: ['derrame cerebral','acv','ictus','cara torcida','brazo dormido','no puedo hablar bien','paralisis mitad del cuerpo','lengua trabada'],
+    descripcion: 'Pérdida súbita de fuerza, sensibilidad o control en la cara, brazo o pierna, usualmente de un solo lado. Es el signo cardinal de un Derrame Cerebral (ACV).',
+    causas_comunes: ['Accidente Cerebrovascular Isquémico (coágulo)','Accidente Cerebrovascular Hemorrágico (derrame)','Ataque Isquémico Transitorio (AIT)'],
+    cuidados_casa: [
+      'NO dar aspirina ni ningún medicamento por boca.',
+      'NO dar de comer ni beber (riesgo de asfixia).',
+      'Anotar la hora EXACTA en que iniciaron los síntomas.',
+      'Acostar a la persona con la cabeza ligeramente elevada.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA ABSOLUTA: Llamar a una ambulancia o ir al hospital INMEDIATAMENTE.',
+      'Usa la prueba FAST: Face (Cara caída), Arms (Brazo débil), Speech (Habla rara), Time (Tiempo de actuar).',
+      'Cada minuto cuenta para salvar el cerebro.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 19,
+    nombre: 'Palpitaciones o Taquicardia',
+    categoria: 'Cardiovascular',
+    sinonimos: ['el corazon me late muy rapido','corazon acelerado','brincos en el pecho','arritmia','pulsaciones fuertes','siento el corazon en la garganta'],
+    descripcion: 'Sensación de que el corazón late muy rápido, fuerte, o de manera irregular.',
+    causas_comunes: ['Ansiedad / Estrés','Consumo alto de cafeína o energizantes','Arritmias cardíacas (Fibrilación auricular)','Hipertiroidismo','Fiebre o Deshidratación'],
+    cuidados_casa: [
+      'Siéntate, respira profundo y trata de relajarte.',
+      'Bebe un vaso de agua fría.',
+      'Realiza maniobras de Valsalva (tapar nariz, boca y hacer fuerza como para inflar un globo).',
+      'Evita café, tabaco, alcohol y descongestionantes nasales.'
+    ],
+    cuando_consultar: [
+      'Acompañado de dolor en el pecho, falta de aire o mareos.',
+      'Pérdida del conocimiento (desmayo).',
+      'Si las palpitaciones duran más de unos minutos o son un problema nuevo.',
+      'Si tienes antecedentes de enfermedad del corazón.'
+    ],
+    urgencia_default: 'MEDIA',
+    requiere_atencion: false
+  },
+  {
+    id: 20,
+    nombre: 'Heces con sangre o heces negras (Sangrado Digestivo)',
+    categoria: 'Digestivo',
+    sinonimos: ['sangre al defecar','heces oscuras','melena','pupú con sangre','sangrado rectal','caca negra como alquitran'],
+    descripcion: 'Presencia de sangre roja viva al ir al baño, o evacuaciones de color negro pegajoso y muy maloliente, indicativo de sangre digerida.',
+    causas_comunes: ['Hemorroides o fisuras anales (sangre roja viva al limpiarse)','Úlcera gástrica sangrante (heces negras)','Uso crónico de Ibuprofeno/Aspirina','Tumores o pólipos intestinales','Varices esofágicas'],
+    cuidados_casa: [
+      'Suspender inmediatamente medicamentos como Aspirina, Ibuprofeno o Naproxeno.',
+      'Evitar esfuerzos físicos pesados.',
+      'Si tomaste Bismuto (Pepto-Bismol) o Hierro, las heces negras son normales y no indican sangrado.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Heces negras abundantes, pegajosas como alquitrán (Melena).',
+      'EMERGENCIA: Vómitos con sangre o con aspecto de "borra de café".',
+      'Acompañado de mareos al pararse, palidez extrema, sudoración fría o debilidad severa.',
+      'El sangrado rectal es continuo o en forma de coágulos.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 21,
+    nombre: 'Síncope o Desmayo',
+    categoria: 'Neurológico',
+    sinonimos: ['desmayo','perdida de conocimiento','se cayo redondo','sincope','me fui a negro','se desvanecio','lipotimia'],
+    descripcion: 'Pérdida temporal del conocimiento y postura, con recuperación rápida, causada por una disminución del flujo de sangre al cerebro.',
+    causas_comunes: ['Reacción vasovagal (ver sangre, dolor, calor extremo)','Deshidratación','Bajón rápido de azúcar o presión arterial','Arritmias cardíacas graves','Ponerse de pie muy rápido'],
+    cuidados_casa: [
+      'Acostar a la persona y levantarle las piernas sobre el nivel del corazón.',
+      'Aflojar prendas apretadas en cuello y cintura.',
+      'Si ya despertó, NO levantarlo de inmediato. Que permanezca acostado 10-15 minutos.',
+      'Darle líquidos azucarados solo si está TOTALMENTE consciente.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Si no recupera el conocimiento después de 1-2 minutos.',
+      'Si el desmayo ocurrió mientras hacía ejercicio o deporte.',
+      'Si tiene antecedentes del corazón, o hubo dolor de pecho/palpitaciones antes de caer.',
+      'Si al caer sufrió un golpe fuerte en la cabeza o hay convulsiones.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 22,
+    nombre: 'Convulsiones',
+    categoria: 'Neurológico',
+    sinonimos: ['ataque epileptico','convulsionando','temblor incontrolable del cuerpo','se esta trabando','echando espuma por la boca'],
+    descripcion: 'Episodio de actividad eléctrica anormal en el cerebro que causa movimientos espasmódicos incontrolables, pérdida del conocimiento y a veces incontinencia.',
+    causas_comunes: ['Epilepsia conocida','Fiebre muy alta en niños (convulsiones febriles)','Infección cerebral (meningitis)','Traumatismo craneal severo','Abstinencia de alcohol/drogas'],
+    cuidados_casa: [
+      'NO meter nada en la boca (ni cucharas, ni dedos, no se va a tragar la lengua).',
+      'Proteger la cabeza de la persona poniendo algo suave debajo (almohada, chaqueta).',
+      'Aflojar la ropa alrededor del cuello y retirar objetos peligrosos del área.',
+      'Voltear a la persona de lado una vez que paren los temblores para que pueda respirar bien.',
+      'Tomar el tiempo de la crisis.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: La convulsión dura más de 5 minutos.',
+      'EMERGENCIA: Es la primera vez que la persona sufre una convulsión en su vida.',
+      'Viene una crisis tras otra sin recuperar la conciencia entre ellas.',
+      'La persona está embarazada, tiene diabetes o se golpeó gravemente.'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 23,
+    nombre: 'Pérdida de Visión Repentina',
+    categoria: 'Oftalmológico',
+    sinonimos: ['deje de ver de un ojo','vision borrosa de la nada','ceguera temporal','mancha negra en el ojo','luces y sombras repentinas','cortina negra en el ojo'],
+    descripcion: 'Pérdida brusca y sin dolor de la visión en uno o ambos ojos, o aparición de una "cortina negra" que tapa parte del campo visual.',
+    causas_comunes: ['Desprendimiento de retina','Derrame cerebral (ACV) visual','Migraña con aura (luces en zigzag que pasan en 30 min)','Neuropatía isquémica óptica','Glaucoma agudo (con dolor severo)'],
+    cuidados_casa: [
+      'Evitar frotarse el ojo.',
+      'No manejar ni operar maquinaria.',
+      'Si se acompaña de dolor de cabeza pulsátil que ya has tenido antes (migraña), espera 30 minutos recostado en la oscuridad.'
+    ],
+    cuando_consultar: [
+      'EMERGENCIA: Es un síntoma crítico. Si la pérdida de visión no se recupera en minutos, debes ir al servicio de urgencias u oftalmología INMEDIATAMENTE.',
+      'Sensación de ver una "cortina" o "telaraña" fija cayendo sobre el ojo (riesgo de desprendimiento de retina).',
+      'Acompañado de debilidad, dificultad para hablar o desequilibrio (Riesgo de ACV).'
+    ],
+    urgencia_default: 'ALTA',
+    requiere_atencion: true
+  },
+  {
+    id: 24,
+    nombre: 'Dolor de oído intenso',
+    categoria: 'Otorrino',
+    sinonimos: ['otalgia','me duele el oido','punzadas en la oreja','oido tapado con dolor','infeccion de oido','zumbido con dolor'],
+    descripcion: 'Dolor severo, pulsátil o agudo dentro del canal auditivo. Es muy común en niños pero también afecta a adultos.',
+    causas_comunes: ['Otitis media aguda (infección bacteriana)','Otitis externa (oído de nadador)','Tapón de cerumen impactado','Problemas en la articulación de la mandíbula (ATM)','Cambios de presión (vuelos)'],
+    cuidados_casa: [
+      'Tomar Ibuprofeno o Paracetamol para controlar el dolor fuerte.',
+      'Aplicar un paño tibio sobre la oreja externa.',
+      'Masticar chicle o bostezar si el dolor fue causado por un viaje en avión.',
+      'NO introducir hisopos (cotonetes), llaves ni ningún objeto en el oído.',
+      'NO aplicar gotas caseras de aceite o ajo si no sabe si el tímpano está perforado.'
+    ],
+    cuando_consultar: [
+      'Sale pus, sangre o un líquido maloliente del oído (tímpano perforado).',
+      'El dolor es insoportable o viene acompañado de fiebre alta, mareos extremos o pérdida de audición.',
+      'Hinchazón o enrojecimiento severo DETRÁS de la oreja (riesgo de mastoiditis).',
+      'En niños menores de 6 meses con llanto incontrolable.'
+    ],
+    urgencia_default: 'MEDIA',
     requiere_atencion: false
   }
 ];
