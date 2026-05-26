@@ -390,14 +390,6 @@ export function Profile() {
               src={profile.photoURL}
             />
 
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handlePhotoChange}
-              className="hidden"
-            />
-
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-200">
               <Camera className="text-white w-8 h-8" />
             </div>
@@ -422,6 +414,15 @@ export function Profile() {
               )}
             </AnimatePresence>
           </div>
+
+        {/* El input debe ir FUERA del div clickable para evitar un bucle infinito de eventos */}
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handlePhotoChange}
+          className="hidden"
+        />
 
           {isPreviewMode && (
             <motion.div
