@@ -2,17 +2,17 @@
 ═══════════════════════════════════════════════════════════════
 BASE DE DATOS DE SALUD — Salud-Conecta IA (Granada, Nicaragua)
 ═══════════════════════════════════════════════════════════════
-📌 VERSIÓN: 11.0.0
-📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-15
-📌 CAMBIOS v11.0.0:
-- Redacción clínica profesionalizada en recomendaciones de triaje y cuidados preventivos.
-- Expansión de protocolos de primer contacto para mejorar la respuesta de la IA.
-- Añadidos 6 nuevos cuadros clínicos de alta relevancia (Insomnio, Artralgia, Constipación, Urticaria, Pérdida de peso, Sudoración nocturna).
+📌 VERSIÓN: 12.0.0
+📌 ÚLTIMA ACTUALIZACIÓN: 2026-12-20
+📌 CAMBIOS v12.0.0:
+- Actualización masiva de la base de datos de síntomas y enfermedades (19 nuevos cuadros clínicos).
+- Inclusión de enfermedades endémicas (Dengue/Zika/Chikungunya), psiquiatría, urología, ginecología, dermatología y reumatología.
+- Expansión masiva del motor de razonamiento de triaje para la IA.
 ═══════════════════════════════════════════════════════════════
 */
 
-export const VERSION_BASE_DATOS = '11.0.0';
-export const ULTIMA_ACTUALIZACION = '2026-12-15';
+export const VERSION_BASE_DATOS = '12.0.0';
+export const ULTIMA_ACTUALIZACION = '2026-12-20';
 
 // ═══════════════════════════════════════════════════════════════
 //  🏥 HOSPITALES
@@ -93,6 +93,19 @@ export const CLINICAS = [
     barrio: 'Barrio Estación',
     notas: 'Centro de Salud principal MINSA Granada. Frente al Parque Sandino. Atención gratuita.',
     seguros: ['MINSA','Atención gratuita']
+  },
+  {
+    id: 15, categoria: 'clinica',
+    nombre: 'Clínica Santa Gema',
+    direccion: 'Calle El Consulado, de la Iglesia La Merced 2 cuadras al sur',
+    telefono: '2552-6226', emergencia: false,
+    lat: 11.9288, lng: -85.9561,
+    horario: 'Lun-Vie 8am-6pm, Sab 8am-1pm',
+    servicios: ['consulta_general','especialidades','ultrasonido','procedimientos_menores'],
+    disponible: true, verificado: true,
+    barrio: 'El Consulado',
+    notas: 'Clínica privada con atención de especialidades.',
+    seguros: ['Particular', 'Seguros privados']
   }
 
 ];
@@ -102,6 +115,19 @@ export const CLINICAS = [
 // ═══════════════════════════════════════════════════════════════
 export const LABORATORIOS = [
  
+  {
+    id: 13, categoria: 'laboratorio',
+    nombre: 'Laboratorio Clínico San Pablo',
+    direccion: 'De la Alcaldía Municipal, 1/2 cuadra al lago, Granada',
+    telefono: '2552-4659', emergencia: false,
+    lat: 11.9313, lng: -85.9555,
+    horario: 'Lun-Vie 7am-5pm, Sab 7am-12pm',
+    servicios: ['analisis_sangre', 'examenes_orina', 'examenes_heces', 'pruebas_especiales', 'perfil_lipidico', 'quimica_sanguinea'],
+    disponible: true, verificado: true,
+    barrio: 'Centro',
+    notas: 'Laboratorio privado con amplia gama de pruebas clínicas.',
+    seguros: ['Particular']
+  }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -119,6 +145,18 @@ export const FARMACIAS = [
     disponible: true, verificado: true,
     barrio: 'Xalteva',
     notas: 'Precios económicos.'
+  },
+  {
+    id: 14, categoria: 'farmacia',
+    nombre: 'Farmacia Xolotlán',
+    direccion: 'Calle La Calzada, del Parque Central 1 cuadra al lago',
+    telefono: '2552-2628', emergencia: true,
+    lat: 11.9305, lng: -85.9532,
+    horario: '24 horas',
+    servicios: ['medicamentos','productos_higiene','recargas'],
+    disponible: true, verificado: true,
+    barrio: 'La Calzada',
+    notas: 'Farmacia céntrica con servicio 24 horas.'
   },
   
 ];
@@ -4231,7 +4269,433 @@ export const SINTOMAS = [
     ],
     urgencia_default: 'ALTA',
     requiere_atencion: true
-  }
+    },
+    {
+      id: 37,
+      nombre: 'Fiebre con Dolor Articular/Muscular (Sospecha de Arbovirosis)',
+      categoria: 'Infeccioso / Tropical',
+      sinonimos: ['dengue', 'chikungunya', 'zika', 'fiebre rompehuesos', 'dolor de huesos con fiebre', 'dolor detras de los ojos', 'brote con fiebre'],
+      descripcion: 'Cuadro febril agudo típico de zonas endémicas, transmitido por el mosquito Aedes aegypti. Se caracteriza por fiebre alta, cefalea severa, dolor retroocular y mialgias/artralgias incapacitantes.',
+      causas_comunes: ['Dengue', 'Chikungunya', 'Zika', 'Otras infecciones virales sistémicas'],
+      cuidados_casa: [
+        'Reposo absoluto en cama y uso de mosquitero para evitar la propagación a familiares.',
+        'Hidratación agresiva con Sales de Rehidratación Oral (SRO) o suero, mínimo 2 a 3 litros al día.',
+        'Controlar la fiebre ÚNICAMENTE con Paracetamol y medios físicos (paños de agua tibia).',
+        'ESTRICTAMENTE PROHIBIDO el uso de AINEs (Ibuprofeno, Aspirina, Naproxeno, Diclofenaco) o inyecciones intramusculares por alto riesgo de hemorragia.'
+      ],
+      cuando_consultar: [
+        'Aparición de SIGNOS DE ALARMA (suelen ocurrir cuando baja la fiebre): dolor abdominal intenso y continuo.',
+        'Vómitos persistentes o imposibilidad de retener líquidos.',
+        'Sangrado de encías, nariz, vómitos con sangre o heces oscuras.',
+        'Somnolencia extrema, letargo o irritabilidad.',
+        'Dificultad para respirar o acumulación de líquidos.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 38,
+      nombre: 'Odontalgia (Dolor de Muela / Diente)',
+      categoria: 'Odontología',
+      sinonimos: ['dolor de muela', 'dolor de diente', 'caries', 'hinchazon en la cara', 'absceso dental', 'muela picada', 'flemón'],
+      descripcion: 'Dolor agudo originado en las estructuras dentales o tejidos de soporte (periodonto), generalmente debido a la inflamación o infección de la pulpa dental.',
+      causas_comunes: ['Caries dental profunda (pulpitis irreversible)', 'Absceso periapical', 'Enfermedad periodontal', 'Bruxismo (rechinar de dientes)', 'Impactación de alimentos'],
+      cuidados_casa: [
+        'Mantener una higiene bucal estricta utilizando hilo dental suavemente para remover restos de comida impactados.',
+        'Enjuagues bucales con agua tibia y sal (1/2 cucharadita de sal en un vaso de agua) cada 4 horas.',
+        'Aplicar compresas frías en la mejilla externa si hay hinchazón; NUNCA aplicar calor externo ni colocar aspirina directamente sobre la encía.',
+        'Uso de analgésicos sistémicos de venta libre (Ibuprofeno o Paracetamol) para control del dolor.'
+      ],
+      cuando_consultar: [
+        'Inflamación visible en el rostro, mandíbula o cuello (celulitis facial, potencial urgencia).',
+        'Dolor intenso que impide dormir o no cede con analgésicos.',
+        'Presencia de fiebre, malestar general o dificultad para abrir la boca (trismo).',
+        'Drenaje de pus o mal sabor constante en la boca.'
+      ],
+      urgencia_default: 'MEDIA',
+      requiere_atencion: false
+    },
+    {
+      id: 39,
+      nombre: 'Pirosis / Reflujo Gastroesofágico',
+      categoria: 'Digestivo',
+      sinonimos: ['acidez', 'agruras', 'reflujo', 'quemazon en el pecho', 'fuego en el estomago', 'eructos acidos', 'gastritis'],
+      descripcion: 'Sensación de ardor o quemazón retroesternal (detrás del esternón) que suele ascender hacia el cuello o garganta, causada por el retorno del ácido estomacal al esófago.',
+      causas_comunes: ['Enfermedad por Reflujo Gastroesofágico (ERGE)', 'Gastritis erosiva', 'Hernia de hiato', 'Transgresiones dietéticas (picantes, grasas, café, alcohol)'],
+      cuidados_casa: [
+        'Evitar comidas copiosas, especialmente 2 a 3 horas antes de acostarse.',
+        'Elevar la cabecera de la cama unos 15-20 cm usando tacos bajo las patas de la cama (no solo almohadas).',
+        'Identificar y evitar alimentos desencadenantes (cítricos, menta, chocolate, tomate, grasas fritas).',
+        'Uso ocasional de antiácidos neutralizantes (Magaldrato, Hidróxido de aluminio) o IBP (Omeprazol) de venta libre por tiempo limitado.'
+      ],
+      cuando_consultar: [
+        'Síntomas persistentes (más de 2 veces por semana) a pesar de cambios en la dieta y uso de antiácidos.',
+        'Dificultad o dolor al tragar los alimentos (disfagia u odinofagia).',
+        'Sensación de que la comida se atasca en el pecho.',
+        'Pérdida de peso inexplicable, vómitos persistentes o presencia de sangre en heces/vómito.',
+        'Si el dolor se irradia a mandíbula o brazo (descartar dolor cardíaco).'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 40,
+      nombre: 'Crisis Hipertensiva (Presión Arterial Elevada)',
+      categoria: 'Cardiovascular',
+      sinonimos: ['presion alta', 'hipertension', 'subidon de presion', 'zumbido en los oidos por presion', 'dolor de cabeza por presion'],
+      descripcion: 'Elevación aguda de la presión arterial (usualmente Sistólica > 180 mmHg y/o Diastólica > 110 mmHg). Requiere diferenciar entre "urgencia" (sin daño a órganos) y "emergencia" (con daño orgánico).',
+      causas_comunes: ['Abandono del tratamiento antihipertensivo', 'Consumo excesivo de sodio (sal)', 'Ansiedad severa o crisis de pánico', 'Uso de fármacos (AINEs, descongestionantes nasales)', 'Patologías renales agudas'],
+      cuidados_casa: [
+        'Mantener la calma, sentarse y reposar en un ambiente tranquilo y oscuro por 15-30 minutos.',
+        'Si el paciente olvidó su dosis habitual del medicamento para la presión, administrarla según su prescripción.',
+        'No utilizar medicamentos sublinguales (como Nifedipina) sin supervisión médica, ya que pueden causar caídas bruscas y peligrosas de la presión.',
+        'Re-evaluar la presión arterial tras 30 minutos de reposo absoluto.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA: Presión arterial > 180/110 acompañada de dolor de pecho opresivo, falta de aire o asfixia.',
+        'EMERGENCIA: Presencia de confusión mental, dificultad para hablar, debilidad en la cara/brazos o pérdida de visión (signos de ACV).',
+        'Dolor de cabeza extremadamente severo (el peor de su vida), náuseas o vómitos.',
+        'Epistaxis (sangrado nasal) masiva que no cede.'
+      ],
+      urgencia_default: 'ALTA',
+      requiere_atencion: true
+    },
+    {
+      id: 41,
+      nombre: 'Síndrome Prostático / Retención Urinaria',
+      categoria: 'Urología',
+      sinonimos: ['problemas de prostata', 'no puedo orinar', 'chorro debil', 'goteo al orinar', 'me levanto mucho a orinar', 'dolor bajo vientre hombres'],
+      descripcion: 'Conjunto de síntomas del tracto urinario inferior (STUI) comúnmente asociados al agrandamiento de la glándula prostática en hombres mayores de 50 años.',
+      causas_comunes: ['Hiperplasia Prostática Benigna (HPB)', 'Prostatitis (infección/inflamación)', 'Infección del tracto urinario', 'Uso de medicamentos (antihistamínicos, descongestionantes)'],
+      cuidados_casa: [
+        'Reducir la ingesta de líquidos 2-3 horas antes de ir a dormir para disminuir la nicturia.',
+        'Evitar el consumo de alcohol y cafeína, ya que irritan la vejiga y actúan como diuréticos.',
+        'Realizar el "doble vaciado" (orinar, esperar unos minutos y volver a intentar vaciar la vejiga).',
+        'Evitar estrictamente los medicamentos descongestionantes (antigripales con pseudoefedrina) porque pueden bloquear completamente la uretra.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA: Incapacidad total para orinar (retención urinaria aguda) acompañada de dolor intenso en el bajo vientre (globo vesical).',
+        'Sangre visible en la orina (hematuria).',
+        'Dolor urente al orinar acompañado de fiebre alta, escalofríos y dolor lumbar.',
+        'Pérdida del control de la orina (incontinencia por rebosamiento).'
+      ],
+      urgencia_default: 'MEDIA',
+      requiere_atencion: false
+    },
+    {
+      id: 42,
+      nombre: 'Vaginitis / Flujo Vaginal Anormal',
+      categoria: 'Ginecología',
+      sinonimos: ['flujo anormal', 'picazon vaginal', 'mal olor intimo', 'secrecion blanca', 'ardor vaginal', 'infeccion vaginal'],
+      descripcion: 'Inflamación o infección de la mucosa vaginal, manifestada típicamente por cambios en el volumen, color u olor del flujo vaginal, a menudo con prurito y ardor.',
+      causas_comunes: ['Vaginosis bacteriana (flujo grisáceo, olor a pescado)', 'Candidiasis vulvovaginal (hongo, flujo blanco grumoso tipo requesón, mucha picazón)', 'Tricomoniasis (ITS, flujo amarillento-verdoso espumoso)', 'Irritación química (jabones perfumados, duchas vaginales)'],
+      cuidados_casa: [
+        'Evitar totalmente las duchas vaginales, ya que destruyen la flora bacteriana protectora (lactobacilos).',
+        'Usar ropa interior 100% de algodón y evitar prendas extremadamente ajustadas para reducir la humedad.',
+        'Lavar el área vulvar solo con agua tibia o un jabón neutro suave sin perfumes. No limpiar dentro de la vagina.',
+        'Si hay sospecha clara de Candidiasis previa diagnosticada, se pueden usar cremas/óvulos antimicóticos de venta libre (Clotrimazol, Miconazol).'
+      ],
+      cuando_consultar: [
+        'Flujo acompañado de fiebre, escalofríos o dolor pélvico bajo intenso (sospecha de Enfermedad Pélvica Inflamatoria).',
+        'Úlceras, ampollas o llagas dolorosas en la zona genital (sospecha de herpes).',
+        'Si los síntomas no mejoran tras uso de tratamientos de venta libre o si el problema es recurrente (>4 veces al año).',
+        'Pacientes gestantes (cualquier flujo anormal requiere evaluación para evitar complicaciones obstétricas).'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 43,
+      nombre: 'Enfermedad Hemorroidal',
+      categoria: 'Gastroenterología / Proctología',
+      sinonimos: ['hemorroides', 'almorranas', 'sangrado rectal leve', 'bolita en el ano', 'ardor al defecar', 'picazon anal', 'sangre en el papel'],
+      descripcion: 'Dilatación e inflamación de los plexos venosos en el canal anal y recto inferior, que pueden ser internas o externas, causando dolor, prurito y sangrado rojo brillante.',
+      causas_comunes: ['Estreñimiento crónico (esfuerzo al defecar)', 'Embarazo', 'Sedentarismo prolongado', 'Dieta baja en fibra', 'Levantamiento de objetos pesados'],
+      cuidados_casa: [
+        'Aumentar masivamente la ingesta de fibra (frutas, verduras, salvado) y agua (2-3 litros diarios) para ablandar las heces.',
+        'Realizar baños de asiento con agua tibia (sumergir la zona pélvica 10-15 minutos) 2 o 3 veces al día para reducir el espasmo esfinteriano.',
+        'Evitar el papel higiénico seco; utilizar toallitas húmedas sin alcohol o lavar con agua tras la defecación.',
+        'No permanecer sentado en el inodoro por más de 5 minutos, ni forzar la evacuación.'
+      ],
+      cuando_consultar: [
+        'Sangrado rectal oscuro, abundante o heces color alquitrán (melena - indica sangrado digestivo alto).',
+        'Aparición de un bulto perianal súbito, duro, violáceo y extremadamente doloroso (trombosis hemorroidal).',
+        'Pérdida de peso inexplicable o cambios permanentes en el hábito intestinal (descartar patología oncológica).',
+        'Mareos, palidez o debilidad severa asociados al sangrado.'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 44,
+      nombre: 'Herpes Zóster (Culebrilla)',
+      categoria: 'Dermatología / Infeccioso',
+      sinonimos: ['culebrilla', 'herpes zoster', 'fuego en el cuerpo', 'sarpullido doloroso en una linea', 'dolor de nervio con ronchas', 'ardor en la piel'],
+      descripcion: 'Reactivación del virus de la varicela-zóster en un ganglio nervioso, manifestándose como una erupción vesicular dolorosa agrupada en el trayecto de un nervio (dermatoma), sin cruzar la línea media del cuerpo.',
+      causas_comunes: ['Inmunosupresión temporal (estrés severo, edad avanzada)', 'Infección por VIH', 'Pacientes oncológicos', 'Uso de corticosteroides crónicos'],
+      cuidados_casa: [
+        'Mantener la erupción limpia y seca para prevenir sobreinfecciones bacterianas.',
+        'Aplicar compresas frías, húmedas o loción de calamina para aliviar el ardor local.',
+        'Evitar el contacto físico directo de las lesiones activas (ampollas) con mujeres embarazadas, recién nacidos o personas que nunca tuvieron varicela.',
+        'Tomar analgésicos sistémicos (Paracetamol o AINEs) para manejar el dolor agudo.'
+      ],
+      cuando_consultar: [
+        'Idealmente consultar en las primeras 72 horas desde el inicio de las ampollas para iniciar terapia antiviral (Aciclovir), lo que reduce el riesgo de dolor crónico (neuralgia posherpética).',
+        'La erupción afecta la cara, especialmente cerca del ojo o la punta de la nariz (riesgo de ceguera - urgencia oftalmológica).',
+        'El dolor es insoportable y no responde a analgésicos comunes.',
+        'Las ampollas se llenan de pus espeso o provocan fiebre alta.'
+      ],
+      urgencia_default: 'MEDIA',
+      requiere_atencion: false
+    },
+    {
+      id: 45,
+      nombre: 'Micosis Superficial (Tiña / Pie de Atleta)',
+      categoria: 'Dermatología',
+      sinonimos: ['hongos en la piel', 'pie de atleta', 'tinea', 'tiña', 'manchas rojas redondas que pican', 'caspa corporal', 'descamacion en los pies', 'empeines'],
+      descripcion: 'Infección fúngica superficial que afecta la capa córnea de la piel, cabello o uñas. Clínicamente presenta lesiones anulares (en forma de anillo) descamativas, bordes activos y prurito.',
+      causas_comunes: ['Humedad excesiva y falta de secado', 'Contagio por contacto en gimnasios, piscinas o duchas compartidas', 'Uso prolongado de calzado cerrado sintético', 'Contacto con mascotas infectadas'],
+      cuidados_casa: [
+        'Mantener el área afectada estrictamente limpia y seca. Secar muy bien entre los dedos de los pies tras el baño.',
+        'Usar calcetines 100% de algodón y cambiarlos diariamente; preferir calzado abierto o de cuero transpirable.',
+        'Aplicar cremas antimicóticas de venta libre (Clotrimazol, Miconazol, Terbinafina) 2 veces al día, y continuar aplicándola por 1-2 semanas DESPUÉS de que desaparezca la lesión.',
+        'No compartir toallas, zapatos ni ropa personal.'
+      ],
+      cuando_consultar: [
+        'Infección que afecta el cuero cabelludo (tiña capitis) o múltiples uñas (onicomicosis extensa), pues requieren antimicóticos orales sistémicos.',
+        'Las lesiones están muy inflamadas, rojas, calientes o drenan pus (infección bacteriana secundaria).',
+        'Falta de mejoría tras 2 a 4 semanas de tratamiento antimicótico tópico constante.',
+        'Pacientes con diabetes o inmunosupresión con infecciones en los pies.'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 46,
+      nombre: 'Aftas / Úlceras Bucales',
+      categoria: 'Estomatología',
+      sinonimos: ['llagas en la boca', 'aftas', 'fuego en la boca', 'ulceras bucales', 'blanquitos en la lengua', 'boca lastimada'],
+      descripcion: 'Pequeñas úlceras dolorosas, blanquecinas o amarillentas con un halo rojo, que aparecen en la mucosa oral (interior de mejillas, labios, lengua o encías). No son contagiosas.',
+      causas_comunes: ['Traumatismo mecánico (mordeduras, cepillado brusco, ortodoncia)', 'Estrés emocional agudo', 'Déficit vitamínico (B12, Hierro, Ácido fólico)', 'Cambios hormonales', 'Alergias o sensibilidad a alimentos (cítricos, piña, picantes)'],
+      cuidados_casa: [
+        'Evitar alimentos ácidos, picantes, salados y muy crujientes que puedan irritar la herida.',
+        'Realizar enjuagues bucales suaves con agua tibia y sal, o bicarbonato de sodio.',
+        'Mantener una higiene bucal impecable, usando un cepillo de cerdas muy suaves.',
+        'Se pueden usar geles protectores orales o anestésicos locales tópicos de venta libre (Benzocaína) para aliviar el dolor al comer.'
+      ],
+      cuando_consultar: [
+        'Úlceras excepcionalmente grandes, que se propagan o que duran más de 3 semanas sin curar.',
+        'Dificultad extrema para beber líquidos que ponga en riesgo la hidratación.',
+        'Aparición de aftas recurrentes muy frecuentes asociadas a dolor abdominal o pérdida de peso (descartar enfermedad celíaca o de Crohn).',
+        'Presencia de fiebre alta u otras ampollas en la piel del cuerpo.'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 47,
+      nombre: 'Esguince / Torcedura Articular',
+      categoria: 'Traumatología',
+      sinonimos: ['esguince', 'torcedura', 'me doble el tobillo', 'dolor de articulacion tras golpe', 'pie doblado', 'luxacion leve', 'falseo del pie'],
+      descripcion: 'Lesión traumática de los ligamentos de una articulación, caracterizada por dolor, edema, equimosis (moretón) y limitación de la movilidad funcional. El tobillo es la articulación más frecuentemente afectada.',
+      causas_comunes: ['Traumatismo indirecto (torsión o giro brusco de la articulación)', 'Práctica deportiva', 'Caminar sobre superficies irregulares con calzado inadecuado'],
+      cuidados_casa: [
+        'Aplicar el protocolo R.I.C.E.:',
+        'R (Rest - Reposo): Evitar apoyar peso sobre la articulación afectada.',
+        'I (Ice - Hielo): Aplicar hielo envuelto en tela por 15-20 minutos cada 2-3 horas durante los primeros dos días.',
+        'C (Compression - Compresión): Usar un vendaje elástico compresivo, sin que quede tan apretado que corte la circulación.',
+        'E (Elevation - Elevación): Mantener la extremidad elevada por encima del nivel del corazón para reducir el edema.',
+        'Tomar analgésicos o AINEs (Ibuprofeno, Diclofenaco) para dolor e inflamación.'
+      ],
+      cuando_consultar: [
+        'Incapacidad absoluta para soportar peso sobre la pierna inmediatamente después de la lesión y en el servicio de urgencias (sospecha de fractura ósea).',
+        'Deformidad visual evidente de la articulación, huesos que se ven fuera de lugar.',
+        'Adormecimiento, frío, palidez o coloración morada profunda en la extremidad por debajo de la lesión.',
+        'El dolor y la hinchazón empeoran dramáticamente a pesar del reposo y el hielo.'
+      ],
+      urgencia_default: 'MEDIA',
+      requiere_atencion: false
+    },
+    {
+      id: 48,
+      nombre: 'Espasmo Muscular (Calambre)',
+      categoria: 'Musculoesquelético',
+      sinonimos: ['calambre', 'tiron muscular', 'musculo engarrotado', 'espasmo doloroso', 'se me subio el musculo', 'charley horse'],
+      descripcion: 'Contracción muscular involuntaria, dolorosa y transitoria (generalmente segundos a minutos). Muy frecuente en pantorrillas (gemelos) y pie durante la noche o la actividad física.',
+      causas_comunes: ['Fatiga y sobrecarga muscular por ejercicio intenso', 'Deshidratación y pérdida de electrolitos (Sodio, Potasio, Magnesio)', 'Permanecer en una misma posición por tiempo prolongado', 'Embarazo', 'Uso de medicamentos diuréticos'],
+      cuidados_casa: [
+        'Estirar pasiva y suavemente el músculo acalambrado y frotarlo para relajar la contracción.',
+        'Si el calambre es en la pantorrilla, poner el peso sobre esa pierna o tirar de la punta del pie hacia la espinilla.',
+        'Aplicar calor en el músculo tenso, o hielo si persiste dolorimiento posterior.',
+        'Rehidratarse agresivamente con agua y bebidas ricas en electrolitos (agua de coco, plátano, SRO).'
+      ],
+      cuando_consultar: [
+        'Calambres que causan un dolor insoportable, severo y que no ceden tras los estiramientos.',
+        'Asociados con hinchazón, enrojecimiento extremo o cambios en la piel de la pierna.',
+        'Presencia de debilidad muscular severa después de que el calambre pasa.',
+        'Ocurren con alta frecuencia y sin un factor desencadenante obvio.'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 49,
+      nombre: 'Artritis Gotosa (Ataque de Gota)',
+      categoria: 'Reumatología',
+      sinonimos: ['gota', 'ataque de gota', 'dolor intenso en el dedo gordo del pie', 'articulacion roja y muy dolorosa', 'podagra', 'acido urico alto con dolor'],
+      descripcion: 'Artritis inflamatoria aguda, producida por la precipitación de cristales de ácido úrico en el espacio articular. Típicamente afecta la primera articulación metatarsofalángica (dedo gordo del pie), conocida como podagra.',
+      causas_comunes: ['Hiperuricemia crónica (ácido úrico elevado en sangre)', 'Excesos dietéticos (carnes rojas, mariscos, vísceras)', 'Consumo elevado de alcohol (especialmente cerveza)', 'Deshidratación', 'Uso de diuréticos tiazídicos'],
+      cuidados_casa: [
+        'Reposo absoluto de la articulación afectada, dejándola descubierta (incluso el peso de una sábana puede ser intolerable).',
+        'Aplicación cuidadosa de frío local para mitigar la inflamación aguda.',
+        'Hidratación agresiva (mínimo 3 litros de agua al día) para facilitar la excreción renal de ácido úrico.',
+        'Uso temprano de antiinflamatorios (AINEs como Naproxeno o Indometacina). NO tomar Aspirina ya que puede alterar la excreción de ácido úrico.',
+        'NO iniciar terapia reductora de ácido úrico (Alopurinol) en medio de un ataque agudo si no se tomaba previamente (puede empeorar la crisis).'
+      ],
+      cuando_consultar: [
+        'Es el primer episodio (requiere diagnóstico diferencial con Artritis Séptica, que es una urgencia vital).',
+        'Acompañado de fiebre alta o escalofríos.',
+        'El dolor no se controla tras 24-48 horas de uso de AINEs o se propaga a múltiples articulaciones.',
+        'Si hay evidencia de lesión o herida cerca de la articulación roja y caliente.'
+      ],
+      urgencia_default: 'MEDIA',
+      requiere_atencion: false
+    },
+    {
+      id: 50,
+      nombre: 'Neuropatía Periférica (Hormigueo y Ardor)',
+      categoria: 'Neurológico',
+      sinonimos: ['hormigueo en los pies', 'ardor en los pies', 'entumecimiento de manos', 'piquetes en las piernas', 'neuropatia diabetica', 'adormecimiento', 'siento agujas'],
+      descripcion: 'Daño al sistema nervioso periférico que se manifiesta con alteraciones sensitivas (parestesias, disestesias), dolor de tipo quemante o eléctrico, y ocasionalmente déficit motor, típicamente de progresión distal a proximal ("en guante y calcetín").',
+      causas_comunes: ['Diabetes Mellitus crónica (Neuropatía diabética)', 'Déficit de Vitamina B12', 'Alcoholismo crónico', 'Compresión nerviosa (Síndrome del túnel carpiano)', 'Enfermedades renales crónicas'],
+      cuidados_casa: [
+        'Inspección visual diaria y rigurosa de los pies en busca de úlceras o heridas no sentidas (crucial en diabéticos).',
+        'Uso de calzado cómodo, cerrado, de la talla correcta, y calcetines sin costuras apretadas.',
+        'Control estricto de la patología de base (monitoreo glucémico impecable en diabetes).',
+        'Evitar la aplicación de calor directo en los pies (bolsas de agua caliente), ya que la disminución de sensibilidad aumenta el riesgo de quemaduras graves.'
+      ],
+      cuando_consultar: [
+        'Debilidad muscular progresiva que dificulte caminar o sostener objetos (tropiezos frecuentes).',
+        'Hormigueo o debilidad que aparece de forma súbita, especialmente si afecta un solo lado del cuerpo (descartar ACV).',
+        'Aparición de úlceras, llagas o enrojecimiento en pies o manos que no cicatrizan.',
+        'Pérdida de control de esfínteres (vejiga/intestino) asociada a los síntomas periféricos.'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 51,
+      nombre: 'Episodio Depresivo / Tristeza Profunda',
+      categoria: 'Salud Mental',
+      sinonimos: ['depresion', 'tristeza extrema', 'ganas de llorar todo el dia', 'falta de motivacion', 'apatia', 'no quiero levantarme de la cama', 'angustia existencial'],
+      descripcion: 'Trastorno del estado de ánimo caracterizado por anhedonia (incapacidad para sentir placer), tristeza persistente, abulia, alteraciones del sueño y del apetito, afectando severamente la funcionalidad diaria.',
+      causas_comunes: ['Trastorno depresivo mayor', 'Duelo no resuelto o pérdidas significativas', 'Trastornos de la glándula tiroides (hipotiroidismo)', 'Estrés psicosocial crónico', 'Efecto secundario de ciertos medicamentos o sustancias'],
+      cuidados_casa: [
+        'Evitar el aislamiento extremo; procurar mantener contacto con al menos un familiar o persona de confianza.',
+        'Intentar mantener rutinas básicas (higiene personal, alimentación en horarios fijos), estructurando el día en metas pequeñas y manejables.',
+        'Evitar totalmente el consumo de alcohol y drogas recreativas, ya que actúan como depresores del sistema nervioso.',
+        'Realizar actividad física suave (caminar al sol) para estimular la liberación natural de endorfinas.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA: Presencia de pensamientos suicidas, planes detallados de autolesión o expresiones de que "la vida no vale la pena".',
+        'Los síntomas persisten por más de 2 semanas y paralizan las actividades laborales, académicas o familiares.',
+        'Presencia de alucinaciones (escuchar voces) o delirios (creencias irreales paranoides).',
+        'Pérdida total del apetito que compromete el estado nutricional.'
+      ],
+      urgencia_default: 'MEDIA',
+      requiere_atencion: false
+    },
+    {
+      id: 52,
+      nombre: 'Rinosinusitis Aguda (Dolor facial y Congestión)',
+      categoria: 'Otorrinolaringología',
+      sinonimos: ['sinusitis', 'moco verde', 'dolor en la frente y mejillas', 'nariz tupida con dolor', 'pesadez en la cara al agacharse'],
+      descripcion: 'Inflamación de la mucosa de los senos paranasales, comúnmente posterior a una infección viral del tracto respiratorio superior, que puede sobreinfectarse bacterianamente. Clínicamente presenta rinorrea purulenta, congestión y dolor/presión facial.',
+      causas_comunes: ['Infecciones virales (resfriado común prolongado)', 'Rinitis alérgica no controlada', 'Infección bacteriana secundaria', 'Anomalías anatómicas (desviación del tabique)'],
+      cuidados_casa: [
+        'Irrigaciones nasales abundantes y frecuentes con solución salina estéril (Suero Fisiológico) para facilitar el drenaje mecánico del moco.',
+        'Uso de vaporizaciones (inhalación de vapor de agua tibia) para humidificar la vía aérea.',
+        'Analgésicos y antiinflamatorios sistémicos (Ibuprofeno, Paracetamol) para el dolor y la inflamación facial.',
+        'Uso de descongestionantes nasales tópicos (Oximetazolina) por un máximo estricto de 3 a 5 días para evitar efecto rebote (rinitis medicamentosa).'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA: Hinchazón, enrojecimiento o dolor intenso ALREDEDOR de uno de los ojos (riesgo de celulitis periorbitaria/orbitaria).',
+        'Síntomas que duran más de 10-14 días sin mejoría (sugestivo de infección bacteriana que requiere antibióticos).',
+        'Aparición de fiebre alta (>39°C), confusión mental, rigidez de cuello o dolor de cabeza insoportable.',
+        'Visión doble, visión borrosa o cambios bruscos en la agudeza visual.'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 53,
+      nombre: 'Insuficiencia Venosa Crónica (Várices y Piernas Pesadas)',
+      categoria: 'Cardiovascular / Angiología',
+      sinonimos: ['varices', 'venas saltadas', 'piernas pesadas', 'hinchazon de tobillos en la tarde', 'arañitas vasculares', 'dolor de piernas al estar de pie'],
+      descripcion: 'Deficiencia en el retorno venoso de las extremidades inferiores hacia el corazón, provocando estasis venosa. Se manifiesta con sensación de pesadez, edema perimaleolar vespertino, dolor sordo y tortuosidad venosa.',
+      causas_comunes: ['Fallo de las válvulas venosas', 'Bipedestación o sedestación prolongada (trabajos de pie o sentados)', 'Embarazo', 'Obesidad', 'Factores genéticos'],
+      cuidados_casa: [
+        'Elevación de los miembros inferiores por encima del nivel del corazón durante 20-30 minutos, varias veces al día y al dormir.',
+        'Uso de medias o calcetines de compresión graduada (deben colocarse a primera hora de la mañana, antes de bajarse de la cama).',
+        'Evitar permanecer de pie o sentado en la misma postura por tiempos prolongados; realizar ejercicios de flexo-extensión de los tobillos regularmente.',
+        'Evitar exposición directa al calor intenso en las piernas (estufas, baños muy calientes) ya que provoca vasodilatación.'
+      ],
+      cuando_consultar: [
+        'EMERGENCIA: Hinchazón súbita, dolorosa, enrojecida y caliente de una SOLA pierna (riesgo alto de Trombosis Venosa Profunda - TVP).',
+        'Aparición de una úlcera o llaga abierta cerca de los tobillos que no cicatriza.',
+        'Si un bulto varicoso sangra espontáneamente tras un roce leve o trauma.',
+        'Endurecimiento progresivo y oscurecimiento severo de la piel de las pantorrillas (lipodermatoesclerosis).'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 54,
+      nombre: 'Dermatitis de Contacto / Alergia Tópica',
+      categoria: 'Dermatología',
+      sinonimos: ['alergia en la piel', 'sarpullido por toque', 'irritacion por jabon', 'piel roja con comezon', 'ampollitas de alergia', 'dermatitis'],
+      descripcion: 'Reacción inflamatoria cutánea provocada por el contacto directo con un agente exógeno, ya sea por mecanismo irritativo (daño químico) o alérgico (inmunológico). Se caracteriza por eritema, edema, vesículas, costras y prurito intenso.',
+      causas_comunes: ['Níquel (bisutería, hebillas)', 'Cosméticos, perfumes y desodorantes', 'Plantas tóxicas', 'Detergentes o productos de limpieza', 'Medicamentos tópicos'],
+      cuidados_casa: [
+        'Identificar y retirar/lavar inmediatamente el agente causal si es conocido.',
+        'Lavar la zona afectada con agua y un jabón neutro muy suave para eliminar restos del alérgeno/irritante.',
+        'Aplicar compresas frías y cremas emolientes (hidratantes sin perfumes) o calamina para aliviar la picazón.',
+        'Uso de antihistamínicos orales (Loratadina, Cetirizina) para el control sintomático del prurito nocturno.',
+        'Para brotes leves, puede aplicarse crema de Hidrocortisona al 1% de venta libre por no más de 5-7 días.'
+      ],
+      cuando_consultar: [
+        'La erupción es severa, afecta la cara, los genitales o involucra una gran superficie corporal (>20%).',
+        'Las vesículas o ampollas presentan secreción purulenta, costras amarillas (melicéricas) o dolor creciente (sobreinfección bacteriana).',
+        'Ausencia de mejoría significativa tras 1-2 semanas de evitar el contacto con el presunto alérgeno.',
+        'Afectación de las mucosas (interior de la boca, ojos).'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    },
+    {
+      id: 55,
+      nombre: 'Síndrome de Ojo Seco / Irritación Ocular',
+      categoria: 'Oftalmología',
+      sinonimos: ['ojo seco', 'ardor de ojos', 'sensacion de arena en el ojo', 'ojos cansados', 'picazon en los ojos por pantallas', 'fatiga visual'],
+      descripcion: 'Trastorno de la película lagrimal debido a la deficiencia en la producción de lágrimas o al aumento de la evaporación de las mismas. Genera inflamación de la superficie ocular, hiperemia, ardor, sensación de cuerpo extraño y fluctuación de la visión.',
+      causas_comunes: ['Uso prolongado de pantallas digitales (disminuye la frecuencia de parpadeo)', 'Ambientes con aire acondicionado o ventiladores directos', 'Uso de lentes de contacto', 'Envejecimiento (especialmente en menopausia)', 'Efecto secundario de antihistamínicos o antidepresivos'],
+      cuidados_casa: [
+        'Uso frecuente de lubricantes oculares (lágrimas artificiales), preferiblemente formulaciones sin preservantes si se usan más de 4 veces al día.',
+        'Aplicar la regla "20-20-20" al usar pantallas: cada 20 minutos, mirar un objeto a 20 pies (6 metros) durante al menos 20 segundos.',
+        'Evitar que el aire de ventiladores o del aire acondicionado dé directamente en el rostro.',
+        'Uso de gafas de sol envolventes en exteriores para proteger los ojos del viento y el polvo.',
+        'Parpadear conscientemente con mayor frecuencia durante actividades que requieran fijación visual.'
+      ],
+      cuando_consultar: [
+        'Dolor ocular profundo, severo o acompañado de enrojecimiento intenso (ojo rojo agudo, descartar uveítis o glaucoma).',
+        'Pérdida de visión, visión borrosa que no mejora tras parpadear o usar lágrimas artificiales.',
+        'Presencia de secreción ocular abundante, purulenta o matutina que sella los párpados.',
+        'No hay alivio de los síntomas a pesar del uso regular de lágrimas artificiales tras varias semanas.'
+      ],
+      urgencia_default: 'BAJA',
+      requiere_atencion: false
+    }
+  ];
 ];
 
 // ═══════════════════════════════════════════════════════════════
