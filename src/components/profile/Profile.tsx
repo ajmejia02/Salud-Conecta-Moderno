@@ -287,6 +287,20 @@ export function Profile() {
     setIsSaving(true);
     
     try {
+      let finalPhotoURL = profile.photoURL;
+
+      // Si la foto está en base64 (recién seleccionada localmente), la subimos a Firebase Storage
+      if (user && finalPhotoURL.startsWith('data:')) {
+        try {
+          const storage = getStorage();
+          const storageRef = ref(storage, `profiles/${user.uid}/avatar.jpg`);
+          await uploadString(storageRef, finalPhotoURL, 'data_url');
+          finalPhotoURL = await getDownloadURL(storageRef);
+        } catch (uploadError) {
+          console.error('[Profile] Error al subir foto a Storage:', uploadError);
+        }
+      }
+
       const profileData = {
         name: profile.name,
         phone: profile.phone,
@@ -295,7 +309,7 @@ export function Profile() {
         bloodType: profile.bloodType,
         allergies: profile.allergies,
         dob: profile.dob,
-        photoURL: profile.photoURL
+        photoURL: finalPhotoURL
       };
 
       // 1. Local Storage fallback
