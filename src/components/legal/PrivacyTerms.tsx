@@ -116,29 +116,29 @@ const highlights = [
 
 export default function PrivacyTerms() {
   return (
-    <div className="w-full px-4 md:px-6 py-8 md:py-10 pb-28">
-      <div className="max-w-5xl mx-auto flex flex-col gap-8">
+    <div className="w-full px-4 py-8 md:py-10 pb-28">
+      <div className="max-w-5xl mx-auto flex flex-col gap-6 md:gap-8">
         {/* Cabecera Estandarizada */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <button 
             onClick={() => window.dispatchEvent(new CustomEvent('changeTab', { detail: 'profile' }))}
             className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center hover:bg-surface-container-high transition-all text-on-surface-variant border border-outline-variant/30 shadow-sm"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-3xl md:text-4xl font-display font-black text-on-surface tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-black text-on-surface tracking-tight">
             Términos Legales
           </h1>
         </div>
 
-        <section className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-6 md:p-8 shadow-xl">
-          <div className="flex flex-col lg:flex-row lg:items-start gap-8">
+        <section className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
             <div className="flex-1 flex flex-col gap-4">
               <div className="flex items-center gap-3 text-primary text-xs font-black uppercase tracking-widest mb-1">
                 <LockKeyhole className="w-4 h-4" />
                 Documento legal
               </div>
-              <h2 className="text-3xl md:text-5xl font-display font-black text-on-surface tracking-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-display font-black text-on-surface tracking-tight">
                 Privacidad y Términos de Uso
               </h2>
               <p className="mt-2 text-on-surface-variant leading-relaxed max-w-3xl">
@@ -192,10 +192,10 @@ export default function PrivacyTerms() {
 
         <section className="flex flex-col gap-4">
           {sections.map((section) => (
-            <article key={section.title} className="bg-surface-container border border-outline-variant/30 rounded-2xl p-6 md:p-7">
+            <article key={section.title} className="bg-surface-container border border-outline-variant/30 rounded-2xl p-5 md:p-7">
               <div className="flex items-start gap-3 mb-4">
                 <FileText className="w-5 h-5 text-primary mt-1 shrink-0" />
-                <h2 className="text-lg md:text-xl font-display font-black text-on-surface">{section.title}</h2>
+                <h2 className="text-base sm:text-lg md:text-xl font-display font-black text-on-surface">{section.title}</h2>
               </div>
               <div className="space-y-3">
                 {section.body.map((paragraph) => (

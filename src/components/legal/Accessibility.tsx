@@ -56,16 +56,16 @@ const improvementAreas = [
 
 export default function Accessibility() {
   return (
-    <div className="w-full px-4 md:px-6 py-8 md:py-10 pb-28">
-      <div className="max-w-5xl mx-auto flex flex-col gap-8">
-        <section className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-6 md:p-8 shadow-xl">
-          <div className="flex flex-col lg:flex-row lg:items-start gap-8">
+    <div className="w-full px-4 py-8 md:py-10 pb-28">
+      <div className="max-w-5xl mx-auto flex flex-col gap-6 md:gap-8">
+        <section className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
             <div className="flex-1">
               <div className="flex items-center gap-3 text-secondary text-xs font-black uppercase tracking-widest mb-4">
                 <HeartHandshake className="w-4 h-4" />
                 Declaración de accesibilidad
               </div>
-              <h1 className="text-3xl md:text-5xl font-display font-black text-on-surface tracking-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-display font-black text-on-surface tracking-tight">
                 Accesibilidad
               </h1>
               <p className="mt-4 text-on-surface-variant leading-relaxed max-w-3xl">
@@ -93,7 +93,7 @@ export default function Accessibility() {
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {commitments.map((item) => (
-            <article key={item.title} className="bg-surface-container border border-outline-variant/30 rounded-2xl p-6">
+            <article key={item.title} className="bg-surface-container border border-outline-variant/30 rounded-2xl p-5">
               <item.icon className="w-6 h-6 text-primary mb-4" />
               <h2 className="text-lg font-display font-black text-on-surface">{item.title}</h2>
               <p className="text-sm text-on-surface-variant mt-3 leading-relaxed">{item.text}</p>
@@ -101,8 +101,8 @@ export default function Accessibility() {
           ))}
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <article className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-6 md:p-8">
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <article className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-5 md:p-8">
             <div className="flex items-center gap-3 mb-5">
               <CheckCircle2 className="w-6 h-6 text-secondary" />
               <h2 className="text-xl font-display font-black text-on-surface">Funciones disponibles</h2>
@@ -117,7 +117,7 @@ export default function Accessibility() {
             </ul>
           </article>
 
-          <article className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-6 md:p-8">
+          <article className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-5 md:p-8">
             <div className="flex items-center gap-3 mb-5">
               <FileWarning className="w-6 h-6 text-tertiary" />
               <h2 className="text-xl font-display font-black text-on-surface">Mejoras en curso</h2>
@@ -133,8 +133,8 @@ export default function Accessibility() {
           </article>
         </section>
 
-        <section className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="bg-surface-container border border-outline-variant/30 rounded-3xl p-5 md:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             <div className="flex flex-col gap-3">
               <Keyboard className="w-6 h-6 text-primary" />
               <h2 className="text-base font-display font-black text-on-surface">Teclado</h2>
@@ -159,7 +159,7 @@ export default function Accessibility() {
           </div>
         </section>
 
-        <section className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-6 md:p-8">
+        <section className="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-5 md:p-8">
           <h2 className="text-xl font-display font-black text-on-surface">Contacto de accesibilidad</h2>
           <p className="text-sm text-on-surface-variant mt-3 leading-relaxed">
             Antes de producción, configura un canal real para reportes de accesibilidad. Sugerencia temporal:
