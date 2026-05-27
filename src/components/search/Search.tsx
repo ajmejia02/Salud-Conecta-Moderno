@@ -77,21 +77,21 @@ export default function Search({ onOpenRegistration }: SearchProps) {
 
   const publicItems = useMemo(() => {
     return centrosSaludData.map((item: any, index: number) => {
-      const rawType = (item.type || '').toLowerCase();
+      const rawName = (item.nombre || '').toLowerCase();
       return {
         id: `public-${index}`,
         category: 'public_health',
-        name: item.name,
-        description: item.sector || item.address || 'Institución Pública de Salud',
+        name: item.nombre,
+        description: `${item.ciudad}, ${item.departamento}` || 'Institución Pública de Salud',
         image: '',
         rating: 4.5,
         distance: 'Centro MINSA',
-        status: rawType.includes('hospital') ? 'Abierto 24h' : 'Horario Regular',
+        status: rawName.includes('hospital') ? 'Abierto 24h' : 'Horario Regular',
         statusType: 'available',
-        services: item.services || ['Atención General'],
-        phone: item.phone || '+505 2222-2222',
-        address: item.address || 'Nicaragua',
-        location: { lat: item.location.lat, lng: item.location.lng }
+        services: ['Atención General'],
+        phone: '+505 2222-2222',
+        address: `${item.ciudad}, ${item.departamento}`,
+        location: { lat: item.latitud, lng: item.longitud }
       };
     });
   }, []);
