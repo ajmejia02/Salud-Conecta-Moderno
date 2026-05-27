@@ -33,7 +33,7 @@ let _minsaNameCache: Set<string> | null = null;
 export const getMinsaReferenceNames = (): Set<string> => {
   if (_minsaNameCache) return _minsaNameCache;
   _minsaNameCache = new Set([
-    ...centrosSaludData.map((h: any) => normalizeStr(h.name)),
+    ...centrosSaludData.map((h: any) => normalizeStr(h.nombre)),
   ]);
   return _minsaNameCache;
 };
@@ -46,7 +46,7 @@ export const getMinsaMetadata = (name: string) => {
   const normalized = normalizeStr(name);
   return (
     centrosSaludData.find(
-      (h: any) => normalizeStr(h.name) === normalized
+      (h: any) => normalizeStr(h.nombre) === normalized
     ) ?? null
   );
 };
@@ -106,7 +106,7 @@ export const seedPublicClinics = async () => {
   const clinicsRef = collection(db, 'clinics');
 
   for (const clinicData of centrosSaludData) {
-    const name = clinicData.name || 'Unnamed';
+    const name = clinicData.nombre || 'Unnamed';
     const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
     const docRef = doc(clinicsRef, id);
     batch.set(docRef, clinicData, { merge: true });

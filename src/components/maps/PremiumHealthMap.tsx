@@ -95,25 +95,25 @@ export default function PremiumHealthMap() {
   useEffect(() => {
     const allClinics: Clinic[] = centrosSaludData.map((c: any, i: number) => {
         let mappedType = 'clinic';
-        const rawType = (c.type || '').toLowerCase();
-        if (rawType.includes('hospital')) mappedType = 'hospital';
-        else if (rawType.includes('farmacia')) mappedType = 'pharmacy';
-        else if (rawType.includes('laboratorio')) mappedType = 'laboratory';
+        const rawName = (c.nombre || '').toLowerCase();
+        if (rawName.includes('hospital')) mappedType = 'hospital';
+        else if (rawName.includes('farmacia')) mappedType = 'pharmacy';
+        else if (rawName.includes('laboratorio')) mappedType = 'laboratory';
 
         return {
           id: `priv-${i}`,
-          name: c.name,
+          name: c.nombre,
           type: mappedType as 'hospital' | 'clinic' | 'pharmacy' | 'laboratory',
           sector: 'private',
-          location: { lat: c.location.lat, lng: c.location.lng },
-          address: c.address,
-          phone: c.phone || '',
-          open24h: rawType.includes('hospital'),
+          location: { lat: c.latitud, lng: c.longitud },
+          address: `${c.ciudad}, ${c.departamento}`,
+          phone: '',
+          open24h: rawName.includes('hospital'),
           isOpen: true,
           rating: 4.5,
           reviews: 0,
-          description: c.sector || '',
-          services: c.services || [],
+          description: 'Centro Privado',
+          services: ['Consulta General'],
         } as Clinic;
     });
     
